@@ -50,6 +50,10 @@ void SynTexMain::SETUP(String Type, String Version, int Interval)
 
     saveFileSystem();
   }
+
+  this -> Version = Version;
+  this -> Type = Type;
+  this -> Interval = Interval;
   
   if(WiFiName != "")
   {
@@ -95,10 +99,10 @@ void SynTexMain::SETUP(String Type, String Version, int Interval)
   server.on("/settings", HTTP_POST, [this]{ saveWiFiSettings(); });
   server.on("/", [this]{ server.sendHeader("Access-Control-Allow-Origin", "*"); server.send(200, "text/plain", ""); });
   server.on("/reset", [this]{ resetDevice(); });
-  server.on("/restart", [this]{ server.sendHeader("Access-Control-Allow-Origin", "*"); server.send(200, "text/plain", ""); ESP.restart(); });
+  server.on("/restart", [this]{ server.sendHeader("Access-Control-Allow-Origin", "*"); server.send(200, "text/plain", ""); delay(2000); ESP.restart(); });
   server.on("/version", [this]{ server.sendHeader("Access-Control-Allow-Origin", "*"); server.send(200, "text/plain", this -> Version); });
   server.on("/update", [this]{ updateDevice(); });
-  server.on("/loadcfg", [this]{ loadDatabaseSettings(); });
+  server.on("/refresh", [this]{ loadDatabaseSettings(); });
   server.begin();
 }
 
