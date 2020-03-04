@@ -1,23 +1,12 @@
-#include <DHT.h>
-#define DHTTYPE DHT11
-#define DHTPIN  2
-
-DHT dht(DHTPIN, DHTTYPE);
-
 #include "main.h"
+#include <DHT.h>
 
 SynTexMain m;
-
-void test()
-{
-  Serial.println("Hallo Welt!");
-}
+DHT dht(2, DHT11);
 
 void setup()
 {
   m.SETUP("temperature", "3.0.0", 10000);
-
-  m.server.on("/test", test);
 
   dht.begin();
 }
@@ -39,8 +28,6 @@ unsigned long previousMillis = -10000000;
 void getTemperature()
 {
   unsigned long currentMillis = millis();
-
-  //Serial.println(String(currentMillis) + "-" + String(previousMillis) + ">=" + String(m.Interval));
  
   if(currentMillis - previousMillis >= m.Interval)
   {
