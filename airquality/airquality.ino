@@ -1,39 +1,32 @@
-#include <ESP8266WiFi.h>
-#include <ESP8266HTTPClient.h>
+#include "main.h"
 
-HTTPClient sender;
+SynTexMain m;
 
 void setup()
 {
-  Serial.begin(115200);
-  Serial.println("ESP Gestartet");
-  WiFi.begin("WLAN-C6F2BC V4", "9182113706784115");
-  Serial.print("Verbindung wird hergestellt ..");
-  
-  while(WiFi.status() != WL_CONNECTED)
-  {
-    delay(500);
-    Serial.print(".");
-  }
-  Serial.println();
+  m.SETUP("airquality", "3.0.0", 10000);
 
-  Serial.print("Verbunden! IP-Adresse: ");
-  Serial.println(WiFi.localIP());
+  //m.sender.begin("http://syntex.local:1710/devices?mac=" + WiFi.macAddress() + "&type=" + m.Type + "&value=false");
 }
 
-void loop() {
-  getAirQuality();
+void loop()
+{
+  m.LOOP();
+
+  if(m.checkConnection())
+  {
+    getAirQuality();
+  }
 }
 
 float quality;
 unsigned long previousMillis = -500;
-long interval = 500;
 
 void getAirQuality()
 {
   unsigned long currentMillis = millis();
  
-  if(currentMillis - previousMillis >= interval)
+  if(currentMillis - previousMillis >= m.Interval)
   {
     previousMillis = currentMillis;   
  
@@ -58,9 +51,9 @@ void getAirQuality()
     if(qualitytmp != quality)
     {
       quality = qualitytmp;
-      sender.begin("http://192.168.188.121:51828/?accessoryId=sensor7&value=" + String(quality));
-      sender.GET();
-      sender.end();
+      //sender.begin("http://192.168.188.121:51828/?accessoryId=sensor7&value=" + String(quality));
+      //sender.GET();
+      //sender.end();
     }
 
     Serial.println("Luftqualität: " + String(quality));
