@@ -4,9 +4,9 @@ SynTexMain m;
 
 void setup()
 {
-  m.SETUP("motion", "3.0.0", 5000);
+  m.SETUP("motion", "3.1.1", 5000);
 
-  m.sender.begin("http://syntex.local:1710/devices?mac=" + WiFi.macAddress() + "&type=" + m.Type + "&value=false");
+  m.sender.begin("http://syntex.local:1710/devices?mac=" + WiFi.macAddress() + "&value=false");
   m.sender.GET();
   m.sender.end();
 }
@@ -41,7 +41,7 @@ void getMotion()
 
     if(motion)
     {
-      m.sender.begin("http://syntex.local:1710/devices?mac=" + WiFi.macAddress() + "&type=" + m.Type + "&value=true");
+      m.sender.begin("http://syntex.local:1710/devices?mac=" + WiFi.macAddress() + "&value=true");
 
       if(m.LED)
       {
@@ -52,7 +52,7 @@ void getMotion()
     }
     else
     {
-      m.sender.begin("http://syntex.local:1710/devices?mac=" + WiFi.macAddress() + "&type=" + m.Type + "&value=false");
+      m.sender.begin("http://syntex.local:1710/devices?mac=" + WiFi.macAddress() + "&value=false");
 
       if(m.LED)
       {

@@ -7,9 +7,9 @@ boolean lock;
 
 void setup()
 {
-  m.SETUP("switch", "3.1.0", 0);
+  m.SETUP("switch", "3.1.1", 0);
 
-  m.sender.begin("http://syntex.local:1710/devices?mac=" + WiFi.macAddress() + "&type=" + m.Type + "&value=false");
+  m.sender.begin("http://syntex.local:1710/devices?mac=" + WiFi.macAddress() + "&value=false");
   m.sender.GET();
   m.sender.end();
 
@@ -40,7 +40,7 @@ void setup()
 
     if(button)
     {
-      m.sender.begin("http://syntex.local:1710/devices?mac=" + WiFi.macAddress() + "&type=" + m.Type + "&value=true");
+      m.sender.begin("http://syntex.local:1710/devices?mac=" + WiFi.macAddress() + "&value=true");
 
       if(m.LED)
       {
@@ -51,7 +51,7 @@ void setup()
     }
     else
     {
-      m.sender.begin("http://syntex.local:1710/devices?mac=" + WiFi.macAddress() + "&type=" + m.Type + "&value=false");
+      m.sender.begin("http://syntex.local:1710/devices?mac=" + WiFi.macAddress() + "&value=false");
 
       if(m.LED)
       {
@@ -98,7 +98,7 @@ void getSwitch()
   {
     if(button)
     {
-      m.sender.begin("http://syntex.local:1710/devices?mac=" + WiFi.macAddress() + "&type=" + m.Type + "&value=true");
+      m.sender.begin("http://syntex.local:1710/devices?mac=" + WiFi.macAddress() + "&value=true");
 
       if(m.LED)
       {
@@ -109,7 +109,7 @@ void getSwitch()
     }
     else
     {
-      m.sender.begin("http://syntex.local:1710/devices?mac=" + WiFi.macAddress() + "&type=" + m.Type + "&value=false");
+      m.sender.begin("http://syntex.local:1710/devices?mac=" + WiFi.macAddress() + "&value=false");
 
       if(m.LED)
       {
