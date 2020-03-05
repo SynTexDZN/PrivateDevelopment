@@ -60,7 +60,7 @@ void getTemperature()
         interval = 5000;
       }
       */
-      if(temptmp != temp)
+      if(temptmp - temp >= 0.5 || temptmp - temp <= -0.5)
       {
         temp = temptmp;
         m.sender.begin("http://syntex.local:1710/devices?mac=" + WiFi.macAddress() + "&type=" + m.Type + "&value=" + String(temp));

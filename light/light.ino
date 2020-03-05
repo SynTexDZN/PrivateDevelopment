@@ -90,7 +90,7 @@ void getLight()
       m.sender.GET();
       m.sender.end();
 
-      if(light < 100 && !sunsetScene)
+      if(light < 100 && !sunsetScene && m.SceneControl)
       {
         m.sender.begin("http://syntex.local:1710/devices?mac=" + WiFi.macAddress() + "&event=0");
         m.sender.GET();
@@ -101,7 +101,7 @@ void getLight()
         Serial.println("( LEDs ) Scene wird aktiviert!");
       }
 
-      if(light <= 1 && !nightScene)
+      if(light <= 1 && !nightScene && m.SceneControl)
       {
         m.sender.begin("http://syntex.local:1710/devices?mac=" + WiFi.macAddress() + "&event=1");
         m.sender.GET();
@@ -112,7 +112,7 @@ void getLight()
         Serial.println("( Rolladen ) Scene wird aktiviert!");
       }
 
-      if(light > 400 && (sunsetScene || nightScene))
+      if(light > 400 && (sunsetScene || nightScene) && m.SceneControl)
       {
         sunsetScene = false;
         nightScene = false;
