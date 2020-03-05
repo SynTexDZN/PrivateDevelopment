@@ -42,10 +42,20 @@ void setup()
     if(digitalRead(5))
     {
       Serial.println("Relais: An");
+
+      if(m.LED)
+      {
+        digitalWrite(LED_BUILTIN, LOW);
+      }
     }
     else
     {
       Serial.println("Relais: Aus");
+
+      if(m.LED)
+      {
+        digitalWrite(LED_BUILTIN, HIGH);
+      }
     }
 
     m.server.sendHeader("Access-Control-Allow-Origin", "*");

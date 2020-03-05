@@ -2,6 +2,9 @@
 
 SynTexMain m;
 
+boolean button;
+boolean lock;
+
 void setup()
 {
   m.SETUP("switch", "3.0.0", 0);
@@ -10,19 +13,17 @@ void setup()
   m.sender.GET();
   m.sender.end();
 
-  pinMode(5, OUTPUT);
-
   m.server.on("/switch", []
   {
     if(m.server.hasArg("value"))
     {
       if(m.server.arg("value") == "true")
       {
-        digitalWrite(5, HIGH);
+        button = true;
       }
       else if(m.server.arg("value") == "false")
       {
-        digitalWrite(5, LOW);
+        button = false;
       }
     }
     else
@@ -31,21 +32,31 @@ void setup()
       
       if(state)
       {
-        digitalWrite(5, LOW);
+        button = false;
       }
       else
       {
-        digitalWrite(5, HIGH);
+        button = true;
       }
     }
 
-    if(digitalRead(5))
+    if(button)
     {
-      Serial.println("Relais: An");
+      Serial.println("Schalter: An");
+
+      if(m.LED)
+      {
+        digitalWrite(LED_BUILTIN, LOW);
+      }
     }
     else
     {
-      Serial.println("Relais: Aus");
+      Serial.println("Schalter: Aus");
+
+      if(m.LED)
+      {
+        digitalWrite(LED_BUILTIN, HIGH);
+      }
     }
 
     m.server.sendHeader("Access-Control-Allow-Origin", "*");
@@ -62,9 +73,6 @@ void loop()
     getSwitch();
   }
 }
-
-boolean button;
-boolean lock;
 
 void getSwitch()
 {
@@ -86,11 +94,23 @@ void getSwitch()
     if(button)
     {
       m.sender.begin("http://syntex.local:1710/devices?mac=" + WiFi.macAddress() + "&type=" + m.Type + "&value=true");
+
+      if(m.LED)
+      {
+        digitalWrite(LED_BUILTIN, LOW);
+      }
+      
       Serial.println("Schalter: An");
     }
     else
     {
       m.sender.begin("http://syntex.local:1710/devices?mac=" + WiFi.macAddress() + "&type=" + m.Type + "&value=false");
+
+      if(m.LED)
+      {
+        digitalWrite(LED_BUILTIN, HIGH);
+      }
+      
       Serial.println("Schalter: Aus");
     }
     

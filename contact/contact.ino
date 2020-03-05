@@ -34,11 +34,23 @@ void getContact()
     if(contact)
     {
       m.sender.begin("http://syntex.local:1710/devices?mac=" + WiFi.macAddress() + "&type=" + m.Type + "&value=false");
+
+      if(m.LED)
+      {
+        digitalWrite(LED_BUILTIN, LOW);
+      }
+      
       Serial.println("Kontakt: Nein");
     }
     else
     {
       m.sender.begin("http://syntex.local:1710/devices?mac=" + WiFi.macAddress() + "&type=" + m.Type + "&value=true");
+
+      if(m.LED)
+      {
+        digitalWrite(LED_BUILTIN, HIGH);
+      }
+      
       Serial.println("Kontakt: Ja");
     }
     

@@ -7,8 +7,15 @@
 
 class SynTexMain
 {
+  private:
+    String WiFiName;
+    String WiFiPass;
+    String Version;
+    String Name;
+    
   public:
     SynTexMain();
+    
     void SETUP(String Type, String Version, int Interval);
     void LOOP();
     boolean loadFileSystem();
@@ -20,16 +27,11 @@ class SynTexMain
     void scanWiFi();
     void updateDevice();
     boolean loadDatabaseSettings();
+    
     ESP8266WebServer server;
     HTTPClient sender;
-    int Interval;
     String Type;
-
-  private:
-    String WiFiName;
-    String WiFiPass;
-    String Version;
-    String Name;
+    int Interval;
     boolean LED;
     boolean SceneControl;
 };

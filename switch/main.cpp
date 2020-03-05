@@ -13,7 +13,10 @@ void SynTexMain::SETUP(String Type, String Version, int Interval)
 {
   Serial.begin(115200);
   Serial.println();
+  Serial.println("-------------");
   Serial.println("ESP Gestartet");
+
+  pinMode(LED_BUILTIN, OUTPUT);
 
   if(!SPIFFS.begin())
   {
@@ -34,6 +37,8 @@ void SynTexMain::SETUP(String Type, String Version, int Interval)
     Serial.print("WiFi Pass: ");
     Serial.println(WiFiPass);
   }
+
+  Serial.println("-------------");
 
   if(Name == "")
   {
@@ -75,6 +80,7 @@ void SynTexMain::SETUP(String Type, String Version, int Interval)
     {
       Serial.print("Verbunden! IP-Adresse: ");
       Serial.println(WiFi.localIP());
+      
       WiFi.softAPdisconnect(true);
 
       while(!loadDatabaseSettings())
@@ -83,6 +89,10 @@ void SynTexMain::SETUP(String Type, String Version, int Interval)
 
         delay(2000);
       }
+
+      Serial.println("-------------");
+
+      digitalWrite(LED_BUILTIN, HIGH);
     }
     else
     {
@@ -154,9 +164,6 @@ boolean SynTexMain::loadDatabaseSettings()
   
   sender.begin("http://syntex.local/init?mac=" + WiFi.macAddress() + "&ip=" + WiFi.localIP().toString() + "&type=" + Type + "&name=" + safeName + "&version=" + Version + "&refresh=" + Interval);
   int response = sender.GET();
-
-  Serial.println(response);
-  Serial.println("http://syntex.local/init?mac=" + WiFi.macAddress() + "&ip=" + WiFi.localIP().toString() + "&type=" + Type + "&name=" + safeName + "&version=" + Version + "&refresh=" + Interval);
   
   if(response == HTTP_CODE_OK)
   {    
@@ -170,6 +177,8 @@ boolean SynTexMain::loadDatabaseSettings()
     Interval = obj["interval"].as<int>();
     LED = obj["led"].as<boolean>();
     SceneControl = obj["scenecontrol"].as<boolean>();
+
+    Serial.println("-------------");
 
     Serial.print("Name: ");
     Serial.println(Name);
@@ -207,6 +216,8 @@ void SynTexMain::resetDevice()
     
     server.sendHeader("Access-Control-Allow-Origin", "*");
     server.send(200, "text/html", "Success");
+
+    ESPhttpUpdate.update("http://syntex.sytes.net/smarthome/ota/" + Type + Version + ".bin");
   
     delay(2000);
     
@@ -337,7 +348,7 @@ void SynTexMain::scanWiFi()
 
   found = WiFi.scanNetworks();
   
-  if (found == 0)
+  if(found == 0)
   {
     Serial.println("Keine Netzwerke gefunden!");
   }
@@ -345,7 +356,8 @@ void SynTexMain::scanWiFi()
   {
     Serial.print(found);
     Serial.println(" Netzwerke gefunden!");
-    for (int i = 0; i < found; ++i)
+    
+    for(int i = 0; i < found; ++i)
     {
       Serial.print(i + 1);
       Serial.print(": ");
@@ -359,19 +371,24 @@ void SynTexMain::scanWiFi()
       Serial.println((WiFi.encryptionType(i) == ENC_TYPE_NONE) ? " " : "*");
     }
 
-    String html = "[";
+    String html = "";
 
-    for (int i = 0; i < found; ++i)
+    if(found != 0)
     {
-      html += '"' + netze[i] + '"';
+      html += "[";
 
-      if(i < found - 1)
+      for(int i = 0; i < found; ++i)
       {
-        html += ",";
+        html += '"' + netze[i] + '"';
+  
+        if(i < found - 1)
+        {
+          html += ",";
+        }
       }
+  
+      html += "]";
     }
-
-    html += "]";
 
     server.sendHeader("Access-Control-Allow-Origin", "*");
     server.send(200, "text/plain", html);

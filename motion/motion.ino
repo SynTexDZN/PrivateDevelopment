@@ -42,11 +42,23 @@ void getMotion()
     if(motion)
     {
       m.sender.begin("http://syntex.local:1710/devices?mac=" + WiFi.macAddress() + "&type=" + m.Type + "&value=true");
+
+      if(m.LED)
+      {
+        digitalWrite(LED_BUILTIN, LOW);
+      }
+      
       Serial.println("Bewegung: Ja");
     }
     else
     {
       m.sender.begin("http://syntex.local:1710/devices?mac=" + WiFi.macAddress() + "&type=" + m.Type + "&value=false");
+
+      if(m.LED)
+      {
+        digitalWrite(LED_BUILTIN, HIGH);
+      }
+      
       Serial.println("Bewegung: Nein");
     }
     
