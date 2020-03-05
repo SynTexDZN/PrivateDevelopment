@@ -1,4 +1,4 @@
-# Smart Home Projekt
+# Smart Home Project
 Arduino Code for SynTex devices and more stuff
 
 # Currently Supported
