@@ -15,6 +15,9 @@ void SynTexMain::SETUP(String Type, String Version, int Interval)
   Serial.println();
   Serial.println("-------------");
   Serial.println("ESP Gestartet");
+  Serial.print("Version: ");
+  Serial.println(Version);
+  Serial.println("-------------");
 
   pinMode(LED_BUILTIN, OUTPUT);
 
@@ -130,12 +133,17 @@ void SynTexMain::updateDevice()
   ESPhttpUpdate.onError(update_error);
   */
 
-  sender.begin("syntex.sytes.net/smarthome/ota/check-version.php?device=" + Type);
+  sender.begin("http://syntex.sytes.net/smarthome/check-version.php?device=" + Type);
   int response = sender.GET();
   
   if(response == HTTP_CODE_OK)
   {    
     String newVersion = sender.getString();
+
+    server.sendHeader("Access-Control-Allow-Origin", "*");
+    server.send(200, "text/html", "Success");
+
+    Serial.println("http://syntex.sytes.net/smarthome/ota/" + Type + newVersion + ".bin");
 
     t_httpUpdate_return ret = ESPhttpUpdate.update("http://syntex.sytes.net/smarthome/ota/" + Type + newVersion + ".bin");
 
@@ -153,6 +161,11 @@ void SynTexMain::updateDevice()
         Serial.println("HTTP_UPDATE_OK");
         break;
     }
+  }
+  else
+  {
+    server.sendHeader("Access-Control-Allow-Origin", "*");
+    server.send(200, "text/html", "Error");
   }
 }
 
@@ -175,8 +188,8 @@ boolean SynTexMain::loadDatabaseSettings()
 
     Name = obj["name"].as<String>();
     Interval = obj["interval"].as<int>();
-    LED = obj["led"].as<boolean>();
-    SceneControl = obj["scenecontrol"].as<boolean>();
+    LED = obj["led"].as<int>();
+    SceneControl = obj["scenecontrol"].as<int>();
 
     Serial.println("-------------");
 
@@ -190,11 +203,17 @@ boolean SynTexMain::loadDatabaseSettings()
     Serial.println(SceneControl);
 
     saveFileSystem();
+
+    server.sendHeader("Access-Control-Allow-Origin", "*");
+    server.send(200, "text/html", "Success");
     
     return true;
   }
   else
   {
+    server.sendHeader("Access-Control-Allow-Origin", "*");
+    server.send(200, "text/html", "Error");
+    
     return false;
   }
   
