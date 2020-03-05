@@ -59,12 +59,12 @@ void loop()
 
   if(m.checkConnection())
   {
-    getSwitch();
+    //getSwitch();
   }
 }
 
 boolean button;
-
+/*
 void getSwitch()
 {
   boolean contacttmp = digitalRead(14);
@@ -88,3 +88,4 @@ void getSwitch()
     m.sender.end();
   }
 }
+*/

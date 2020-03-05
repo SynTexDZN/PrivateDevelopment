@@ -4,7 +4,7 @@ SynTexMain m;
 
 void setup()
 {
-  m.SETUP("switch", "3.0.0", 0);
+  m.SETUP("relais", "3.0.0", 0);
 
   m.sender.begin("http://syntex.local:1710/devices?mac=" + WiFi.macAddress() + "&type=" + m.Type + "&value=false");
   m.sender.GET();

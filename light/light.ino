@@ -1,10 +1,16 @@
 #include "main.h"
+#include <Wire.h>
+#include <BH1750.h>
 
 SynTexMain m;
+BH1750 lightMeter;
 
 void setup()
 {
   m.SETUP("light", "3.0.0", 10000);
+
+  Wire.begin();
+  lightMeter.begin(BH1750::CONTINUOUS_HIGH_RES_MODE_2);
 }
 
 void loop()
@@ -14,136 +20,133 @@ void loop()
   if(m.checkConnection())
   {
     getLight();
-    //getRain();
+    getRain();
   }
 }
 /*
-unsigned long previousUpdateMillis = -120000;
-long updateInterval = 120000;
 
 void checkUpdates()
 {
-  unsigned long currentMillis = millis();
- 
-  if(currentMillis - previousUpdateMillis >= updateInterval)
-  {
-    previousUpdateMillis = currentMillis;   
-
-    Serial.println("Prüfe auf Updates ..");
+  Serial.println("Prüfe auf Updates ..");
+  
+  sender.begin("http://syntex.local/ota/check-version.php?device=" + SensorType);
+  int response = sender.GET();
+  
+  if(response == HTTP_CODE_OK)
+  {    
+    if(sender.getString() != Version)
+    {
+      Serial.println("Update gefunden! Installation ..");
+      
+      WiFiClient client;
+      t_httpUpdate_return ret = ESPhttpUpdate.update(client, "http://syntex.local/ota/" + SensorType + sender.getString() + ".bin");
     
-    sender.begin("http://syntex.local/ota/check-version.php?device=" + SensorType);
-    int response = sender.GET();
+      switch (ret) {
+        case HTTP_UPDATE_FAILED:
+          Serial.printf("HTTP_UPDATE_FAILD Error (%d): %s\n", ESPhttpUpdate.getLastError(), ESPhttpUpdate.getLastErrorString().c_str());
+          break;
     
-    if(response == HTTP_CODE_OK)
-    {    
-      if(sender.getString() != Version)
-      {
-        Serial.println("Update gefunden! Installation ..");
-        
-        WiFiClient client;
-        t_httpUpdate_return ret = ESPhttpUpdate.update(client, "http://syntex.local/ota/" + SensorType + sender.getString() + ".bin");
-      
-        switch (ret) {
-          case HTTP_UPDATE_FAILED:
-            Serial.printf("HTTP_UPDATE_FAILD Error (%d): %s\n", ESPhttpUpdate.getLastError(), ESPhttpUpdate.getLastErrorString().c_str());
-            break;
-      
-          case HTTP_UPDATE_NO_UPDATES:
-            Serial.println("HTTP_UPDATE_NO_UPDATES");
-            break;
-      
-          case HTTP_UPDATE_OK:
-            Serial.println("HTTP_UPDATE_OK");
-            break;
-        }
-      }
-      else
-      {
-        Serial.println("Das Gerät hat bereits die neuste Firmware!");
+        case HTTP_UPDATE_NO_UPDATES:
+          Serial.println("HTTP_UPDATE_NO_UPDATES");
+          break;
+    
+        case HTTP_UPDATE_OK:
+          Serial.println("HTTP_UPDATE_OK");
+          break;
       }
     }
     else
     {
-      Serial.println("Update Server ist nicht erreichbar!");
+      Serial.println("Das Gerät hat bereits die neuste Firmware!");
     }
-  
-    sender.end();
   }
+  else
+  {
+    Serial.println("Update Server ist nicht erreichbar!");
+  }
+
+  sender.end();
 }
 */
 float light;
-unsigned long previousMillisL = -30000;
-long intervalL = 30000;
+boolean sunsetScene;
+boolean nightScene;
+unsigned long previousMillis = -10000000;
 
 void getLight()
 {
   unsigned long currentMillis = millis();
  
-  if(currentMillis - previousMillisL >= intervalL)
+  if(currentMillis - previousMillis >= m.Interval)
   {
-    previousMillisL = currentMillis;   
+    previousMillis = currentMillis;   
  
-    float lighttmp = 1024 - analogRead(A0);
+    float lighttmp = lightMeter.readLightLevel();
     
     if(lighttmp != light)
     {
       light = lighttmp;
-      sender.begin("http://192.168.188.121:51828/?accessoryId=sensor" + ((String)SensorID) + "&value=" + String(light));
-      sender.GET();
-      sender.end();
+      m.sender.begin("http://syntex.local:1710/devices?mac=" + WiFi.macAddress() + "&type=" + m.Type + "&value=" + String(light));
+      m.sender.GET();
+      m.sender.end();
 
-      /*
-      if(light > 150 && light < 150)
+      if(light < 100 && !sunsetScene)
       {
-        sender.begin("http://192.168.188.121:51828/?accessoryId=statelessswitch1&buttonName=led-an&event=0");
-        sender.GET();
-        sender.end();
+        m.sender.begin("http://syntex.local:1710/devices?mac=" + WiFi.macAddress() + "&event=0");
+        m.sender.GET();
+        m.sender.end();
+
+        sunsetScene = true;
 
         Serial.println("( LEDs ) Scene wird aktiviert!");
       }
 
-      if(light == 0)
+      if(light <= 1 && !nightScene)
       {
-        sender.begin("http://192.168.188.121:51828/?accessoryId=statelessswitch1&buttonName=rolladen-runter&event=0");
-        sender.GET();
-        sender.end();
+        m.sender.begin("http://syntex.local:1710/devices?mac=" + WiFi.macAddress() + "&event=1");
+        m.sender.GET();
+        m.sender.end();
+
+        nightScene = true;
 
         Serial.println("( Rolladen ) Scene wird aktiviert!");
       }
-      */
+
+      if(light > 400 && (sunsetScene || nightScene))
+      {
+        sunsetScene = false;
+        nightScene = false;
+
+        Serial.println("Scenen wurden zurückgesetzt!");
+      }
     }
     
     Serial.println("Licht: " + String(light) + " lux");
   }
 }
 
-String rain;
-unsigned long previousMillisR = -30000;
-long intervalR = 30000;
+boolean rain;
 
 void getRain()
 {
-  unsigned long currentMillis = millis();
- 
-  if(currentMillis - previousMillisR >= intervalR)
+  boolean raintmp = digitalRead(2);
+    
+  if(raintmp != rain)
   {
-    previousMillisR = currentMillis;   
+    rain = raintmp;
 
-    String raintmp = "false";
+    if(rain)
+    {
+      m.sender.begin("http://syntex.local:1710/devices?mac=" + WiFi.macAddress() + "&type=rain&value=false");
+      Serial.println("Regen: Nein");
+    }
+    else
+    {
+      m.sender.begin("http://syntex.local:1710/devices?mac=" + WiFi.macAddress() + "&type=rain&value=true");
+      Serial.println("Regen: Ja");
+    }
 
-    if(digitalRead(D1) == 0)
-    {
-      raintmp = "true";
-    }
-    
-    if(raintmp != rain)
-    {
-      rain = raintmp;
-      sender.begin("http://192.168.188.121:51828/?accessoryId=sensor" + ((String)SensorID) + "&state=" + rain);
-      sender.GET();
-      sender.end();
-    }
-    
-    Serial.println("Regen: " + rain);
+    m.sender.GET();
+    m.sender.end();
   }
 }
