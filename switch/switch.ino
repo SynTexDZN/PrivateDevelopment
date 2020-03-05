@@ -59,33 +59,47 @@ void loop()
 
   if(m.checkConnection())
   {
-    //getSwitch();
+    getSwitch();
   }
 }
 
 boolean button;
-/*
+boolean lock;
+
 void getSwitch()
 {
-  boolean contacttmp = digitalRead(14);
+  boolean buttontmp = digitalRead(5);
 
-  if(contacttmp != contact)
+  if(buttontmp && !button && !lock)
   {
-    contact = contacttmp;
+    button = true;
+    lock = true;
+  }
+  else if(buttontmp && button && !lock)
+  {
+    button = false;
+    lock = true;
+  }
 
-    if(contact)
+  if(!buttontmp && lock)
+  {
+    if(button)
     {
-      m.sender.begin("http://syntex.local:1710/devices?mac=" + WiFi.macAddress() + "&type=" + m.Type + "&value=false");
-      Serial.println("Kontakt: Nein");
+      m.sender.begin("http://syntex.local:1710/devices?mac=" + WiFi.macAddress() + "&type=" + m.Type + "&value=true");
+      Serial.println("Schalter: An");
     }
     else
     {
-      m.sender.begin("http://syntex.local:1710/devices?mac=" + WiFi.macAddress() + "&type=" + m.Type + "&value=true");
-      Serial.println("Kontakt: Ja");
+      m.sender.begin("http://syntex.local:1710/devices?mac=" + WiFi.macAddress() + "&type=" + m.Type + "&value=false");
+      Serial.println("Schalter: Aus");
     }
     
     m.sender.GET();
     m.sender.end();
   }
+
+  if(!buttontmp)
+  {
+    lock = false;
+  }
 }
-*/

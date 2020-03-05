@@ -148,8 +148,15 @@ void SynTexMain::updateDevice()
 
 boolean SynTexMain::loadDatabaseSettings()
 {
-  sender.begin("http://syntex.local/init?mac=" + WiFi.macAddress() + "&ip=" + WiFi.localIP().toString() + "&type=" + Type + "&name=" + Name + "&version=" + Version + "&refresh=" + Interval);
+  String safeName = Name;
+
+  safeName.replace(" ", "");
+  
+  sender.begin("http://syntex.local/init?mac=" + WiFi.macAddress() + "&ip=" + WiFi.localIP().toString() + "&type=" + Type + "&name=" + safeName + "&version=" + Version + "&refresh=" + Interval);
   int response = sender.GET();
+
+  Serial.println(response);
+  Serial.println("http://syntex.local/init?mac=" + WiFi.macAddress() + "&ip=" + WiFi.localIP().toString() + "&type=" + Type + "&name=" + safeName + "&version=" + Version + "&refresh=" + Interval);
   
   if(response == HTTP_CODE_OK)
   {    

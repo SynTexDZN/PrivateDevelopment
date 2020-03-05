@@ -8,6 +8,14 @@ void setup()
 {
   m.SETUP("temperature", "3.0.0", 10000);
 
+  m.sender.begin("http://syntex.local:1710/devices?mac=" + WiFi.macAddress() + "&type=" + m.Type + "&value=0");
+  m.sender.GET();
+  m.sender.end();
+  
+  m.sender.begin("http://syntex.local:1710/devices?mac=" + WiFi.macAddress() + "&type=humidity&value=0");
+  m.sender.GET();
+  m.sender.end();
+
   dht.begin();
 }
 

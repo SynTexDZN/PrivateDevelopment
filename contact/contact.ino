@@ -6,7 +6,7 @@ void setup()
 {
   m.SETUP("contact", "3.0.0", 0);
 
-  m.sender.begin("http://syntex.local:1710/devices?mac=" + WiFi.macAddress() + "&type=" + m.Type + "&value=false");
+  m.sender.begin("http://syntex.local:1710/devices?mac=" + WiFi.macAddress() + "&type=" + m.Type + "&value=true");
   m.sender.GET();
   m.sender.end();
 }

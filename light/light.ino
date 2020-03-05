@@ -9,6 +9,14 @@ void setup()
 {
   m.SETUP("light", "3.0.0", 10000);
 
+  m.sender.begin("http://syntex.local:1710/devices?mac=" + WiFi.macAddress() + "&type=" + m.Type + "&value=0");
+  m.sender.GET();
+  m.sender.end();
+  
+  m.sender.begin("http://syntex.local:1710/devices?mac=" + WiFi.macAddress() + "&type=rain&value=false");
+  m.sender.GET();
+  m.sender.end();
+
   Wire.begin();
   lightMeter.begin(BH1750::CONTINUOUS_HIGH_RES_MODE_2);
 }
