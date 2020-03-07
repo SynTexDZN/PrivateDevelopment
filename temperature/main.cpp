@@ -177,6 +177,9 @@ boolean SynTexMain::loadDatabaseSettings()
   
   sender.begin("http://syntex.local/init?mac=" + WiFi.macAddress() + "&ip=" + WiFi.localIP().toString() + "&type=" + Type + "&name=" + safeName + "&version=" + Version + "&refresh=" + Interval);
   int response = sender.GET();
+
+  Serial.println("http://syntex.local/init?mac=" + WiFi.macAddress() + "&ip=" + WiFi.localIP().toString() + "&type=" + Type + "&name=" + safeName + "&version=" + Version + "&refresh=" + Interval);
+  Serial.println(response);
   
   if(response == HTTP_CODE_OK)
   {    

@@ -6,7 +6,7 @@ DHT dht(2, DHT11);
 
 void setup()
 {
-  m.SETUP("temperature", "3.1.0", 10000);
+  m.SETUP("temperature", "3.1.1", 10000);
 
   m.sender.begin("http://syntex.local:1710/devices?mac=" + WiFi.macAddress() + "&type=" + m.Type + "&value=0");
   m.sender.GET();
@@ -68,7 +68,7 @@ void getTemperature()
         interval = 5000;
       }
       */
-      if(temptmp - temp >= 0.5 || temptmp - temp <= -0.5)
+      if(temp - temptmp >= 0.5 || temp - temptmp <= -0.5)
       {
         temp = temptmp;
         m.sender.begin("http://syntex.local:1710/devices?mac=" + WiFi.macAddress() + "&type=" + m.Type + "&value=" + String(temp));
