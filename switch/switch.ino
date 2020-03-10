@@ -17,25 +17,11 @@ void setup()
   {
     if(m.server.hasArg("value"))
     {
-      if(m.server.arg("value") == "true")
-      {
-        button = true;
-      }
-      else if(m.server.arg("value") == "false")
-      {
-        button = false;
-      }
+      button = (m.server.arg("value") == "true") ? true : false;
     }
     else
     {
-      if(button)
-      {
-        button = false;
-      }
-      else
-      {
-        button = true;
-      }
+      button ? button = false : button = true;
     }
 
     if(button)

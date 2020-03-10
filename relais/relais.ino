@@ -16,27 +16,11 @@ void setup()
   {
     if(m.server.hasArg("value"))
     {
-      if(m.server.arg("value") == "true")
-      {
-        digitalWrite(5, HIGH);
-      }
-      else if(m.server.arg("value") == "false")
-      {
-        digitalWrite(5, LOW);
-      }
+      (m.server.arg("value") == "true") ? digitalWrite(5, HIGH) : digitalWrite(5, LOW);
     }
     else
     {
-      boolean state = digitalRead(5);
-      
-      if(state)
-      {
-        digitalWrite(5, LOW);
-      }
-      else
-      {
-        digitalWrite(5, HIGH);
-      }
+      digitalRead(5) ? digitalWrite(5, LOW) : digitalWrite(5, HIGH);
     }
 
     if(digitalRead(5))
