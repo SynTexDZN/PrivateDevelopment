@@ -4,11 +4,10 @@ SynTexMain m;
 
 void setup()
 {
-  m.SETUP("contact", "3.1.1", 0);
-
-  m.sender.begin("http://syntex.local:1710/devices?mac=" + WiFi.macAddress() + "&value=true");
-  m.sender.GET();
-  m.sender.end();
+  if(m.SETUP("contact", "3.2.0", 0) && m.checkConnection())
+  {
+    getContact();
+  }
 }
 
 void loop()

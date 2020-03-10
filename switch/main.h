@@ -16,7 +16,7 @@ class SynTexMain
   public:
     SynTexMain();
     
-    void SETUP(String Type, String Version, int Interval);
+    boolean SETUP(String Type, String Version, int Interval);
     void LOOP();
     boolean loadFileSystem();
     boolean saveFileSystem();

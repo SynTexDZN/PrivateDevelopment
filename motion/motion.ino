@@ -4,11 +4,10 @@ SynTexMain m;
 
 void setup()
 {
-  m.SETUP("motion", "3.1.1", 5000);
-
-  m.sender.begin("http://syntex.local:1710/devices?mac=" + WiFi.macAddress() + "&value=false");
-  m.sender.GET();
-  m.sender.end();
+  if(m.SETUP("motion", "3.2.0", 5000) && m.checkConnection())
+  {
+    getMotion();
+  }
 }
 
 void loop()

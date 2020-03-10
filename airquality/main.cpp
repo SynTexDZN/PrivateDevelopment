@@ -9,7 +9,7 @@ SynTexMain::SynTexMain()
   Serial.println("New object created!");
 }
 
-void SynTexMain::SETUP(String Type, String Version, int Interval)
+boolean SynTexMain::SETUP(String Type, String Version, int Interval)
 {
   Serial.begin(115200);
   Serial.println();
@@ -24,7 +24,7 @@ void SynTexMain::SETUP(String Type, String Version, int Interval)
   if(!SPIFFS.begin())
   {
     Serial.println("Es konnte nicht auf das Dateisystem zugegriffen werden");
-    return;
+    //return;
   }
   
   if(!loadFileSystem())
@@ -117,6 +117,8 @@ void SynTexMain::SETUP(String Type, String Version, int Interval)
   server.on("/update", [this]{ updateDevice(); });
   server.on("/refresh", [this]{ loadDatabaseSettings(); });
   server.begin();
+
+  return true;
 }
 
 void SynTexMain::LOOP()

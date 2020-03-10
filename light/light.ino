@@ -7,18 +7,14 @@ BH1750 lightMeter;
 
 void setup()
 {
-  m.SETUP("light", "3.1.0", 10000);
-
-  m.sender.begin("http://syntex.local:1710/devices?mac=" + WiFi.macAddress() + "&type=" + m.Type + "&value=0");
-  m.sender.GET();
-  m.sender.end();
-  
-  m.sender.begin("http://syntex.local:1710/devices?mac=" + WiFi.macAddress() + "&type=rain&value=false");
-  m.sender.GET();
-  m.sender.end();
-
-  Wire.begin();
-  lightMeter.begin(BH1750::CONTINUOUS_HIGH_RES_MODE_2);
+  if(m.SETUP("light", "3.2.0", 10000) && m.checkConnection())
+  {
+    Wire.begin();
+    lightMeter.begin(BH1750::CONTINUOUS_HIGH_RES_MODE_2);
+    
+    getLight();
+    getRain();
+  }
 }
 
 void loop()
@@ -79,7 +75,7 @@ void checkUpdates()
 float light;
 boolean sunsetScene;
 boolean nightScene;
-unsigned long previousMillis = -10000000;
+unsigned long previousMillis = 0;
 
 void getLight()
 {

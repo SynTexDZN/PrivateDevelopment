@@ -6,17 +6,12 @@ DHT dht(2, DHT11);
 
 void setup()
 {
-  m.SETUP("temperature", "3.1.1", 10000);
-
-  m.sender.begin("http://syntex.local:1710/devices?mac=" + WiFi.macAddress() + "&type=" + m.Type + "&value=0");
-  m.sender.GET();
-  m.sender.end();
-  
-  m.sender.begin("http://syntex.local:1710/devices?mac=" + WiFi.macAddress() + "&type=humidity&value=0");
-  m.sender.GET();
-  m.sender.end();
-
-  dht.begin();
+  if(m.SETUP("temperature", "3.2.0", 10000) && m.checkConnection())
+  {
+    dht.begin();
+    
+    getTempHum();
+  }
 }
 
 void loop()
@@ -25,15 +20,15 @@ void loop()
 
   if(m.checkConnection())
   {
-    getTemperature();
+    getTempHum();
   }
 }
 
 float temp;
 float hum;
-unsigned long previousMillis = -10000000;
+unsigned long previousMillis = 0;
 
-void getTemperature()
+void getTempHum()
 {
   unsigned long currentMillis = millis();
  
@@ -50,24 +45,6 @@ void getTemperature()
     }
     else
     {
-      /*
-      if((hum - humtmp > 5 || hum - humtmp < -5) || (temp - temptmp > 0.5 || temp - temptmp < -0.5))
-      {
-        interval = 2000;
-      }
-      else if(hum - humtmp == 0 && temp - temptmp == 0)
-      {
-        interval = 30000;
-      }
-      else if(hum - humtmp < 2 && hum - humtmp > -2 && temp - temptmp < 0.2 && temp - temptmp > -0.2)
-      {
-        interval = 20000;
-      }
-      else if(hum - humtmp < 5 && hum - humtmp > -5 && temp - temptmp < 0.5 && temp - temptmp > -0.5)
-      {
-        interval = 5000;
-      }
-      */
       if(temp - temptmp >= 0.5 || temp - temptmp <= -0.5)
       {
         temp = temptmp;
