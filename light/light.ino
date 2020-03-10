@@ -5,12 +5,19 @@
 SynTexMain m;
 BH1750 lightMeter;
 
+float light;
+boolean sunsetScene;
+boolean nightScene;
+unsigned long previousMillis;
+
 void setup()
 {
   if(m.SETUP("light", "3.2.0", 10000) && m.checkConnection())
   {
     Wire.begin();
     lightMeter.begin(BH1750::CONTINUOUS_HIGH_RES_MODE_2);
+
+    previousMillis = -m.Interval;
     
     getLight();
     getRain();
@@ -72,10 +79,6 @@ void checkUpdates()
   sender.end();
 }
 */
-float light;
-boolean sunsetScene;
-boolean nightScene;
-unsigned long previousMillis = 0;
 
 void getLight()
 {

@@ -2,10 +2,15 @@
 
 SynTexMain m;
 
+boolean motion;
+unsigned long previousMillis;
+
 void setup()
 {
   if(m.SETUP("motion", "3.2.0", 5000) && m.checkConnection())
   {
+    previousMillis = -m.Interval;
+    
     getMotion();
   }
 }
@@ -19,9 +24,6 @@ void loop()
     getMotion();
   }
 }
-
-boolean motion;
-unsigned long previousMillis = 0;
 
 void getMotion()
 {

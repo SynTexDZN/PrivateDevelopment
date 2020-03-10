@@ -4,11 +4,17 @@
 SynTexMain m;
 DHT dht(2, DHT11);
 
+float temp;
+float hum;
+unsigned long previousMillis;
+
 void setup()
 {
   if(m.SETUP("temperature", "3.2.0", 10000) && m.checkConnection())
   {
     dht.begin();
+
+    previousMillis = -m.Interval;
     
     getTempHum();
   }
@@ -24,14 +30,10 @@ void loop()
   }
 }
 
-float temp;
-float hum;
-unsigned long previousMillis = 0;
-
 void getTempHum()
 {
   unsigned long currentMillis = millis();
- 
+
   if(currentMillis - previousMillis >= m.Interval)
   {
     previousMillis = currentMillis;   

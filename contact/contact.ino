@@ -2,6 +2,8 @@
 
 SynTexMain m;
 
+boolean contact;
+
 void setup()
 {
   if(m.SETUP("contact", "3.2.0", 0) && m.checkConnection())
@@ -19,8 +21,6 @@ void loop()
     getContact();
   }
 }
-
-boolean contact;
 
 void getContact()
 {

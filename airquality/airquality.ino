@@ -2,11 +2,17 @@
 
 SynTexMain m;
 
+float quality;
+unsigned long previousMillis;
+
 void setup()
 {
-  m.SETUP("airquality", "3.0.0", 10000);
-
-  //m.sender.begin("http://syntex.local:1710/devices?mac=" + WiFi.macAddress() + "&type=" + m.Type + "&value=false");
+  if(m.SETUP("airquality", "3.2.0", 10000) && m.checkConnection())
+  {
+    previousMillis = -m.Interval;
+    
+    getAirQuality();
+  }
 }
 
 void loop()
@@ -18,9 +24,6 @@ void loop()
     getAirQuality();
   }
 }
-
-float quality;
-unsigned long previousMillis = -500;
 
 void getAirQuality()
 {
@@ -36,24 +39,24 @@ void getAirQuality()
     float t2;
     float t3;
 
-    t1=(analogRead(A0)/1024.0) * 3300;
-    Serial.print("smoke: ");
+    t1 = (analogRead(A0) / 1024.0) * 3300;
+    Serial.print("Smoke: ");
     Serial.println(t1);
 
-    t2=(t1/10);
-    Serial.print("celc: ");
+    t2 = (t1 / 10);
+    Serial.print("Celc: ");
     Serial.println(t2);
 
-    t3=((t2 * 9)/5 + 32);
-    Serial.print("fhrn: ");
+    t3 = ((t2 * 9) / 5 + 32);
+    Serial.print("Fhrn: ");
     Serial.println(t3);
     
     if(qualitytmp != quality)
     {
       quality = qualitytmp;
-      //sender.begin("http://192.168.188.121:51828/?accessoryId=sensor7&value=" + String(quality));
-      //sender.GET();
-      //sender.end();
+      m.sender.begin("http://syntex.local:1710/devices?mac=" + WiFi.macAddress() + "&value=" + String(quality));
+      m.sender.GET();
+      m.sender.end();
     }
 
     Serial.println("Luftqualität: " + String(quality));
