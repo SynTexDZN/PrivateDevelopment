@@ -17,9 +17,7 @@ void setup()
     lightMeter.begin(BH1750::CONTINUOUS_HIGH_RES_MODE_2);
 
     previousMillis = -m.Interval;
-
-    // NEW
-
+    
     Scenes = new boolean [m.SceneCount];
     
     for(int i = 0; i < m.SceneCount; i++)
@@ -117,11 +115,11 @@ void getLight()
               m.sender.GET();
               m.sender.end();
 
-              for(int i = 0; i < m.SceneCount; i++)
+              for(int j = 0; j < m.SceneCount; j++)
               {
-                if(m.SceneControl[i] >= 0)
+                if(m.SceneControl[j] >= 0)
                 {
-                  Scenes[i] = false;  
+                  Scenes[j] = false;  
                 }
               }
       

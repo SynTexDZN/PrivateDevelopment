@@ -6,6 +6,7 @@ DHT dht(2, DHT11);
 
 float temp;
 float hum;
+boolean *Scenes;
 unsigned long previousMillis;
 
 void setup()
@@ -15,6 +16,13 @@ void setup()
     dht.begin();
 
     previousMillis = -m.Interval;
+
+    Scenes = new boolean [m.SceneCount];
+    
+    for(int i = 0; i < m.SceneCount; i++)
+    {
+      Scenes[i] = false;
+    }
     
     getTempHum();
   }
@@ -65,40 +73,41 @@ void getTempHum()
                 m.sender.begin("http://syntex.local:1710/devices?mac=" + WiFi.macAddress() + "&event=" + i);
                 m.sender.GET();
                 m.sender.end();
-  
-                for(int i = 0; i < m.SceneCount; i++)
+                
+                for(int j = 0; j < m.SceneCount; j++)
                 {
-                  if(m.SceneControl[i] >= 0)
+                  if(m.SceneControl[j] >= 0)
                   {
-                    Scenes[i] = false;  
+                    Scenes[j] = false;  
                   }
                 }
-        
+                
                 Scenes[i] = true;
         
                 Serial.println("( " + String(i) + " ) Scene wird aktiviert!");
               }
             }
             else
-            {
+            {              
               if(temp > m.SceneControl[i] && !Scenes[i])
               {
                 m.sender.begin("http://syntex.local:1710/devices?mac=" + WiFi.macAddress() + "&event=" + i);
                 m.sender.GET();
                 m.sender.end();
-  
-                for(int i = 0; i < m.SceneCount; i++)
+                
+                for(int j = 0; j < m.SceneCount; j++)
                 {
-                  if(m.SceneControl[i] < 0)
+                  if(m.SceneControl[j] < 0)
                   {
-                    Scenes[i] = false;  
+                    Scenes[j] = false;  
                   }
                 }
-        
+                
                 Scenes[i] = true;
-        
+                
                 Serial.println("( " + String(i) + " ) Reset-Scene wird aktiviert!");
-              }  
+                
+              }
             }
           }  
         }
