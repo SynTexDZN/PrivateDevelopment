@@ -10,7 +10,7 @@ unsigned long previousMillis;
 
 void setup()
 {
-  if(m.SETUP("temperature", "3.2.0", 10000) && m.checkConnection())
+  if(m.SETUP("temperature", "3.3.0", 10000) && m.checkConnection())
   {
     dht.begin();
 
@@ -53,6 +53,55 @@ void getTempHum()
         m.sender.begin("http://syntex.local:1710/devices?mac=" + WiFi.macAddress() + "&type=" + m.Type + "&value=" + String(temp));
         m.sender.GET();
         m.sender.end();
+
+        if(m.SceneControl)
+        {
+          for(int i = 0; i < m.SceneCount; i++)
+          {
+            if(m.SceneControl[i] < 0)
+            {
+              if(temp < -m.SceneControl[i] && !Scenes[i])
+              {
+                m.sender.begin("http://syntex.local:1710/devices?mac=" + WiFi.macAddress() + "&event=" + i);
+                m.sender.GET();
+                m.sender.end();
+  
+                for(int i = 0; i < m.SceneCount; i++)
+                {
+                  if(m.SceneControl[i] >= 0)
+                  {
+                    Scenes[i] = false;  
+                  }
+                }
+        
+                Scenes[i] = true;
+        
+                Serial.println("( " + String(i) + " ) Scene wird aktiviert!");
+              }
+            }
+            else
+            {
+              if(temp > m.SceneControl[i] && !Scenes[i])
+              {
+                m.sender.begin("http://syntex.local:1710/devices?mac=" + WiFi.macAddress() + "&event=" + i);
+                m.sender.GET();
+                m.sender.end();
+  
+                for(int i = 0; i < m.SceneCount; i++)
+                {
+                  if(m.SceneControl[i] < 0)
+                  {
+                    Scenes[i] = false;  
+                  }
+                }
+        
+                Scenes[i] = true;
+        
+                Serial.println("( " + String(i) + " ) Reset-Scene wird aktiviert!");
+              }  
+            }
+          }  
+        }
       }
       
       if(humtmp != hum)

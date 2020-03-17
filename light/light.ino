@@ -6,18 +6,26 @@ SynTexMain m;
 BH1750 lightMeter;
 
 float light;
-boolean sunsetScene;
-boolean nightScene;
+boolean *Scenes;
 unsigned long previousMillis;
 
 void setup()
 {
-  if(m.SETUP("light", "3.2.0", 10000) && m.checkConnection())
+  if(m.SETUP("light", "3.3.0", 10000) && m.checkConnection())
   {
     Wire.begin();
     lightMeter.begin(BH1750::CONTINUOUS_HIGH_RES_MODE_2);
 
     previousMillis = -m.Interval;
+
+    // NEW
+
+    Scenes = new boolean [m.SceneCount];
+    
+    for(int i = 0; i < m.SceneCount; i++)
+    {
+      Scenes[i] = false;
+    }
     
     getLight();
     getRain();
@@ -97,34 +105,53 @@ void getLight()
       m.sender.GET();
       m.sender.end();
 
-      if(light < 100 && !sunsetScene && m.SceneControl)
+      if(m.SceneControl)
       {
-        m.sender.begin("http://syntex.local:1710/devices?mac=" + WiFi.macAddress() + "&event=0");
-        m.sender.GET();
-        m.sender.end();
+        for(int i = 0; i < m.SceneCount; i++)
+        {
+          if(m.SceneControl[i] < 0)
+          {
+            if(light < -m.SceneControl[i] && !Scenes[i])
+            {
+              m.sender.begin("http://syntex.local:1710/devices?mac=" + WiFi.macAddress() + "&event=" + i);
+              m.sender.GET();
+              m.sender.end();
 
-        sunsetScene = true;
+              for(int i = 0; i < m.SceneCount; i++)
+              {
+                if(m.SceneControl[i] >= 0)
+                {
+                  Scenes[i] = false;  
+                }
+              }
+      
+              Scenes[i] = true;
+      
+              Serial.println("( " + String(i) + " ) Scene wird aktiviert!");
+            }
+          }
+          else
+          {
+            if(light > m.SceneControl[i] && !Scenes[i])
+            {
+              m.sender.begin("http://syntex.local:1710/devices?mac=" + WiFi.macAddress() + "&event=" + i);
+              m.sender.GET();
+              m.sender.end();
 
-        Serial.println("( LEDs ) Scene wird aktiviert!");
-      }
-
-      if(light <= 1 && !nightScene && m.SceneControl)
-      {
-        m.sender.begin("http://syntex.local:1710/devices?mac=" + WiFi.macAddress() + "&event=1");
-        m.sender.GET();
-        m.sender.end();
-
-        nightScene = true;
-
-        Serial.println("( Rolladen ) Scene wird aktiviert!");
-      }
-
-      if(light > 400 && (sunsetScene || nightScene) && m.SceneControl)
-      {
-        sunsetScene = false;
-        nightScene = false;
-
-        Serial.println("Scenen wurden zurückgesetzt!");
+              for(int i = 0; i < m.SceneCount; i++)
+              {
+                if(m.SceneControl[i] < 0)
+                {
+                  Scenes[i] = false;  
+                }
+              }
+      
+              Scenes[i] = true;
+      
+              Serial.println("( " + String(i) + " ) Reset-Scene wird aktiviert!");
+            }  
+          }
+        }  
       }
     }
     

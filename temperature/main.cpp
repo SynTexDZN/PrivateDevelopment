@@ -191,7 +191,6 @@ boolean SynTexMain::loadDatabaseSettings()
     Name = obj["name"].as<String>();
     Interval = obj["interval"].as<int>();
     LED = obj["led"].as<int>();
-    SceneControl = obj["scenecontrol"].as<int>();
 
     Serial.println("-------------");
 
@@ -202,7 +201,22 @@ boolean SynTexMain::loadDatabaseSettings()
     Serial.print("LED: ");
     Serial.println(LED);
     Serial.print("SceneControl: ");
-    Serial.println(SceneControl);
+
+    char str[50];
+    char *token;
+    SceneCount = 0; 
+    obj["scenecontrol"].as<String>().toCharArray(str, 50);
+    token = strtok(str, ",");
+   
+    while(token != NULL)
+    {
+      SceneControl[SceneCount] = atoi(token);
+      Serial.print(String(SceneControl[SceneCount]) + " ");
+      token = strtok(NULL, ",");
+      SceneCount++;
+    }
+
+    Serial.println("");
 
     saveFileSystem();
 

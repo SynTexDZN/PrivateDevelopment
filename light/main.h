@@ -33,7 +33,8 @@ class SynTexMain
     String Type;
     int Interval;
     boolean LED;
-    boolean SceneControl;
+    int SceneCount;
+    int SceneControl[];
 };
 
 #endif
