@@ -12,7 +12,7 @@ unsigned long previousMillis;
 
 void setup()
 {
-  if(m.SETUP("light", "3.3.1", 10000) && m.checkConnection())
+  if(m.SETUP("light", "3.4.0", 10000) && m.checkConnection())
   {
     Wire.begin();
     lightMeter.begin(BH1750::CONTINUOUS_HIGH_RES_MODE_2);
@@ -113,7 +113,7 @@ void getLight()
 
       for(int i = 0; i < m.SceneCountNegative; i++)
       {
-        if(temp < m.SceneControlNegative[i] && !ScenesNegative[i])
+        if(light < m.SceneControlNegative[i] && !ScenesNegative[i])
         {
           m.sender.begin("http://syntex.local:1710/devices?mac=" + WiFi.macAddress() + "&event=" + i);
           m.sender.GET();
@@ -131,7 +131,7 @@ void getLight()
         
         for(int i = 0; i < m.SceneCountPositive; i++)
         {  
-          if(temp > m.SceneControlPositive[i] && !ScenesPositive[i])
+          if(light > m.SceneControlPositive[i] && !ScenesPositive[i])
           {
             m.sender.begin("http://syntex.local:1710/devices?mac=" + WiFi.macAddress() + "&event=" + String(i + m.SceneCountNegative));
             m.sender.GET();
