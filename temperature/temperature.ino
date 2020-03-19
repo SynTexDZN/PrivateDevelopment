@@ -6,31 +6,15 @@ DHT dht(2, DHT11);
 
 float temp;
 float hum;
-boolean *ScenesNegative;
-boolean *ScenesPositive;
 unsigned long previousMillis;
 
 void setup()
 {
-  if(m.SETUP("temperature", "3.4.0", 10000) && m.checkConnection())
+  if(m.SETUP("temperature", "3.5.0", 10000) && m.checkConnection())
   {
     dht.begin();
 
     previousMillis = -m.Interval;
-
-    ScenesNegative = new boolean [m.SceneCountNegative];
-    
-    for(int i = 0; i < m.SceneCountNegative; i++)
-    {
-      ScenesNegative[i] = false;
-    }
-
-    ScenesPositive = new boolean [m.SceneCountPositive];
-    
-    for(int i = 0; i < m.SceneCountPositive; i++)
-    {
-      ScenesPositive[i] = false;
-    }
 
     getTempHum();
   }
@@ -72,7 +56,7 @@ void getTempHum()
 
         for(int i = 0; i < m.SceneCountNegative; i++)
         {
-          if(temp < m.SceneControlNegative[i] && !ScenesNegative[i])
+          if(temp < m.SceneControlNegative[i] && !m.ScenesNegative[i])
           {
             m.sender.begin("http://syntex.local:1710/devices?mac=" + WiFi.macAddress() + "&event=" + i);
             m.sender.GET();
@@ -80,17 +64,17 @@ void getTempHum()
             
             for(int j = 0; j < m.SceneCountPositive; j++)
             {
-              ScenesPositive[j] = false;
+              m.ScenesPositive[j] = false;
             }
             
-            ScenesNegative[i] = true;
+            m.ScenesNegative[i] = true;
     
             Serial.println("( " + String(i) + " ) Scene wird aktiviert!");
           }
           
           for(int i = 0; i < m.SceneCountPositive; i++)
           {  
-            if(temp > m.SceneControlPositive[i] && !ScenesPositive[i])
+            if(temp > m.SceneControlPositive[i] && !m.ScenesPositive[i])
             {
               m.sender.begin("http://syntex.local:1710/devices?mac=" + WiFi.macAddress() + "&event=" + String(i + m.SceneCountNegative));
               m.sender.GET();
@@ -98,10 +82,10 @@ void getTempHum()
               
               for(int j = 0; j < m.SceneCountNegative; j++)
               {
-                ScenesNegative[j] = false;
+                m.ScenesNegative[j] = false;
               }
               
-              ScenesPositive[i] = true;
+              m.ScenesPositive[i] = true;
               
               Serial.println("( " + String(i + m.SceneCountNegative) + " ) Scene wird aktiviert!");
             }

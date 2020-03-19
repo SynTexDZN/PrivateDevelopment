@@ -16,8 +16,6 @@ class SynTexMain
     void scanWiFi();
     void updateDevice();
     boolean loadDatabaseSettings();
-  
-    
     
   public:
     String WiFiName;
@@ -35,22 +33,16 @@ class SynTexMain
     void LOOP();
     boolean checkConnection();
     
+    int SceneCountNegative;
+    boolean *ScenesNegative;
+    int SceneControlNegative[];
+
     ESP8266WebServer server;
     HTTPClient sender;
 
-    int SceneCountNegative;
-
-    boolean x1;
-
-    int SceneControlPositive[];
-
-    boolean x2;
-
     int SceneCountPositive;
-
-    boolean x3;
-
-    int SceneControlNegative[];
+    boolean *ScenesPositive;
+    int SceneControlPositive[];    
 };
 
 #endif

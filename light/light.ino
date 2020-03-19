@@ -6,31 +6,29 @@ SynTexMain m;
 BH1750 lightMeter;
 
 float light;
-boolean *ScenesNegative;
-boolean *ScenesPositive;
 unsigned long previousMillis;
 
 void setup()
 {
-  if(m.SETUP("light", "3.4.0", 10000) && m.checkConnection())
+  if(m.SETUP("light", "3.5.0", 10000) && m.checkConnection())
   {
     Wire.begin();
     lightMeter.begin(BH1750::CONTINUOUS_HIGH_RES_MODE_2);
 
     previousMillis = -m.Interval;
     
-    ScenesNegative = new boolean [m.SceneCountNegative];
+    m.ScenesNegative = new boolean [m.SceneCountNegative];
     
     for(int i = 0; i < m.SceneCountNegative; i++)
     {
-      ScenesNegative[i] = false;
+      m.ScenesNegative[i] = false;
     }
 
-    ScenesPositive = new boolean [m.SceneCountPositive];
+    m.ScenesPositive = new boolean [m.SceneCountPositive];
     
     for(int i = 0; i < m.SceneCountPositive; i++)
     {
-      ScenesPositive[i] = false;
+      m.ScenesPositive[i] = false;
     }
     
     getLight();
@@ -113,7 +111,7 @@ void getLight()
 
       for(int i = 0; i < m.SceneCountNegative; i++)
       {
-        if(light < m.SceneControlNegative[i] && !ScenesNegative[i])
+        if(light < m.SceneControlNegative[i] && !m.ScenesNegative[i])
         {
           m.sender.begin("http://syntex.local:1710/devices?mac=" + WiFi.macAddress() + "&event=" + i);
           m.sender.GET();
@@ -121,17 +119,17 @@ void getLight()
           
           for(int j = 0; j < m.SceneCountPositive; j++)
           {
-            ScenesPositive[j] = false;
+            m.ScenesPositive[j] = false;
           }
           
-          ScenesNegative[i] = true;
+          m.ScenesNegative[i] = true;
   
           Serial.println("( " + String(i) + " ) Scene wird aktiviert!");
         }
         
         for(int i = 0; i < m.SceneCountPositive; i++)
         {  
-          if(light > m.SceneControlPositive[i] && !ScenesPositive[i])
+          if(light > m.SceneControlPositive[i] && !m.ScenesPositive[i])
           {
             m.sender.begin("http://syntex.local:1710/devices?mac=" + WiFi.macAddress() + "&event=" + String(i + m.SceneCountNegative));
             m.sender.GET();
@@ -139,10 +137,10 @@ void getLight()
             
             for(int j = 0; j < m.SceneCountNegative; j++)
             {
-              ScenesNegative[j] = false;
+              m.ScenesNegative[j] = false;
             }
             
-            ScenesPositive[i] = true;
+            m.ScenesPositive[i] = true;
             
             Serial.println("( " + String(i + m.SceneCountNegative) + " ) Scene wird aktiviert!");
           }

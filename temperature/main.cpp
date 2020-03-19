@@ -200,27 +200,28 @@ boolean SynTexMain::loadDatabaseSettings()
     Serial.println(LED);
     Serial.print("SceneControl: ");
 
+    SceneCountNegative = 0; 
+    SceneCountPositive = 0; 
+
     if(obj["scenecontrol"].as<String>().indexOf(",") == -1)
     {
       if(obj["scenecontrol"].as<int>() < 0)
       {
-        SceneCountNegative = 1;
         SceneControlNegative[0] = -obj["scenecontrol"].as<int>();
         Serial.println("<" + String(SceneControlNegative[0]));
+        SceneCountNegative++;
       }
       else
       {
-        SceneCountPositive = 1;
         SceneControlPositive[0] = obj["scenecontrol"].as<int>();
         Serial.println(">" + String(SceneControlPositive[0]));
+        SceneCountPositive++;
       }
     }
     else
     {
       char str[50];
       char *token;
-      SceneCountNegative = 0; 
-      SceneCountPositive = 0; 
       obj["scenecontrol"].as<String>().toCharArray(str, 50);
       token = strtok(str, ",");
      
@@ -245,6 +246,20 @@ boolean SynTexMain::loadDatabaseSettings()
       }
 
       Serial.println("");
+    }
+
+    ScenesNegative = new boolean [SceneCountNegative];
+    
+    for(int i = 0; i < SceneCountNegative; i++)
+    {
+      ScenesNegative[i] = false;
+    }
+
+    ScenesPositive = new boolean [SceneCountPositive];
+    
+    for(int i = 0; i < SceneCountPositive; i++)
+    {
+      ScenesPositive[i] = false;
     }
 
     Serial.println("-------------");
