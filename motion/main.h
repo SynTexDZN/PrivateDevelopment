@@ -8,32 +8,49 @@
 class SynTexMain
 {
   private:
-    String WiFiName;
-    String WiFiPass;
-    String Version;
-    String Name;
-    
-  public:
-    SynTexMain();
-    
-    boolean SETUP(String Type, String Version, int Interval);
-    void LOOP();
     boolean loadFileSystem();
     boolean saveFileSystem();
     void startAccessPoint();
     void saveWiFiSettings();
-    boolean checkConnection();
     void resetDevice();
     void scanWiFi();
     void updateDevice();
     boolean loadDatabaseSettings();
+  
     
-    ESP8266WebServer server;
-    HTTPClient sender;
+    
+  public:
+    String WiFiName;
+    String WiFiPass;
+    String Version;
+    String Name;
+  
     String Type;
     int Interval;
     boolean LED;
-    boolean SceneControl;
+  
+    SynTexMain();
+
+    boolean SETUP(String Type, String Version, int Interval);
+    void LOOP();
+    boolean checkConnection();
+    
+    ESP8266WebServer server;
+    HTTPClient sender;
+
+    int SceneCountNegative;
+
+    boolean x1;
+
+    int SceneControlPositive[];
+
+    boolean x2;
+
+    int SceneCountPositive;
+
+    boolean x3;
+
+    int SceneControlNegative[];
 };
 
 #endif

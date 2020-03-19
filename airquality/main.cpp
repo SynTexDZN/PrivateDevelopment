@@ -93,8 +93,6 @@ boolean SynTexMain::SETUP(String Type, String Version, int Interval)
         delay(2000);
       }
 
-      Serial.println("-------------");
-
       digitalWrite(LED_BUILTIN, HIGH);
     }
     else
@@ -191,7 +189,6 @@ boolean SynTexMain::loadDatabaseSettings()
     Name = obj["name"].as<String>();
     Interval = obj["interval"].as<int>();
     LED = obj["led"].as<int>();
-    SceneControl = obj["scenecontrol"].as<int>();
 
     Serial.println("-------------");
 
@@ -202,7 +199,55 @@ boolean SynTexMain::loadDatabaseSettings()
     Serial.print("LED: ");
     Serial.println(LED);
     Serial.print("SceneControl: ");
-    Serial.println(SceneControl);
+
+    if(obj["scenecontrol"].as<String>().indexOf(",") == -1)
+    {
+      if(obj["scenecontrol"].as<int>() < 0)
+      {
+        SceneCountNegative = 1;
+        SceneControlNegative[0] = -obj["scenecontrol"].as<int>();
+        Serial.println("<" + String(SceneControlNegative[0]));
+      }
+      else
+      {
+        SceneCountPositive = 1;
+        SceneControlPositive[0] = obj["scenecontrol"].as<int>();
+        Serial.println(">" + String(SceneControlPositive[0]));
+      }
+    }
+    else
+    {
+      char str[50];
+      char *token;
+      SceneCountNegative = 0; 
+      SceneCountPositive = 0; 
+      obj["scenecontrol"].as<String>().toCharArray(str, 50);
+      token = strtok(str, ",");
+     
+      while(token != NULL)
+      {
+        int t = atoi(token);
+
+        if(t < 0)
+        {
+          SceneControlNegative[SceneCountNegative] = -t;
+          Serial.print("<" + String(SceneControlNegative[SceneCountNegative]) + " ");
+          SceneCountNegative++;
+        }
+        else
+        {
+          SceneControlPositive[SceneCountPositive] = t;
+          Serial.print(">" + String(SceneControlPositive[SceneCountPositive]) + " ");
+          SceneCountPositive++;
+        }
+
+        token = strtok(NULL, ",");
+      }
+
+      Serial.println("");
+    }
+
+    Serial.println("-------------");
 
     saveFileSystem();
 

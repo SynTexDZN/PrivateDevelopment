@@ -11,7 +11,7 @@ unsigned long previousMillis;
 
 void setup()
 {
-  if(m.SETUP("light", "3.3.0", 10000) && m.checkConnection())
+  if(m.SETUP("light", "3.3.1", 10000) && m.checkConnection())
   {
     Wire.begin();
     lightMeter.begin(BH1750::CONTINUOUS_HIGH_RES_MODE_2);

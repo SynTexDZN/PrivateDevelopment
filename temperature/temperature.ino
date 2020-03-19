@@ -6,24 +6,32 @@ DHT dht(2, DHT11);
 
 float temp;
 float hum;
-boolean *Scenes;
+boolean *ScenesNegative;
+boolean *ScenesPositive;
 unsigned long previousMillis;
 
 void setup()
 {
-  if(m.SETUP("temperature", "3.3.0", 10000) && m.checkConnection())
+  if(m.SETUP("temperature", "3.4.0", 10000) && m.checkConnection())
   {
     dht.begin();
 
     previousMillis = -m.Interval;
 
-    Scenes = new boolean [m.SceneCount];
+    ScenesNegative = new boolean [m.SceneCountNegative];
     
-    for(int i = 0; i < m.SceneCount; i++)
+    for(int i = 0; i < m.SceneCountNegative; i++)
     {
-      Scenes[i] = false;
+      ScenesNegative[i] = false;
     }
+
+    ScenesPositive = new boolean [m.SceneCountPositive];
     
+    for(int i = 0; i < m.SceneCountPositive; i++)
+    {
+      ScenesPositive[i] = false;
+    }
+
     getTempHum();
   }
 }
@@ -62,55 +70,43 @@ void getTempHum()
         m.sender.GET();
         m.sender.end();
 
-        if(m.SceneControl)
+        for(int i = 0; i < m.SceneCountNegative; i++)
         {
-          for(int i = 0; i < m.SceneCount; i++)
+          if(temp < m.SceneControlNegative[i] && !ScenesNegative[i])
           {
-            if(m.SceneControl[i] < 0)
+            m.sender.begin("http://syntex.local:1710/devices?mac=" + WiFi.macAddress() + "&event=" + i);
+            m.sender.GET();
+            m.sender.end();
+            
+            for(int j = 0; j < m.SceneCountPositive; j++)
             {
-              if(temp < -m.SceneControl[i] && !Scenes[i])
-              {
-                m.sender.begin("http://syntex.local:1710/devices?mac=" + WiFi.macAddress() + "&event=" + i);
-                m.sender.GET();
-                m.sender.end();
-                
-                for(int j = 0; j < m.SceneCount; j++)
-                {
-                  if(m.SceneControl[j] >= 0)
-                  {
-                    Scenes[j] = false;  
-                  }
-                }
-                
-                Scenes[i] = true;
-        
-                Serial.println("( " + String(i) + " ) Scene wird aktiviert!");
-              }
+              ScenesPositive[j] = false;
             }
-            else
-            {              
-              if(temp > m.SceneControl[i] && !Scenes[i])
+            
+            ScenesNegative[i] = true;
+    
+            Serial.println("( " + String(i) + " ) Scene wird aktiviert!");
+          }
+          
+          for(int i = 0; i < m.SceneCountPositive; i++)
+          {  
+            if(temp > m.SceneControlPositive[i] && !ScenesPositive[i])
+            {
+              m.sender.begin("http://syntex.local:1710/devices?mac=" + WiFi.macAddress() + "&event=" + String(i + m.SceneCountNegative));
+              m.sender.GET();
+              m.sender.end();
+              
+              for(int j = 0; j < m.SceneCountNegative; j++)
               {
-                m.sender.begin("http://syntex.local:1710/devices?mac=" + WiFi.macAddress() + "&event=" + i);
-                m.sender.GET();
-                m.sender.end();
-                
-                for(int j = 0; j < m.SceneCount; j++)
-                {
-                  if(m.SceneControl[j] < 0)
-                  {
-                    Scenes[j] = false;  
-                  }
-                }
-                
-                Scenes[i] = true;
-                
-                Serial.println("( " + String(i) + " ) Reset-Scene wird aktiviert!");
-                
+                ScenesNegative[j] = false;
               }
+              
+              ScenesPositive[i] = true;
+              
+              Serial.println("( " + String(i + m.SceneCountNegative) + " ) Scene wird aktiviert!");
             }
-          }  
-        }
+          }
+        } 
       }
       
       if(humtmp != hum)
