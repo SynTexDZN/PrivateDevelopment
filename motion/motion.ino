@@ -7,7 +7,7 @@ unsigned long previousMillis;
 
 void setup()
 {
-  if(m.SETUP("motion", "3.5.0", 5000) && m.checkConnection())
+  if(m.SETUP("motion", "3.6.0", 5000) && m.checkConnection())
   {
     previousMillis = -m.Interval;
     
@@ -42,7 +42,7 @@ void getMotion()
 
     if(motion)
     {
-      m.sender.begin("http://syntex.local:1710/devices?mac=" + WiFi.macAddress() + "&value=true");
+      m.sender.begin(m.BridgeIP + ":" + String(m.WebhookPort) + "/devices?mac=" + WiFi.macAddress() + "&value=true");
 
       if(m.LED)
       {
@@ -53,7 +53,7 @@ void getMotion()
     }
     else
     {
-      m.sender.begin("http://syntex.local:1710/devices?mac=" + WiFi.macAddress() + "&value=false");
+      m.sender.begin(m.BridgeIP + ":" + String(m.WebhookPort) + "/devices?mac=" + WiFi.macAddress() + "&value=false");
 
       if(m.LED)
       {

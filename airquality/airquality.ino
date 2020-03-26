@@ -7,7 +7,7 @@ unsigned long previousMillis;
 
 void setup()
 {
-  if(m.SETUP("airquality", "3.5.0", 10000) && m.checkConnection())
+  if(m.SETUP("airquality", "3.6.0", 10000) && m.checkConnection())
   {
     previousMillis = -m.Interval;
     
@@ -54,7 +54,7 @@ void getAirQuality()
     if(qualitytmp != quality)
     {
       quality = qualitytmp;
-      m.sender.begin("http://syntex.local:1710/devices?mac=" + WiFi.macAddress() + "&value=" + String(quality));
+      m.sender.begin(m.BridgeIP + ":" + String(m.WebhookPort) + "/devices?mac=" + WiFi.macAddress() + "&value=" + String(quality));
       m.sender.GET();
       m.sender.end();
     }

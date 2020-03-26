@@ -7,7 +7,7 @@ boolean lock;
 
 void setup()
 {
-  if(m.SETUP("switch", "3.5.0", 0) && m.checkConnection())
+  if(m.SETUP("switch", "3.6.0", 0) && m.checkConnection())
   {
     getSwitch();
   
@@ -24,7 +24,7 @@ void setup()
   
       if(button)
       {
-        m.sender.begin("http://syntex.local:1710/devices?mac=" + WiFi.macAddress() + "&value=true");
+        m.sender.begin(m.BridgeIP + ":" + String(m.WebhookPort) + "/devices?mac=" + WiFi.macAddress() + "&value=true");
   
         if(m.LED)
         {
@@ -35,7 +35,7 @@ void setup()
       }
       else
       {
-        m.sender.begin("http://syntex.local:1710/devices?mac=" + WiFi.macAddress() + "&value=false");
+        m.sender.begin(m.BridgeIP + ":" + String(m.WebhookPort) + "/devices?mac=" + WiFi.macAddress() + "&value=false");
   
         if(m.LED)
         {
@@ -83,7 +83,7 @@ void getSwitch()
   {
     if(button)
     {
-      m.sender.begin("http://syntex.local:1710/devices?mac=" + WiFi.macAddress() + "&value=true");
+      m.sender.begin(m.BridgeIP + ":" + String(m.WebhookPort) + "/devices?mac=" + WiFi.macAddress() + "&value=true");
 
       if(m.LED)
       {
@@ -94,7 +94,7 @@ void getSwitch()
     }
     else
     {
-      m.sender.begin("http://syntex.local:1710/devices?mac=" + WiFi.macAddress() + "&value=false");
+      m.sender.begin(m.BridgeIP + ":" + String(m.WebhookPort) + "/devices?mac=" + WiFi.macAddress() + "&value=false");
 
       if(m.LED)
       {

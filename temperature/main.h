@@ -27,6 +27,7 @@ class SynTexMain
     int Interval;
     boolean LED;
     int WebhookPort;
+    String BridgeIP;
   
     SynTexMain();
 

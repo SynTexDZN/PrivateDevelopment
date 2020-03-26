@@ -10,7 +10,7 @@ unsigned long previousMillis;
 
 void setup()
 {
-  if(m.SETUP("light", "3.5.0", 10000) && m.checkConnection())
+  if(m.SETUP("light", "3.6.0", 10000) && m.checkConnection())
   {
     Wire.begin();
     lightMeter.begin(BH1750::CONTINUOUS_HIGH_RES_MODE_2);
@@ -105,7 +105,7 @@ void getLight()
     if(lighttmp != light)
     {
       light = lighttmp;
-      m.sender.begin("http://syntex.local:1710/devices?mac=" + WiFi.macAddress() + "&type=" + m.Type + "&value=" + String(light));
+      m.sender.begin(m.BridgeIP + ":" + String(m.WebhookPort) + "/devices?mac=" + WiFi.macAddress() + "&type=" + m.Type + "&value=" + String(light));
       m.sender.GET();
       m.sender.end();
 
@@ -113,7 +113,7 @@ void getLight()
       {
         if(light < m.SceneControlNegative[i] && !m.ScenesNegative[i])
         {
-          m.sender.begin("http://syntex.local:1710/devices?mac=" + WiFi.macAddress() + "&event=" + i);
+          m.sender.begin(m.BridgeIP + ":" + String(m.WebhookPort) + "/devices?mac=" + WiFi.macAddress() + "&event=" + i);
           m.sender.GET();
           m.sender.end();
           
@@ -131,7 +131,7 @@ void getLight()
         {  
           if(light > m.SceneControlPositive[i] && !m.ScenesPositive[i])
           {
-            m.sender.begin("http://syntex.local:1710/devices?mac=" + WiFi.macAddress() + "&event=" + String(i + m.SceneCountNegative));
+            m.sender.begin(m.BridgeIP + ":" + String(m.WebhookPort) + "/devices?mac=" + WiFi.macAddress() + "&event=" + String(i + m.SceneCountNegative));
             m.sender.GET();
             m.sender.end();
             
@@ -164,12 +164,12 @@ void getRain()
 
     if(rain)
     {
-      m.sender.begin("http://syntex.local:1710/devices?mac=" + WiFi.macAddress() + "&type=rain&value=false");
+      m.sender.begin(m.BridgeIP + ":" + String(m.WebhookPort) + "/devices?mac=" + WiFi.macAddress() + "&type=rain&value=false");
       Serial.println("Regen: Nein");
     }
     else
     {
-      m.sender.begin("http://syntex.local:1710/devices?mac=" + WiFi.macAddress() + "&type=rain&value=true");
+      m.sender.begin(m.BridgeIP + ":" + String(m.WebhookPort) + "/devices?mac=" + WiFi.macAddress() + "&type=rain&value=true");
       Serial.println("Regen: Ja");
     }
 

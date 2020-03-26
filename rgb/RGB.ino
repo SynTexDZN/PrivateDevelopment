@@ -9,13 +9,13 @@ boolean state;
 
 void setup()
 {
-  if(m.SETUP("rgb", "3.5.0", 0) && m.checkConnection())
+  if(m.SETUP("rgb", "3.6.0", 0) && m.checkConnection())
   {
     pinMode(5, OUTPUT);
     pinMode(4, OUTPUT);
     pinMode(0, OUTPUT);
   
-    m.sender.begin("http://syntex.local:1710/devices?mac=" + WiFi.macAddress() + "&value=false:0:0:0");
+    m.sender.begin(m.BridgeIP + ":" + String(m.WebhookPort) + "/devices?mac=" + WiFi.macAddress() + "&value=false:0:0:0");
     m.sender.GET();
     m.sender.end();
   
@@ -48,7 +48,7 @@ void setup()
   
           String strState = state ? "true" : "false";
   
-          m.sender.begin("http://syntex.local:1710/devices?mac=" + WiFi.macAddress() + "&value=" + strState + ":" + String(r) + ":" + String(g) + ":" + String(b));
+          m.sender.begin(m.BridgeIP + ":" + String(m.WebhookPort) + "/devices?mac=" + WiFi.macAddress() + "&value=" + strState + ":" + String(r) + ":" + String(g) + ":" + String(b));
           m.sender.GET();
           m.sender.end();
         }
@@ -61,7 +61,7 @@ void setup()
   
         Serial.println(strState);
   
-        m.sender.begin("http://syntex.local:1710/devices?mac=" + WiFi.macAddress() + "&value=" + strState + ":" + String(r) + ":" + String(g) + ":" + String(b));
+        m.sender.begin(m.BridgeIP + ":" + String(m.WebhookPort) + "/devices?mac=" + WiFi.macAddress() + "&value=" + strState + ":" + String(r) + ":" + String(g) + ":" + String(b));
         m.sender.GET();
         m.sender.end();
       }
@@ -93,7 +93,7 @@ void setRGB(int red, int green, int blue)
 
   // TODO: Convert RGB to HSL in callback
 
-  m.sender.begin("http://syntex.local:1710/devices?mac=" + WiFi.macAddress() + "&value=" + strState + ":" + String(r) + ":" + String(g) + ":" + String(b));
+  m.sender.begin(m.BridgeIP + ":" + String(m.WebhookPort) + "/devices?mac=" + WiFi.macAddress() + "&value=" + strState + ":" + String(r) + ":" + String(g) + ":" + String(b));
   m.sender.GET();
   m.sender.end();
 }

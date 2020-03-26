@@ -4,9 +4,9 @@ SynTexMain m;
 
 void setup()
 {
-  if(m.SETUP("relais", "3.5.0", 0) && m.checkConnection())
+  if(m.SETUP("relais", "3.6.0", 0) && m.checkConnection())
   {
-    m.sender.begin("http://syntex.local:1710/devices?mac=" + WiFi.macAddress() + "&value=false");
+    m.sender.begin(m.BridgeIP + ":" + String(m.WebhookPort) + "/devices?mac=" + WiFi.macAddress() + "&value=false");
     m.sender.GET();
     m.sender.end();
   

@@ -39,6 +39,8 @@ boolean SynTexMain::SETUP(String Type, String Version, int Interval)
     Serial.println(WiFiName);
     Serial.print("WiFi Pass: ");
     Serial.println(WiFiPass);
+    Serial.print("Bridge IP: ");
+    Serial.println(BridgeIP);
   }
 
   Serial.println("-------------");
@@ -86,9 +88,13 @@ boolean SynTexMain::SETUP(String Type, String Version, int Interval)
       
       WiFi.softAPdisconnect(true);
 
-      while(!loadDatabaseSettings())
+      int counter = 0;
+
+      while(!loadDatabaseSettings() && counter < 15)
       {
         Serial.println("Keine SynTex Bridge gefunden!");
+
+        counter++;
 
         delay(2000);
       }
@@ -175,7 +181,7 @@ boolean SynTexMain::loadDatabaseSettings()
 
   safeName.replace(" ", "");
   
-  sender.begin("http://syntex.local/init?mac=" + WiFi.macAddress() + "&ip=" + WiFi.localIP().toString() + "&type=" + Type + "&name=" + safeName + "&version=" + Version + "&refresh=" + Interval);
+  sender.begin(BridgeIP + "/init?mac=" + WiFi.macAddress() + "&ip=" + WiFi.localIP().toString() + "&type=" + Type + "&name=" + safeName + "&version=" + Version + "&refresh=" + Interval);
   int response = sender.GET();
   
   if(response == HTTP_CODE_OK)
@@ -189,6 +195,12 @@ boolean SynTexMain::loadDatabaseSettings()
     Name = obj["name"].as<String>();
     Interval = obj["interval"].as<int>();
     LED = obj["led"].as<int>();
+    WebhookPort = obj["port"].as<int>();
+
+    Serial.println("-------------");
+
+    Serial.print("WebhookPort: ");
+    Serial.println(WebhookPort);
 
     Serial.println("-------------");
 
@@ -284,7 +296,7 @@ boolean SynTexMain::loadDatabaseSettings()
 
 void SynTexMain::resetDevice()
 {
-  sender.begin("http://syntex.local/remove-device?mac=" + WiFi.macAddress() + "&type=" + Type);
+  sender.begin(BridgeIP + "/remove-device?mac=" + WiFi.macAddress() + "&type=" + Type);
   int response = sender.GET();
   
   if(response == HTTP_CODE_OK)
@@ -360,6 +372,11 @@ boolean SynTexMain::loadFileSystem()
     Name = obj["name"].as<String>();
   }
 
+  if(obj["bridge"].as<String>() != "")
+  {
+    BridgeIP = obj["bridge"].as<String>();
+  }
+
   return true;
 }
 
@@ -369,6 +386,7 @@ boolean SynTexMain::saveFileSystem()
   doc["ssid"] = WiFiName;
   doc["pass"] = WiFiPass;
   doc["name"] = Name;
+  doc["bridge"] = BridgeIP;
 
   File configFile = SPIFFS.open("/config.json", "w");
   
@@ -397,6 +415,13 @@ void SynTexMain::startAccessPoint()
 
 void SynTexMain::saveWiFiSettings()
 {
+  BridgeIP = "http://syntex.local";
+
+  if(server.hasArg("bridge-ip"))
+  {
+    BridgeIP = server.arg("bridge-ip");
+  }
+  
   if(server.hasArg("wifissid") && server.hasArg("wifipass"))
   {   
     WiFiName = server.arg("wifissid");
