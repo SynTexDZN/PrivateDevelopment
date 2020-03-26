@@ -189,6 +189,10 @@ boolean SynTexMain::loadDatabaseSettings()
     Name = obj["name"].as<String>();
     Interval = obj["interval"].as<int>();
     LED = obj["led"].as<int>();
+    WebhookPort = obj["port"].as<int>();
+
+    Serial.print("WebhookPort: ");
+    Serial.println(WebhookPort);
 
     Serial.println("-------------");
 

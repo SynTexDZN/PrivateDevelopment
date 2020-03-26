@@ -50,7 +50,7 @@ void getTempHum()
       if(temp - temptmp >= 0.5 || temp - temptmp <= -0.5)
       {
         temp = temptmp;
-        m.sender.begin("http://syntex.local:1710/devices?mac=" + WiFi.macAddress() + "&type=" + m.Type + "&value=" + String(temp));
+        m.sender.begin("http://syntex.local:" + String(m.WebhookPort) + "/devices?mac=" + WiFi.macAddress() + "&type=" + m.Type + "&value=" + String(temp));
         m.sender.GET();
         m.sender.end();
 
@@ -58,7 +58,7 @@ void getTempHum()
         {
           if(temp < m.SceneControlNegative[i] && !m.ScenesNegative[i])
           {
-            m.sender.begin("http://syntex.local:1710/devices?mac=" + WiFi.macAddress() + "&event=" + i);
+            m.sender.begin("http://syntex.local:" + String(m.WebhookPort) + "/devices?mac=" + WiFi.macAddress() + "&event=" + i);
             m.sender.GET();
             m.sender.end();
             
@@ -76,7 +76,7 @@ void getTempHum()
           {  
             if(temp > m.SceneControlPositive[i] && !m.ScenesPositive[i])
             {
-              m.sender.begin("http://syntex.local:1710/devices?mac=" + WiFi.macAddress() + "&event=" + String(i + m.SceneCountNegative));
+              m.sender.begin("http://syntex.local:" + String(m.WebhookPort) + "/devices?mac=" + WiFi.macAddress() + "&event=" + String(i + m.SceneCountNegative));
               m.sender.GET();
               m.sender.end();
               
@@ -96,7 +96,7 @@ void getTempHum()
       if(humtmp != hum)
       {
         hum = humtmp;
-        m.sender.begin("http://syntex.local:1710/devices?mac=" + WiFi.macAddress() + "&type=humidity&value=" + String(hum));
+        m.sender.begin("http://syntex.local:" + String(m.WebhookPort) + "/devices?mac=" + WiFi.macAddress() + "&type=humidity&value=" + String(hum));
         m.sender.GET();
         m.sender.end();
       }      
