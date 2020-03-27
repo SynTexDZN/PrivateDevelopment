@@ -7,7 +7,7 @@ unsigned long previousMillis;
 
 void setup()
 {
-  if(m.SETUP("motion", "3.6.0", 5000) && m.checkConnection())
+  if(m.SETUP("motion", "3.7.0", 5000) && m.checkConnection())
   {
     previousMillis = -m.Interval;
     

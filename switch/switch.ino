@@ -7,7 +7,7 @@ boolean lock;
 
 void setup()
 {
-  if(m.SETUP("switch", "3.6.0", 0) && m.checkConnection())
+  if(m.SETUP("switch", "3.7.0", 0) && m.checkConnection())
   {
     getSwitch();
   
