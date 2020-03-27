@@ -299,7 +299,7 @@ void SynTexMain::resetDevice()
   sender.begin(BridgeIP + "/remove-device?mac=" + WiFi.macAddress() + "&type=" + Type);
   int response = sender.GET();
   
-  if(response == HTTP_CODE_OK)
+  if(response == HTTP_CODE_OK && sender.getString() == "Success")
   {
     WiFiName = "";
     WiFiPass = "";

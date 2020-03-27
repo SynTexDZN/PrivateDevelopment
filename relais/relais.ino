@@ -4,7 +4,7 @@ SynTexMain m;
 
 void setup()
 {
-  if(m.SETUP("relais", "3.7.0", 0) && m.checkConnection())
+  if(m.SETUP("relais", "3.8.0", 0) && m.checkConnection())
   {
     m.sender.begin(m.BridgeIP + ":" + String(m.WebhookPort) + "/devices?mac=" + WiFi.macAddress() + "&value=false");
     m.sender.GET();

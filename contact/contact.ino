@@ -6,7 +6,7 @@ boolean contact;
 
 void setup()
 {
-  if(m.SETUP("contact", "3.7.0", 0) && m.checkConnection())
+  if(m.SETUP("contact", "3.8.0", 0) && m.checkConnection())
   {
     getContact();
   }

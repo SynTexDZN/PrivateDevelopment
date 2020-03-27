@@ -9,7 +9,7 @@ boolean state;
 
 void setup()
 {
-  if(m.SETUP("rgb", "3.7.0", 0) && m.checkConnection())
+  if(m.SETUP("rgb", "3.8.0", 0) && m.checkConnection())
   {
     pinMode(5, OUTPUT);
     pinMode(4, OUTPUT);
