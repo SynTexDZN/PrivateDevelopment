@@ -10,7 +10,7 @@ unsigned long previousMillis;
 
 void setup()
 {
-  if(m.SETUP("temperature", "3.8.0", 10000) && m.checkConnection())
+  if(m.SETUP("temperature", "3.7.1", 10000) && m.checkConnection())
   {
     dht.begin();
 
@@ -96,7 +96,7 @@ void getTempHum()
       if(humtmp != hum)
       {
         hum = humtmp;
-        m.sender.begin(m.BridgeIP + ":" + String(m.WebhookPort) + "/devices?mac=" + WiFi.macAddress() + "&type=humidity&value=" + String(hum));
+        m.sender.begin(m.BridgeIP + ":" + String(m.WebhookPort) + "/devices?mac=" + WiFi.macAddress() + "&type=humidity&value=" + String((int)hum));
         m.sender.GET();
         m.sender.end();
       }      
