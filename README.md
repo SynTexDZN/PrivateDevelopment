@@ -7,7 +7,8 @@ Arduino Code for SynTex devices and more stuff
 - Motion Sensor
 - Contact Sensor
 - Relais / Switch
+- RGB Lights
 
 # Soon
-- RGB Controller
+- RGBW Lights
 - Airquality Sensor
