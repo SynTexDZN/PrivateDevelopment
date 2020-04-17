@@ -210,70 +210,44 @@ boolean SynTexMain::loadDatabaseSettings()
     Serial.println(Interval);
     Serial.print("LED: ");
     Serial.println(LED);
-    Serial.print("SceneControl: ");
+    Serial.print("Events: ");
 
-    SceneCountNegative = 0; 
-    SceneCountPositive = 0; 
+    EventsNegative = 0; 
+    EventsPositive = 0; 
 
-    if(obj["scenecontrol"].as<String>().indexOf(",") == -1)
+    JsonArray events = obj["events"].as<JsonArray>();
+
+    for(JsonVariant v : events)
     {
-      if(obj["scenecontrol"].as<int>() < 0)
+      if(v.as<int>() < 0)
       {
-        SceneControlNegative[0] = -obj["scenecontrol"].as<int>();
-        Serial.println("<" + String(SceneControlNegative[0]));
-        SceneCountNegative++;
+        EventControlNegative[EventsNegative] = -v.as<int>();
+        Serial.print("< " + String(EventControlNegative[EventsNegative]) + "  ");
+        EventsNegative++;
       }
       else
       {
-        SceneControlPositive[0] = obj["scenecontrol"].as<int>();
-        Serial.println(">" + String(SceneControlPositive[0]));
-        SceneCountPositive++;
+        EventControlPositive[EventsPositive] = v.as<int>();
+        Serial.print("> " + String(EventControlPositive[EventsPositive]) + "  ");
+        EventsPositive++;
       }
     }
-    else
-    {
-      char str[50];
-      char *token;
-      obj["scenecontrol"].as<String>().toCharArray(str, 50);
-      token = strtok(str, ",");
-     
-      while(token != NULL)
-      {
-        int t = atoi(token);
 
-        if(t < 0)
-        {
-          SceneControlNegative[SceneCountNegative] = -t;
-          Serial.print("<" + String(SceneControlNegative[SceneCountNegative]) + " ");
-          SceneCountNegative++;
-        }
-        else
-        {
-          SceneControlPositive[SceneCountPositive] = t;
-          Serial.print(">" + String(SceneControlPositive[SceneCountPositive]) + " ");
-          SceneCountPositive++;
-        }
-
-        token = strtok(NULL, ",");
-      }
-
-      Serial.println("");
-    }
-
-    ScenesNegative = new boolean [SceneCountNegative];
+    EventLockNegative = new boolean [EventsNegative];
     
-    for(int i = 0; i < SceneCountNegative; i++)
+    for(int i = 0; i < EventsNegative; i++)
     {
-      ScenesNegative[i] = false;
+      EventLockNegative[i] = false;
     }
 
-    ScenesPositive = new boolean [SceneCountPositive];
+    EventLockPositive = new boolean [EventsPositive];
     
-    for(int i = 0; i < SceneCountPositive; i++)
+    for(int i = 0; i < EventsPositive; i++)
     {
-      ScenesPositive[i] = false;
+      EventLockPositive[i] = false;
     }
-
+    
+    Serial.println("");
     Serial.println("-------------");
 
     saveFileSystem();

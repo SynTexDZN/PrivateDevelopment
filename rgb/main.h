@@ -35,16 +35,16 @@ class SynTexMain
     void LOOP();
     boolean checkConnection();
     
-    int SceneCountNegative;
-    boolean *ScenesNegative;
-    int SceneControlNegative[];
+    int EventsNegative;
+    boolean *EventLockNegative;
+    int EventControlNegative[];
 
     ESP8266WebServer server;
     HTTPClient sender;
 
-    int SceneCountPositive;
-    boolean *ScenesPositive;
-    int SceneControlPositive[];    
+    int EventsPositive;
+    boolean *EventLockPositive;
+    int EventControlPositive[];    
 };
 
 #endif

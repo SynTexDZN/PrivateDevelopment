@@ -10,7 +10,7 @@ unsigned long previousMillis;
 
 void setup()
 {
-  if(m.SETUP("temperature", "3.7.1", 10000) && m.checkConnection())
+  if(m.SETUP("temperature", "4.0.0", 10000) && m.checkConnection())
   {
     dht.begin();
 
@@ -41,7 +41,7 @@ void getTempHum()
     float humtmp = dht.readHumidity();
     float temptmp = dht.readTemperature();
 
-    if (isnan(humtmp) || isnan(temptmp))
+    if(isnan(humtmp) || isnan(temptmp))
     {
       Serial.println("Fehler beim Lesen vom DHT Sensor!");
     }
@@ -54,40 +54,40 @@ void getTempHum()
         m.sender.GET();
         m.sender.end();
 
-        for(int i = 0; i < m.SceneCountNegative; i++)
+        for(int i = 0; i < m.EventsNegative; i++)
         {
-          if(temp < m.SceneControlNegative[i] && !m.ScenesNegative[i])
+          if(temp < m.EventControlNegative[i] && !m.EventLockNegative[i])
           {
             m.sender.begin(m.BridgeIP + ":" + String(m.WebhookPort) + "/devices?mac=" + WiFi.macAddress() + "&event=" + i);
             m.sender.GET();
             m.sender.end();
             
-            for(int j = 0; j < m.SceneCountPositive; j++)
+            for(int j = 0; j < m.EventsPositive; j++)
             {
-              m.ScenesPositive[j] = false;
+              m.EventLockPositive[j] = false;
             }
             
-            m.ScenesNegative[i] = true;
+            m.EventLockNegative[i] = true;
     
             Serial.println("( " + String(i) + " ) Scene wird aktiviert!");
           }
           
-          for(int i = 0; i < m.SceneCountPositive; i++)
+          for(int i = 0; i < m.EventsPositive; i++)
           {  
-            if(temp > m.SceneControlPositive[i] && !m.ScenesPositive[i])
+            if(temp > m.EventControlPositive[i] && !m.EventLockPositive[i])
             {
-              m.sender.begin(m.BridgeIP + ":" + String(m.WebhookPort) + "/devices?mac=" + WiFi.macAddress() + "&event=" + String(i + m.SceneCountNegative));
+              m.sender.begin(m.BridgeIP + ":" + String(m.WebhookPort) + "/devices?mac=" + WiFi.macAddress() + "&event=" + String(i + m.EventsNegative));
               m.sender.GET();
               m.sender.end();
               
-              for(int j = 0; j < m.SceneCountNegative; j++)
+              for(int j = 0; j < m.EventsNegative; j++)
               {
-                m.ScenesNegative[j] = false;
+                m.EventLockNegative[j] = false;
               }
               
-              m.ScenesPositive[i] = true;
+              m.EventLockPositive[i] = true;
               
-              Serial.println("( " + String(i + m.SceneCountNegative) + " ) Scene wird aktiviert!");
+              Serial.println("( " + String(i + m.EventsNegative) + " ) Scene wird aktiviert!");
             }
           }
         } 
