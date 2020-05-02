@@ -6,14 +6,18 @@ boolean *button;
 
 void setup()
 {  
-  if(m.SETUP("switch", "4.0.0", 0) && m.checkConnection())
+  if(m.SETUP("switch", "4.1.0", 0) && m.checkConnection())
   {    
     button = new boolean[m.EventsPositive];
     
     for(int i = 0; i < m.EventsPositive; i++)
     {
       button[i] = false;
-      getSwitch(i, m.EventControlPositive[i]);
+      
+      if(m.Active)
+      {
+        getSwitch(i, m.EventControlPositive[i]);
+      }
     }
 
     delay(500);
@@ -29,7 +33,7 @@ void loop()
 {
   m.LOOP();
 
-  if(m.checkConnection())
+  if(m.checkConnection() && m.Active)
   {
     for(int i = 0; i < m.EventsPositive; i++)
     {
@@ -55,7 +59,7 @@ void getSwitch(int i, int pin)
   
   if(!buttontmp && m.EventLockPositive[i])
   {
-    m.sender.begin(m.BridgeIP + ":" + String(m.WebhookPort) + "/devices?mac=" + WiFi.macAddress() + "&event=" + i + "&value=" + (button[i] ? 0 : 1));
+    m.sender.begin(m.BridgeIP + ":" + m.WebhookPort + "/devices?mac=" + WiFi.macAddress() + "&event=" + i + "&value=" + (button[i] ? 0 : 1));
     m.sender.GET();
     m.sender.end();
 

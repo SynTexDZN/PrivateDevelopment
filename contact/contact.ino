@@ -6,7 +6,7 @@ boolean contact;
 
 void setup()
 {
-  if(m.SETUP("contact", "4.0.0", 0) && m.checkConnection())
+  if(m.SETUP("contact", "4.1.0", 0) && m.checkConnection() && m.Active)
   {
     getContact();
   }
@@ -16,7 +16,7 @@ void loop()
 {
   m.LOOP();
 
-  if(m.checkConnection())
+  if(m.checkConnection() && m.Active)
   {
     getContact();
   }

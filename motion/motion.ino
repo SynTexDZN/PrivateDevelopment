@@ -7,11 +7,14 @@ unsigned long previousMillis;
 
 void setup()
 {
-  if(m.SETUP("motion", "4.0.0", 5000) && m.checkConnection())
+  if(m.SETUP("motion", "4.1.0", 5000) && m.checkConnection())
   {
     previousMillis = -m.Interval;
-    
-    getMotion();
+
+    if(m.Active)
+    {
+      getMotion();
+    }
   }
 }
 
@@ -19,7 +22,7 @@ void loop()
 {
   m.LOOP();
 
-  if(m.checkConnection())
+  if(m.checkConnection() && m.Active)
   {
     getMotion();
   }

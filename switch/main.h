@@ -18,16 +18,18 @@ class SynTexMain
     boolean loadDatabaseSettings();
     
   public:
+    String WebhookPort;
+    String BridgeIP;
+    
     String WiFiName;
     String WiFiPass;
     String Version;
     String Name;
   
     String Type;
+    boolean Active;
     int Interval;
     boolean LED;
-    int WebhookPort;
-    String BridgeIP;
   
     SynTexMain();
 

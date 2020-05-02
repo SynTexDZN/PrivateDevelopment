@@ -11,15 +11,18 @@ unsigned long previousMillis;
 
 void setup()
 {
-  if(m.SETUP("light", "4.0.0", 10000) && m.checkConnection())
+  if(m.SETUP("light", "4.1.0", 10000) && m.checkConnection())
   {
     Wire.begin();
     lightMeter.begin(BH1750::CONTINUOUS_HIGH_RES_MODE_2);
 
     previousMillis = -m.Interval;
-    
-    getLight();
-    getRain();
+
+    if(m.Active)
+    {
+      getLight();
+      getRain();
+    }
   }
 }
 
@@ -27,7 +30,7 @@ void loop()
 {
   m.LOOP();
 
-  if(m.checkConnection())
+  if(m.checkConnection() && m.Active)
   {
     getLight();
     getRain();

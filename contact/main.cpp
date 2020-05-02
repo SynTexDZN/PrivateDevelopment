@@ -187,15 +187,16 @@ boolean SynTexMain::loadDatabaseSettings()
   if(response == HTTP_CODE_OK)
   {    
     Serial.println("SynTex Bridge erfolgreich verbunden!");
-    
-    StaticJsonDocument<200> doc;
+
+    StaticJsonDocument<400> doc;
     deserializeJson(doc, sender.getString());
     JsonObject obj = doc.as<JsonObject>();
 
     Name = obj["name"].as<String>();
+    Active = obj["active"].as<int>();
     Interval = obj["interval"].as<int>();
     LED = obj["led"].as<int>();
-    WebhookPort = obj["port"].as<int>();
+    WebhookPort = obj["port"].as<String>();
 
     Serial.println("-------------");
 
@@ -206,6 +207,8 @@ boolean SynTexMain::loadDatabaseSettings()
 
     Serial.print("Name: ");
     Serial.println(Name);
+    Serial.print("Aktiv: ");
+    Serial.println(Active);
     Serial.print("Interval: ");
     Serial.println(Interval);
     Serial.print("LED: ");

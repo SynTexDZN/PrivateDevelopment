@@ -10,13 +10,16 @@ unsigned long previousMillis;
 
 void setup()
 {
-  if(m.SETUP("temperature", "4.0.0", 10000) && m.checkConnection())
+  if(m.SETUP("temperature", "4.1.0", 10000) && m.checkConnection())
   {
     dht.begin();
 
     previousMillis = -m.Interval;
 
-    getTempHum();
+    if(m.Active)
+    {
+      getTempHum();
+    }
   }
 }
 
@@ -24,7 +27,7 @@ void loop()
 {
   m.LOOP();
 
-  if(m.checkConnection())
+  if(m.checkConnection() && m.Active)
   {
     getTempHum();
   }
