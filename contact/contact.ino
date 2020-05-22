@@ -6,7 +6,7 @@ boolean contact;
 
 void setup()
 {
-  if(m.SETUP("contact", "4.1.0", 0) && m.checkConnection() && m.Active)
+  if(m.SETUP("contact", "4.2.1", 0, "[]") && m.checkConnection() && m.Active)
   {
     getContact();
   }
@@ -32,7 +32,7 @@ void getContact()
 
     if(contact)
     {
-      m.sender.begin(m.BridgeIP + ":" + String(m.WebhookPort) + "/devices?mac=" + WiFi.macAddress() + "&value=false");
+      m.sender.begin(m.BridgeIP + ":" + String(m.WebhookPort) + "/devices?mac=" + WiFi.macAddress() + "&value=true");
 
       if(m.LED)
       {
@@ -43,7 +43,7 @@ void getContact()
     }
     else
     {
-      m.sender.begin(m.BridgeIP + ":" + String(m.WebhookPort) + "/devices?mac=" + WiFi.macAddress() + "&value=true");
+      m.sender.begin(m.BridgeIP + ":" + String(m.WebhookPort) + "/devices?mac=" + WiFi.macAddress() + "&value=false");
 
       if(m.LED)
       {

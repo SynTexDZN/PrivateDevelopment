@@ -10,7 +10,7 @@ unsigned long previousMillis;
 
 void setup()
 {
-  if(m.SETUP("temperature", "4.1.0", 10000) && m.checkConnection())
+  if(m.SETUP("temperature", "4.2.0", 10000, "[]") && m.checkConnection())
   {
     dht.begin();
 

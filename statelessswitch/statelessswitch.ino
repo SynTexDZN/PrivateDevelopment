@@ -6,7 +6,7 @@ boolean *button;
 
 void setup()
 {  
-  if(m.SETUP("statelessswitch", "4.1.1", 0) && m.checkConnection())
+  if(m.SETUP("statelessswitch", "4.2.0", 0, "[5]") && m.checkConnection())
   {    
     button = new boolean[m.EventsPositive];
     

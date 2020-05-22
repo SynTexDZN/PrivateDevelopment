@@ -9,7 +9,9 @@ SynTexMain::SynTexMain()
   Serial.println("New object created!");
 }
 
-boolean SynTexMain::SETUP(String Type, String Version, int Interval)
+String SetupEvents;
+
+boolean SynTexMain::SETUP(String Type, String Version, int Interval, String Events)
 {
   Serial.begin(115200);
   Serial.println();
@@ -64,6 +66,7 @@ boolean SynTexMain::SETUP(String Type, String Version, int Interval)
   this -> Version = Version;
   this -> Type = Type;
   this -> Interval = Interval;
+  SetupEvents = Events;
   
   if(WiFiName != "")
   {
@@ -88,16 +91,7 @@ boolean SynTexMain::SETUP(String Type, String Version, int Interval)
       
       WiFi.softAPdisconnect(true);
 
-      int counter = 0;
-
-      while(!loadDatabaseSettings() && counter < 15)
-      {
-        Serial.println("Keine SynTex Bridge gefunden!");
-
-        counter++;
-
-        delay(2000);
-      }
+      loadDatabaseSettings();
 
       digitalWrite(LED_BUILTIN, HIGH);
     }
@@ -139,9 +133,10 @@ void SynTexMain::updateDevice()
   ESPhttpUpdate.onError(update_error);
   */
 
-  sender.begin("http://syntex.sytes.net/smarthome/check-version.php?device=" + Type);
-  int response = sender.GET();
-  
+  Serial.print("Nach Updates suchen ..");
+
+  int response = safeFetch("http://syntex.sytes.net/smarthome/check-version.php?device=" + Type, 10);
+
   if(response == HTTP_CODE_OK)
   {    
     String newVersion = sender.getString();
@@ -179,10 +174,11 @@ boolean SynTexMain::loadDatabaseSettings()
 {
   String safeName = Name;
 
-  safeName.replace(" ", "");
-  
-  sender.begin(BridgeIP + "/init?mac=" + WiFi.macAddress() + "&ip=" + WiFi.localIP().toString() + "&type=" + Type + "&name=" + safeName + "&version=" + Version + "&refresh=" + Interval);
-  int response = sender.GET();
+  safeName.replace(" ", "%");
+
+  Serial.print("Mit der SynTex Bridge verbinden ..");
+
+  int response = safeFetch(BridgeIP + "/init?mac=" + WiFi.macAddress() + "&ip=" + WiFi.localIP().toString() + "&type=" + Type + "&name=" + safeName + "&version=" + Version + "&refresh=" + Interval + "&buttons=" + SetupEvents, 10);
   
   if(response == HTTP_CODE_OK)
   {    
@@ -273,8 +269,9 @@ boolean SynTexMain::loadDatabaseSettings()
 
 void SynTexMain::resetDevice()
 {
-  sender.begin(BridgeIP + "/remove-device?mac=" + WiFi.macAddress() + "&type=" + Type);
-  int response = sender.GET();
+  Serial.print("Das Gerät wird zurückgesetzt ..");
+
+  int response = safeFetch(BridgeIP + "/remove-device?mac=" + WiFi.macAddress() + "&type=" + Type, 10);
   
   if(response == HTTP_CODE_OK && sender.getString() == "Success")
   {
@@ -398,6 +395,11 @@ void SynTexMain::saveWiFiSettings()
   {
     BridgeIP = server.arg("bridge-ip");
   }
+
+  if(server.hasArg("device-name"))
+  {
+    Name = server.arg("device-name");
+  }
   
   if(server.hasArg("wifissid") && server.hasArg("wifipass"))
   {   
@@ -476,4 +478,28 @@ void SynTexMain::scanWiFi()
     server.sendHeader("Access-Control-Allow-Origin", "*");
     server.send(200, "text/plain", html);
   }
+}
+
+int SynTexMain::safeFetch(String URL, int Time)
+{
+  int response;
+  int counter = 0;
+  
+  do
+  {
+    sender.begin(URL);
+    response = sender.GET();
+
+    if(response != HTTP_CODE_OK)
+    {
+      delay(500);
+      Serial.print(".");
+      counter++;
+    }
+  }
+  while(response != HTTP_CODE_OK && counter < Time * 2);
+
+  Serial.println();
+
+  return response;
 }
