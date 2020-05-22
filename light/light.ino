@@ -11,7 +11,7 @@ unsigned long previousMillis;
 
 void setup()
 {
-  if(m.SETUP("light", "4.3.0", 10000, "[]") && m.checkConnection())
+  if(m.SETUP("light", "4.3.3", 10000, "[]") && m.checkConnection())
   {
     Wire.begin();
     lightMeter.begin(BH1750::CONTINUOUS_HIGH_RES_MODE_2);
@@ -21,7 +21,10 @@ void setup()
     if(m.Active)
     {
       getLight();
-      getRain();
+
+      rain = digitalRead(2);
+      
+      m.safeFetch(m.BridgeIP + ":" + String(m.WebhookPort) + "/devices?mac=" + WiFi.macAddress() + "&type=rain&value=" + (rain ? "false" : "true"), m.Interval, false);
     }
   }
 }
@@ -36,51 +39,6 @@ void loop()
     getRain();
   }
 }
-/*
-
-void checkUpdates()
-{
-  Serial.println("Prüfe auf Updates ..");
-  
-  sender.begin("http://syntex.local/ota/check-version.php?device=" + SensorType);
-  int response = sender.GET();
-  
-  if(response == HTTP_CODE_OK)
-  {    
-    if(sender.getString() != Version)
-    {
-      Serial.println("Update gefunden! Installation ..");
-      
-      WiFiClient client;
-      t_httpUpdate_return ret = ESPhttpUpdate.update(client, "http://syntex.local/ota/" + SensorType + sender.getString() + ".bin");
-    
-      switch (ret) {
-        case HTTP_UPDATE_FAILED:
-          Serial.printf("HTTP_UPDATE_FAILD Error (%d): %s\n", ESPhttpUpdate.getLastError(), ESPhttpUpdate.getLastErrorString().c_str());
-          break;
-    
-        case HTTP_UPDATE_NO_UPDATES:
-          Serial.println("HTTP_UPDATE_NO_UPDATES");
-          break;
-    
-        case HTTP_UPDATE_OK:
-          Serial.println("HTTP_UPDATE_OK");
-          break;
-      }
-    }
-    else
-    {
-      Serial.println("Das Gerät hat bereits die neuste Firmware!");
-    }
-  }
-  else
-  {
-    Serial.println("Update Server ist nicht erreichbar!");
-  }
-
-  sender.end();
-}
-*/
 
 void getLight()
 {
@@ -95,50 +53,59 @@ void getLight()
     if(lighttmp != light)
     {
       light = lighttmp;
-      m.sender.begin(m.BridgeIP + ":" + String(m.WebhookPort) + "/devices?mac=" + WiFi.macAddress() + "&type=" + m.Type + "&value=" + String(light));
-      m.sender.GET();
-      m.sender.end();
+
+      Serial.println("Licht: " + String(light) + " lux");
+
+      m.safeFetch(m.BridgeIP + ":" + String(m.WebhookPort) + "/devices?mac=" + WiFi.macAddress() + "&type=" + m.Type + "&value=" + String(light), m.Interval, false);
 
       for(int i = 0; i < m.EventsNegative; i++)
       {
         if(light < m.EventControlNegative[i] && !m.EventLockNegative[i])
         {
-          m.sender.begin(m.BridgeIP + ":" + String(m.WebhookPort) + "/devices?mac=" + WiFi.macAddress() + "&event=" + i);
-          m.sender.GET();
-          m.sender.end();
-          
-          for(int j = 0; j < m.EventsPositive; j++)
+          int response = m.safeFetch(m.BridgeIP + ":" + String(m.WebhookPort) + "/devices?mac=" + WiFi.macAddress() + "&event=" + i, m.Interval, false);
+
+          if(response == HTTP_CODE_OK)
           {
-            m.EventLockPositive[j] = false;
+            for(int j = 0; j < m.EventsPositive; j++)
+            {
+              m.EventLockPositive[j] = false;
+            }
+            
+            m.EventLockNegative[i] = true;
+
+            Serial.println("( " + String(i) + " ) Scene wird aktiviert!");
           }
-          
-          m.EventLockNegative[i] = true;
-  
-          Serial.println("( " + String(i) + " ) Scene wird aktiviert!");
+          else
+          {
+            Serial.println("( " + String(i) + " ) Scene konnte nicht aktiviert werden!");
+          }
         }
         
         for(int i = 0; i < m.EventsPositive; i++)
         {  
           if(light > m.EventControlPositive[i] && !m.EventLockPositive[i])
           {
-            m.sender.begin(m.BridgeIP + ":" + String(m.WebhookPort) + "/devices?mac=" + WiFi.macAddress() + "&event=" + String(i + m.EventsNegative));
-            m.sender.GET();
-            m.sender.end();
-            
-            for(int j = 0; j < m.EventsNegative; j++)
+            int response = m.safeFetch(m.BridgeIP + ":" + String(m.WebhookPort) + "/devices?mac=" + WiFi.macAddress() + "&event=" + String(i + m.EventsNegative), m.Interval, false);
+
+            if(response == HTTP_CODE_OK)
             {
-              m.EventLockNegative[j] = false;
+              for(int j = 0; j < m.EventsNegative; j++)
+              {
+                m.EventLockNegative[j] = false;
+              }
+              
+              m.EventLockPositive[i] = true;
+              
+              Serial.println("( " + String(i + m.EventsNegative) + " ) Scene wird aktiviert!");
             }
-            
-            m.EventLockPositive[i] = true;
-            
-            Serial.println("( " + String(i + m.EventsNegative) + " ) Scene wird aktiviert!");
+            else
+            {
+              Serial.println("( " + String(i + m.EventsNegative) + " ) Scene konnte nicht aktiviert werden!");
+            }
           }
         }
       }
     }
-    
-    Serial.println("Licht: " + String(light) + " lux");
   }
 }
 
@@ -150,18 +117,9 @@ void getRain()
   {
     rain = raintmp;
 
-    if(rain)
-    {
-      m.sender.begin(m.BridgeIP + ":" + String(m.WebhookPort) + "/devices?mac=" + WiFi.macAddress() + "&type=rain&value=false");
-      Serial.println("Regen: Nein");
-    }
-    else
-    {
-      m.sender.begin(m.BridgeIP + ":" + String(m.WebhookPort) + "/devices?mac=" + WiFi.macAddress() + "&type=rain&value=true");
-      Serial.println("Regen: Ja");
-    }
+    Serial.print("Regen: ");
+    Serial.println(rain ? "Nein" : "Ja");
 
-    m.sender.GET();
-    m.sender.end();
+    m.safeFetch(m.BridgeIP + ":" + String(m.WebhookPort) + "/devices?mac=" + WiFi.macAddress() + "&type=rain&value=" + (rain ? "false" : "true"), m.Interval, false);
   }
 }

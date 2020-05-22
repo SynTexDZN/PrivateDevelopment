@@ -36,7 +36,7 @@ class SynTexMain
     boolean SETUP(String Type, String Version, int Interval, String Events);
     void LOOP();
     boolean checkConnection();
-    int safeFetch(String URL, int Time);
+    int safeFetch(String URL, int Time, boolean Dots);
     
     int EventsNegative;
     boolean *EventLockNegative;

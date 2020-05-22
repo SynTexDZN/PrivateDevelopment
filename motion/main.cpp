@@ -135,7 +135,7 @@ void SynTexMain::updateDevice()
 
   Serial.print("Nach Updates suchen ..");
 
-  int response = safeFetch("http://syntex.sytes.net/smarthome/check-version.php?device=" + Type, 10);
+  int response = safeFetch("http://syntex.sytes.net/smarthome/check-version.php?device=" + Type, 10, true);
 
   if(response == HTTP_CODE_OK)
   {    
@@ -178,7 +178,7 @@ boolean SynTexMain::loadDatabaseSettings()
 
   Serial.print("Mit der SynTex Bridge verbinden ..");
 
-  int response = safeFetch(BridgeIP + "/init?mac=" + WiFi.macAddress() + "&ip=" + WiFi.localIP().toString() + "&type=" + Type + "&name=" + safeName + "&version=" + Version + "&refresh=" + Interval + "&buttons=" + SetupEvents, 10);
+  int response = safeFetch(BridgeIP + "/init?mac=" + WiFi.macAddress() + "&ip=" + WiFi.localIP().toString() + "&type=" + Type + "&name=" + safeName + "&version=" + Version + "&refresh=" + Interval + "&buttons=" + SetupEvents, 10, true);
   
   if(response == HTTP_CODE_OK)
   {    
@@ -204,11 +204,11 @@ boolean SynTexMain::loadDatabaseSettings()
     Serial.print("Name: ");
     Serial.println(Name);
     Serial.print("Aktiv: ");
-    Serial.println(Active);
+    Serial.println(Active ? "An" : "Aus");
     Serial.print("Interval: ");
     Serial.println(Interval);
     Serial.print("LED: ");
-    Serial.println(LED);
+    Serial.println(LED ? "An" : "Aus");
     Serial.print("Events: ");
 
     EventsNegative = 0; 
@@ -245,6 +245,11 @@ boolean SynTexMain::loadDatabaseSettings()
     {
       EventLockPositive[i] = false;
     }
+
+    if(EventsPositive + EventsNegative == 0)
+    {
+      Serial.print("/");
+    }
     
     Serial.println("");
     Serial.println("-------------");
@@ -271,7 +276,7 @@ void SynTexMain::resetDevice()
 {
   Serial.print("Das Gerät wird zurückgesetzt ..");
 
-  int response = safeFetch(BridgeIP + "/remove-device?mac=" + WiFi.macAddress() + "&type=" + Type, 10);
+  int response = safeFetch(BridgeIP + "/remove-device?mac=" + WiFi.macAddress() + "&type=" + Type, 10, true);
   
   if(response == HTTP_CODE_OK && sender.getString() == "Success")
   {
@@ -480,7 +485,7 @@ void SynTexMain::scanWiFi()
   }
 }
 
-int SynTexMain::safeFetch(String URL, int Time)
+int SynTexMain::safeFetch(String URL, int Time, boolean Dots)
 {
   int response;
   int counter = 0;
@@ -493,13 +498,20 @@ int SynTexMain::safeFetch(String URL, int Time)
     if(response != HTTP_CODE_OK)
     {
       delay(500);
-      Serial.print(".");
       counter++;
+
+      if(Dots)
+      {
+        Serial.print(".");
+      }
     }
   }
   while(response != HTTP_CODE_OK && counter < Time * 2);
 
-  Serial.println();
+  if(Dots)
+  {
+    Serial.println();
+  }
 
   return response;
 }

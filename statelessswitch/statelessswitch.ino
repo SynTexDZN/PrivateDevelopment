@@ -6,18 +6,13 @@ boolean *button;
 
 void setup()
 {  
-  if(m.SETUP("statelessswitch", "4.2.0", 0, "[5]") && m.checkConnection())
+  if(m.SETUP("statelessswitch", "4.3.3", 0, "[5]") && m.checkConnection())
   {    
     button = new boolean[m.EventsPositive];
     
     for(int i = 0; i < m.EventsPositive; i++)
     {
       button[i] = false;
-      
-      if(m.Active)
-      {
-        getSwitch(i, m.EventControlPositive[i]);
-      }
     }
 
     delay(500);
@@ -59,17 +54,20 @@ void getSwitch(int i, int pin)
   
   if(!buttontmp && m.EventLockPositive[i])
   {
-    m.sender.begin(m.BridgeIP + ":" + m.WebhookPort + "/devices?mac=" + WiFi.macAddress() + "&event=" + i + "&value=" + (button[i] ? 0 : 1));
-    m.sender.GET();
-    m.sender.end();
+    if(!buttontmp)
+    {
+      m.EventLockPositive[i] = false;
+    }
 
-    Serial.println("Schalter Nr. " + String(i+1) + ": " + (button[i] ? "An" : "Aus"));
+    Serial.println("Schalter Nr. " + String(i + 1) + ": " + (button[i] ? "An" : "Aus"));
 
-    if(m.LED)
+    int response = m.safeFetch(m.BridgeIP + ":" + m.WebhookPort + "/devices?mac=" + WiFi.macAddress() + "&event=" + i + "&value=" + (button[i] ? 0 : 1), 10, false);
+
+    if(response == HTTP_CODE_OK && m.LED)
     {
       if(m.EventsPositive == 1)
       {
-        digitalWrite(LED_BUILTIN, button[i] ? LOW : HIGH);
+        digitalWrite(LED_BUILTIN, button[i] ? HIGH : LOW);
       }
       else
       {
@@ -78,10 +76,5 @@ void getSwitch(int i, int pin)
         digitalWrite(LED_BUILTIN, HIGH);
       }
     }
-  }
-
-  if(!buttontmp)
-  {
-    m.EventLockPositive[i] = false;
   }
 }

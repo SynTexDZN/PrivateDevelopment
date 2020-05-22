@@ -7,7 +7,7 @@ unsigned long previousMillis;
 
 void setup()
 {
-  if(m.SETUP("airquality", "4.2.0", 10000, "[]") && m.checkConnection())
+  if(m.SETUP("airquality", "4.3.0", 10000, "[]") && m.checkConnection())
   {
     previousMillis = -m.Interval;
     

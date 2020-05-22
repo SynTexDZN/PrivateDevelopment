@@ -7,13 +7,15 @@ unsigned long previousMillis;
 
 void setup()
 {
-  if(m.SETUP("motion", "4.2.0", 5000, "[]") && m.checkConnection())
+  if(m.SETUP("motion", "4.3.1", 5000, "[]") && m.checkConnection())
   {
     previousMillis = -m.Interval;
 
     if(m.Active)
     {
-      getMotion();
+      motion = digitalRead(14);
+    
+      m.safeFetch(m.BridgeIP + ":" + String(m.WebhookPort) + "/devices?mac=" + WiFi.macAddress() + "&value=" + (motion ? "true" : "false"), 10, false);
     }
   }
 }
@@ -43,30 +45,14 @@ void getMotion()
   {
     motion = motiontmp;
 
-    if(motion)
-    {
-      m.sender.begin(m.BridgeIP + ":" + String(m.WebhookPort) + "/devices?mac=" + WiFi.macAddress() + "&value=true");
+    Serial.print("Bewegung: ");
+    Serial.println(motion ? "Ja" : "Nein");
 
-      if(m.LED)
-      {
-        digitalWrite(LED_BUILTIN, LOW);
-      }
-      
-      Serial.println("Bewegung: Ja");
-    }
-    else
-    {
-      m.sender.begin(m.BridgeIP + ":" + String(m.WebhookPort) + "/devices?mac=" + WiFi.macAddress() + "&value=false");
+    int response = m.safeFetch(m.BridgeIP + ":" + String(m.WebhookPort) + "/devices?mac=" + WiFi.macAddress() + "&value=" + (motion ? "true" : "false"), 10, false);
 
-      if(m.LED)
-      {
-        digitalWrite(LED_BUILTIN, HIGH);
-      }
-      
-      Serial.println("Bewegung: Nein");
+    if(response == HTTP_CODE_OK && m.LED)
+    {
+      digitalWrite(LED_BUILTIN, motion ? LOW : HIGH);
     }
-    
-    m.sender.GET();
-    m.sender.end();
   }
 }

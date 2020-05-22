@@ -9,16 +9,12 @@ boolean state;
 
 void setup()
 {
-  if(m.SETUP("rgb", "4.2.0", 0, "[]") && m.checkConnection())
+  if(m.SETUP("rgb", "4.3.1", 0, "[]") && m.checkConnection())
   {
     pinMode(5, OUTPUT);
     pinMode(4, OUTPUT);
     pinMode(0, OUTPUT);
-  
-    m.sender.begin(m.BridgeIP + ":" + String(m.WebhookPort) + "/devices?mac=" + WiFi.macAddress() + "&value=false:0:0:0");
-    m.sender.GET();
-    m.sender.end();
-  
+
     m.server.on("/color", []
     {
       if(m.server.hasArg("r") && m.server.hasArg("g") && m.server.hasArg("b"))
@@ -29,6 +25,8 @@ void setup()
           m.server.send(200, "text/plain", "Success");
       }
     });
+
+    m.safeFetch(m.BridgeIP + ":" + String(m.WebhookPort) + "/devices?mac=" + WiFi.macAddress() + "&value=false:0:0:0", 10, false);
   }
 }
 
@@ -62,8 +60,6 @@ void setRGB(int red, int green, int blue)
     analogWrite(4, g * 4);
     analogWrite(0, b * 4);
   }
-  
-  m.sender.begin(m.BridgeIP + ":" + String(m.WebhookPort) + "/devices?mac=" + WiFi.macAddress() + "&value=" + (state ? "true" : "false") + ":" + String(r) + ":" + String(g) + ":" + String(b));
-  m.sender.GET();
-  m.sender.end();
+
+  m.safeFetch(m.BridgeIP + ":" + String(m.WebhookPort) + "/devices?mac=" + WiFi.macAddress() + "&value=" + (state ? "true" : "false") + ":" + String(r) + ":" + String(g) + ":" + String(b), 10, false);
 }

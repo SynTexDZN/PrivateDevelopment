@@ -6,9 +6,11 @@ boolean contact;
 
 void setup()
 {
-  if(m.SETUP("contact", "4.2.1", 0, "[]") && m.checkConnection() && m.Active)
+  if(m.SETUP("contact", "4.3.4", 0, "[]") && m.checkConnection() && m.Active)
   {
-    getContact();
+    contact = digitalRead(14);
+    
+    m.safeFetch(m.BridgeIP + ":" + String(m.WebhookPort) + "/devices?mac=" + WiFi.macAddress() + "&value=" + (contact ? "true" : "false"), 10, false);
   }
 }
 
@@ -30,30 +32,14 @@ void getContact()
   {
     contact = contacttmp;
 
-    if(contact)
-    {
-      m.sender.begin(m.BridgeIP + ":" + String(m.WebhookPort) + "/devices?mac=" + WiFi.macAddress() + "&value=true");
+    Serial.print("Kontakt: ");
+    Serial.println(contact ? "Nein" : "Ja");
 
-      if(m.LED)
-      {
-        digitalWrite(LED_BUILTIN, LOW);
-      }
-      
-      Serial.println("Kontakt: Nein");
-    }
-    else
-    {
-      m.sender.begin(m.BridgeIP + ":" + String(m.WebhookPort) + "/devices?mac=" + WiFi.macAddress() + "&value=false");
+    int response = m.safeFetch(m.BridgeIP + ":" + String(m.WebhookPort) + "/devices?mac=" + WiFi.macAddress() + "&value=" + (contact ? "true" : "false"), 10, false);
 
-      if(m.LED)
-      {
-        digitalWrite(LED_BUILTIN, HIGH);
-      }
-      
-      Serial.println("Kontakt: Ja");
+    if(response == HTTP_CODE_OK && m.LED)
+    {
+      digitalWrite(LED_BUILTIN, contact ? LOW : HIGH);
     }
-    
-    m.sender.GET();
-    m.sender.end();
   }
 }
