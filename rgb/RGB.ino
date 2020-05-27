@@ -9,7 +9,7 @@ boolean state;
 
 void setup()
 {
-  if(m.SETUP("rgb", "4.3.1", 0, "[]") && m.checkConnection())
+  if(m.SETUP("rgb", "4.3.2", 0, "[]") && m.checkConnection())
   {
     pinMode(5, OUTPUT);
     pinMode(4, OUTPUT);
@@ -60,6 +60,4 @@ void setRGB(int red, int green, int blue)
     analogWrite(4, g * 4);
     analogWrite(0, b * 4);
   }
-
-  m.safeFetch(m.BridgeIP + ":" + String(m.WebhookPort) + "/devices?mac=" + WiFi.macAddress() + "&value=" + (state ? "true" : "false") + ":" + String(r) + ":" + String(g) + ":" + String(b), 10, false);
 }
