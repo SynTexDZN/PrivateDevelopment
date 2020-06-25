@@ -1,3 +1,4 @@
+#include "main.h"
 #include "accessory.h"
 #include "Arduino.h"
 
@@ -62,6 +63,57 @@ boolean Accessory::SETUP(String Type, String Version, int Interval, String Event
   Serial.println("-------------");
   */
   return true;
+}
+
+void Accessory::updateScenes(int value)
+{
+  for(int i = 0; i < EventsNegative; i++)
+  {
+    if(value < EventControlNegative[i] && !EventLockNegative[i])
+    {
+      int response = safeFetch(BridgeIP + ":" + String(WebhookPort) + "/devices?mac=" + WiFi.macAddress() + "&event=" + i, Interval, false);
+
+      if(response == HTTP_CODE_OK)
+      {
+        for(int j = 0; j < EventsPositive; j++)
+        {
+          EventLockPositive[j] = false;
+        }
+        
+        EventLockNegative[i] = true;
+
+        Serial.println("( " + String(i) + " ) Scene wird aktiviert!");
+      }
+      else
+      {
+        Serial.println("( " + String(i) + " ) Scene konnte nicht aktiviert werden!");
+      }
+    }
+    
+    for(int i = 0; i < EventsPositive; i++)
+    {  
+      if(value > EventControlPositive[i] && !EventLockPositive[i])
+      {
+        int response = safeFetch(BridgeIP + ":" + String(WebhookPort) + "/devices?mac=" + WiFi.macAddress() + "&event=" + String(i + EventsNegative), Interval, false);
+
+        if(response == HTTP_CODE_OK)
+        {
+          for(int j = 0; j < EventsNegative; j++)
+          {
+            EventLockNegative[j] = false;
+          }
+          
+          EventLockPositive[i] = true;
+          
+          Serial.println("( " + String(i + EventsNegative) + " ) Scene wird aktiviert!");
+        }
+        else
+        {
+          Serial.println("( " + String(i + EventsNegative) + " ) Scene konnte nicht aktiviert werden!");
+        }
+      }
+    }
+  }
 }
 
 int Accessory::safeFetch(String URL, int Time, boolean Dots)

@@ -20,6 +20,7 @@ class Accessory
     Accessory();
 
     boolean SETUP(String Type, String Version, int Interval, String Events, String BridgeIP, String WebhookPort);
+    void updateScenes(int value);
     int safeFetch(String URL, int Time, boolean Dots);
     
     int EventsNegative;

@@ -3,19 +3,14 @@
 #include "Arduino.h"
 #include <DHT.h>
 
-Accessory main;
+Accessory climateAccessory;
 DHT dht(2, DHT11);
-
-unsigned long previousMillis;
-
-float temp;
-float hum;
 
 Climate::Climate() { }
 
 void Climate::SETUP(String ip, String port, int interval, String events)
 {
-  main.SETUP("climate", "5.0.0", interval, events, ip, port);
+  climateAccessory.SETUP("climate", "5.0.0", interval, events, ip, port);
 
   dht.begin();
 }
@@ -24,7 +19,7 @@ void Climate::UPDATE(boolean force)
 {
   unsigned long currentMillis = millis();
 
-  if(force || currentMillis - previousMillis >= main.Interval)
+  if(force || currentMillis - previousMillis >= climateAccessory.Interval)
   {
     previousMillis = currentMillis;   
 
@@ -45,62 +40,16 @@ void Climate::UPDATE(boolean force)
       {
         temp = temptmp;
 
-        main.safeFetch(main.BridgeIP + ":" + String(main.WebhookPort) + "/devices?mac=" + WiFi.macAddress() + "&type=temperature&value=" + String(temp), main.Interval, false);
+        climateAccessory.safeFetch(climateAccessory.BridgeIP + ":" + String(climateAccessory.WebhookPort) + "/devices?mac=" + WiFi.macAddress() + "&type=temperature&value=" + String(temp), climateAccessory.Interval, false);
 
-        for(int i = 0; i < main.EventsNegative; i++)
-        {
-          if(temp < main.EventControlNegative[i] && !main.EventLockNegative[i])
-          {
-            int response = main.safeFetch(main.BridgeIP + ":" + String(main.WebhookPort) + "/devices?mac=" + WiFi.macAddress() + "&event=" + i, main.Interval, false);
-
-            if(response == HTTP_CODE_OK)
-            {
-              for(int j = 0; j < main.EventsPositive; j++)
-              {
-                main.EventLockPositive[j] = false;
-              }
-              
-              main.EventLockNegative[i] = true;
-      
-              Serial.println("( " + String(i) + " ) Scene wird aktiviert!");
-            }
-            else
-            {
-              Serial.println("( " + String(i) + " ) Scene konnte nicht aktiviert werden!");
-            }
-          }
-          
-          for(int i = 0; i < main.EventsPositive; i++)
-          {  
-            if(temp > main.EventControlPositive[i] && !main.EventLockPositive[i])
-            {
-              int response = main.safeFetch(main.BridgeIP + ":" + String(main.WebhookPort) + "/devices?mac=" + WiFi.macAddress() + "&event=" + String(i + main.EventsNegative), main.Interval, false);
-
-              if(response == HTTP_CODE_OK)
-              {
-                for(int j = 0; j < main.EventsNegative; j++)
-                {
-                  main.EventLockNegative[j] = false;
-                }
-                
-                main.EventLockPositive[i] = true;
-                
-                Serial.println("( " + String(i + main.EventsNegative) + " ) Scene wird aktiviert!");
-              }
-              else
-              {
-                Serial.println("( " + String(i + main.EventsNegative) + " ) Scene konnte nicht aktiviert werden!");
-              }
-            }
-          }
-        } 
+        climateAccessory.updateScenes(temp);
       }
       
       if(humtmp != hum)
       {
         hum = humtmp;
 
-        main.safeFetch(main.BridgeIP + ":" + String(main.WebhookPort) + "/devices?mac=" + WiFi.macAddress() + "&type=humidity&value=" + String((int)hum), main.Interval, false);
+        climateAccessory.safeFetch(climateAccessory.BridgeIP + ":" + String(climateAccessory.WebhookPort) + "/devices?mac=" + WiFi.macAddress() + "&type=humidity&value=" + String((int)hum), climateAccessory.Interval, false);
       }
     }
   }

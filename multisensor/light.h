@@ -1,21 +1,20 @@
-#ifndef Climate_H
-#define Climate_H
+#ifndef Light_H
+#define Light_H
 
 #include "main.h"
 #include "Arduino.h"
 
-class Climate
+class Light
 {
   public:
-    Climate();
+    Light();
     
     void SETUP(String ip, String port, int interval, String events);
     void UPDATE(boolean force);
-
+    
     unsigned long previousMillis;
 
-    float temp;
-    float hum;
+    float light;
 };
 
 #endif
