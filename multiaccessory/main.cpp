@@ -4,12 +4,7 @@
 #include <ArduinoJson.h>
 #include <ESP8266httpUpdate.h>
 
-SynTexMain::SynTexMain()
-{
-  Serial.println("New object created!");
-}
-
-String SetupEvents;
+SynTexMain::SynTexMain() {}
 
 boolean SynTexMain::SETUP(String Type, String Version, int Interval, String Events)
 {
@@ -44,7 +39,7 @@ boolean SynTexMain::SETUP(String Type, String Version, int Interval, String Even
     Serial.print("Bridge IP: ");
     Serial.println(BridgeIP);
   }
-
+  
   Serial.println("-------------");
 
   if(Name == "")
@@ -66,7 +61,7 @@ boolean SynTexMain::SETUP(String Type, String Version, int Interval, String Even
   this -> Version = Version;
   this -> Type = Type;
   this -> Interval = Interval;
-  SetupEvents = Events;
+  this -> Events = Events;
   
   if(WiFiName != "")
   {
@@ -88,7 +83,7 @@ boolean SynTexMain::SETUP(String Type, String Version, int Interval, String Even
     {
       Serial.print("Verbunden! IP-Adresse: ");
       Serial.println(WiFi.localIP());
-      
+
       WiFi.softAPdisconnect(true);
 
       loadDatabaseSettings();
@@ -110,7 +105,7 @@ boolean SynTexMain::SETUP(String Type, String Version, int Interval, String Even
   server.on("/settings", HTTP_POST, [this]{ saveWiFiSettings(); });
   server.on("/", [this]{ server.sendHeader("Access-Control-Allow-Origin", "*"); server.send(200, "text/plain", ""); });
   server.on("/reset", [this]{ resetDevice(); });
-  server.on("/restart", [this]{ server.sendHeader("Access-Control-Allow-Origin", "*"); server.send(200, "text/plain", ""); delay(2000); ESP.restart(); });
+  server.on("/restart", [this]{ server.sendHeader("Access-Control-Allow-Origin", "*"); server.send(200, "text/plain", "Success"); delay(2000); ESP.restart(); });
   server.on("/version", [this]{ server.sendHeader("Access-Control-Allow-Origin", "*"); server.send(200, "text/plain", this -> Version); });
   server.on("/update", [this]{ updateDevice(); });
   server.on("/refresh", [this]{ loadDatabaseSettings(); });
@@ -176,9 +171,11 @@ boolean SynTexMain::loadDatabaseSettings()
 
   safeName.replace(" ", "%");
 
+  Serial.println(BridgeIP + ":1711/serverside/init?mac=" + WiFi.macAddress() + "&ip=" + WiFi.localIP().toString() + "&type=" + Type + "&name=" + safeName + "&version=" + Version + "&refresh=" + Interval + "&buttons=" + Events);
+
   Serial.print("Mit der SynTex Bridge verbinden ..");
 
-  int response = safeFetch(BridgeIP + "/init?mac=" + WiFi.macAddress() + "&ip=" + WiFi.localIP().toString() + "&type=" + Type + "&name=" + safeName + "&version=" + Version + "&refresh=" + Interval + "&buttons=" + SetupEvents, 10, true);
+  int response = safeFetch(BridgeIP + ":1711/serverside/init?mac=" + WiFi.macAddress() + "&ip=" + WiFi.localIP().toString() + "&type=" + Type + "&name=" + safeName + "&version=" + Version + "&refresh=" + Interval + "&buttons=" + Events, 10, true);
   
   if(response == HTTP_CODE_OK)
   {    
@@ -211,42 +208,25 @@ boolean SynTexMain::loadDatabaseSettings()
     Serial.println(LED ? "An" : "Aus");
     Serial.print("Events: ");
 
-    EventsNegative = 0; 
-    EventsPositive = 0; 
+    Events = obj["events"].as<String>();
 
-    JsonArray events = obj["events"].as<JsonArray>();
+    int counter = 0;
 
-    for(JsonVariant v : events)
+    for(JsonVariant v : obj["events"].as<JsonArray>())
     {
       if(v.as<int>() < 0)
       {
-        EventControlNegative[EventsNegative] = -v.as<int>();
-        Serial.print("< " + String(EventControlNegative[EventsNegative]) + "  ");
-        EventsNegative++;
+        Serial.print("< " + String(abs(v.as<int>())) + "  ");
+        counter++;
       }
       else
       {
-        EventControlPositive[EventsPositive] = v.as<int>();
-        Serial.print("> " + String(EventControlPositive[EventsPositive]) + "  ");
-        EventsPositive++;
+        Serial.print("> " + String(abs(v.as<int>())) + "  ");
+        counter++;
       }
     }
 
-    EventLockNegative = new boolean [EventsNegative];
-    
-    for(int i = 0; i < EventsNegative; i++)
-    {
-      EventLockNegative[i] = false;
-    }
-
-    EventLockPositive = new boolean [EventsPositive];
-    
-    for(int i = 0; i < EventsPositive; i++)
-    {
-      EventLockPositive[i] = false;
-    }
-
-    if(EventsPositive + EventsNegative == 0)
+    if(counter == 0)
     {
       Serial.print("/");
     }
@@ -276,7 +256,7 @@ void SynTexMain::resetDevice()
 {
   Serial.print("Das Gerät wird zurückgesetzt ..");
 
-  int response = safeFetch(BridgeIP + "/remove-device?mac=" + WiFi.macAddress() + "&type=" + Type, 10, true);
+  int response = safeFetch(BridgeIP + ":1711/serverside/remove-device?mac=" + WiFi.macAddress() + "&type=" + Type, 10, true);
   
   if(response == HTTP_CODE_OK && sender.getString() == "Success")
   {
@@ -310,7 +290,6 @@ boolean SynTexMain::loadFileSystem()
   
   if(!configFile)
   {
-    Serial.println("Failed to open config file");
     return false;
   }
 
@@ -318,7 +297,7 @@ boolean SynTexMain::loadFileSystem()
   
   if(size > 1024)
   {
-    Serial.println("Config file size is too large");
+    Serial.println("Config Datei ist zu groß!");
     return false;
   }
 
@@ -330,7 +309,7 @@ boolean SynTexMain::loadFileSystem()
   
   if(error)
   {
-    Serial.println("Failed to parse config file");
+    Serial.println("JSON konnte nicht gelesen werden!");
     return false;
   }
 
@@ -415,6 +394,8 @@ void SynTexMain::saveWiFiSettings()
 
   server.sendHeader("Access-Control-Allow-Origin", "*");
   server.send(200, "text/html", WiFi.macAddress());
+
+  delay(2000);
 
   setup();
 }

@@ -37,17 +37,11 @@ class SynTexMain
     void LOOP();
     boolean checkConnection();
     int safeFetch(String URL, int Time, boolean Dots);
-    
-    int EventsNegative;
-    boolean *EventLockNegative;
-    int EventControlNegative[];
 
+    String Events;
+    
     ESP8266WebServer server;
     HTTPClient sender;
-
-    int EventsPositive;
-    boolean *EventLockPositive;
-    int EventControlPositive[];    
 };
 
 #endif

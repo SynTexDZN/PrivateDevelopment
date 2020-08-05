@@ -6,13 +6,15 @@
 Accessory climateAccessory;
 DHT dht(2, DHT11);
 
-Climate::Climate() { }
+Climate::Climate() {}
 
-void Climate::SETUP(String ip, String port, int interval, String events)
+void Climate::SETUP(String ip, String port, int interval, String events, boolean led)
 {
-  climateAccessory.SETUP("climate", "5.0.0", interval, events, ip, port);
+  climateAccessory.SETUP("climate", "1.1.0", interval, events, ip, port, led);
 
   dht.begin();
+
+  activated = true;
 }
 
 void Climate::UPDATE(boolean force)

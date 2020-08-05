@@ -9,13 +9,15 @@ class Climate
   public:
     Climate();
     
-    void SETUP(String ip, String port, int interval, String events);
+    void SETUP(String ip, String port, int interval, String events, boolean led);
     void UPDATE(boolean force);
 
     unsigned long previousMillis;
 
     float temp;
     float hum;
+
+    boolean activated;
 };
 
 #endif

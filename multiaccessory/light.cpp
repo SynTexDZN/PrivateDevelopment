@@ -7,15 +7,17 @@
 Accessory lightAccessory;
 BH1750 lightMeter;
 
-Light::Light() { }
+Light::Light() {}
 
-void Light::SETUP(String ip, String port, int interval, String events)
+void Light::SETUP(String ip, String port, int interval, String events, boolean led)
 {
-  lightAccessory.SETUP("light", "5.0.0", interval, events, ip, port);
+  lightAccessory.SETUP("light", "1.1.0", interval, events, ip, port, led);
 
   Wire.begin();
   
-  lightMeter.begin(BH1750::CONTINUOUS_HIGH_RES_MODE_2);
+  lightMeter.begin(BH1750::CONTINUOUS_HIGH_RES_MODE);
+  
+  activated = true;
 }
 
 void Light::UPDATE(boolean force)
