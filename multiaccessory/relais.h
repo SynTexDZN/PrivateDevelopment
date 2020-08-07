@@ -10,7 +10,7 @@ class Relais
   public:
     Relais();
     
-    void SETUP(String ip, String port, String events, boolean led, ESP8266WebServer &server);
+    void SETUP(String ip, String port, boolean led, ESP8266WebServer &server);
 
     boolean activated;
 };

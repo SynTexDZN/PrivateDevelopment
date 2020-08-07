@@ -21,13 +21,8 @@ class Accessory
     Accessory();
 
     boolean SETUP(String Type, String Version, int Interval, String Events, String BridgeIP, String WebhookPort, boolean LED);
-    void updateScenes(int value);
     int safeFetch(String URL, int Time, boolean Dots);
     
-    int EventsNegative;
-    boolean *EventLockNegative;
-    int *EventControlNegative;
-
     HTTPClient sender;
 
     int EventsPositive;

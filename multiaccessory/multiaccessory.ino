@@ -26,7 +26,7 @@ void setup()
 
   sLED.setupRGB();
   
-  if(m.SETUP("motion", "5.2.2", 10000, "[]") && m.checkConnection())
+  if(m.SETUP("motion", "5.2.3", 10000, "[]") && m.checkConnection())
   {
     sLED.SETUP(m.LED, 2);
 
@@ -35,12 +35,12 @@ void setup()
       m.LED = false;
     }
     
-    //climate.SETUP(m.BridgeIP, m.WebhookPort, m.Interval, m.Events, m.LED);
-    //light.SETUP(m.BridgeIP, m.WebhookPort, m.Interval, m.Events, m.LED);
-    //rain.SETUP(m.BridgeIP, m.WebhookPort, m.Interval, m.Events, m.LED);
-    motion.SETUP(m.BridgeIP, m.WebhookPort, m.Interval, "[]", m.LED);
-    //contact.SETUP(m.BridgeIP, m.WebhookPort, m.Interval, "[]", m.LED);
-    //relais.SETUP(m.BridgeIP, m.WebhookPort, "[]", m.LED, m.server);
+    //climate.SETUP(m.BridgeIP, m.WebhookPort, m.Interval, m.LED);
+    //light.SETUP(m.BridgeIP, m.WebhookPort, m.Interval, m.LED);
+    //rain.SETUP(m.BridgeIP, m.WebhookPort, m.Interval, m.LED);
+    motion.SETUP(m.BridgeIP, m.WebhookPort, m.Interval, m.LED);
+    //contact.SETUP(m.BridgeIP, m.WebhookPort, m.Interval, m.LED);
+    //relais.SETUP(m.BridgeIP, m.WebhookPort, m.LED, m.server);
     //button.SETUP(m.BridgeIP, m.WebhookPort, m.Events, m.LED, m.server);
     //lDisplay.SETUP(m.BridgeIP, m.WebhookPort, m.Interval, m.LED, m.Name, m.Version);
 

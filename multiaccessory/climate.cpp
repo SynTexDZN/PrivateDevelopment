@@ -8,9 +8,9 @@ DHT dht(2, DHT11);
 
 Climate::Climate() {}
 
-void Climate::SETUP(String ip, String port, int interval, String events, boolean led)
+void Climate::SETUP(String ip, String port, int interval, boolean led)
 {
-  climateAccessory.SETUP("climate", "1.1.0", interval, events, ip, port, led);
+  climateAccessory.SETUP("climate", "1.1.2", interval, "[]", ip, port, led);
 
   dht.begin();
 
@@ -43,8 +43,6 @@ void Climate::UPDATE(boolean force)
         temp = temptmp;
 
         climateAccessory.safeFetch(climateAccessory.BridgeIP + ":" + String(climateAccessory.WebhookPort) + "/devices?mac=" + WiFi.macAddress() + "&type=temperature&value=" + String(temp), climateAccessory.Interval, false);
-
-        climateAccessory.updateScenes(temp);
       }
       
       if(humtmp != hum)

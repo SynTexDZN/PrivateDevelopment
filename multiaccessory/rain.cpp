@@ -6,9 +6,9 @@ Accessory rainAccessory;
 
 Rain::Rain() {}
 
-void Rain::SETUP(String ip, String port, int interval, String events, boolean led)
+void Rain::SETUP(String ip, String port, int interval, boolean led)
 {
-  rainAccessory.SETUP("rain", "1.0.0", interval, events, ip, port, led);
+  rainAccessory.SETUP("rain", "1.0.1", interval, "[]", ip, port, led);
   
   activated = true;
 }

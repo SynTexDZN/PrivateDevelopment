@@ -18,52 +18,23 @@ boolean Accessory::SETUP(String Type, String Version, int Interval, String Event
   deserializeJson(doc, Events);
   JsonArray events = doc.as<JsonArray>();
   
-  EventsNegative = 0; 
   EventsPositive = 0; 
   
   for(JsonVariant v : events)
   {
-    if(v.as<int>() < 0)
-    {
-      EventsNegative++;
-    }
-    else
-    {
-      EventsPositive++;
-    }
+    EventsPositive++;
   }
 
   EventControlPositive = new int [EventsPositive];
-  int cp = 0;
+  int c = 0;
   
-  for(int j = 0; j < (EventsNegative + EventsPositive); j++)
+  for(int j = 0; j < EventsPositive; j++)
   {
     if(events[j].as<int>() > 0)
     {
-      EventControlPositive[cp] = events[j].as<int>();
-      //Serial.println("# " + String(EventControlPositive[cp]) + "  " + String(cp));
-      cp++;
+      EventControlPositive[c] = events[j].as<int>();
+      c++;
     }
-  }
-
-  EventControlNegative = new int [EventsNegative];
-  int cn = 0;
-  
-  for(int j = 0; j < EventsNegative + EventsPositive; j++)
-  {
-    if(events[j].as<int>() < 0)
-    {
-      EventControlNegative[cn] = -events[j].as<int>();
-      //Serial.print("# " + String(EventControlNegative[cn]) + "  " + String(cn));
-      cn++;
-    }
-  }
-  
-  EventLockNegative = new boolean [EventsNegative];
-  
-  for(int i = 0; i < EventsNegative; i++)
-  {
-    EventLockNegative[i] = false;
   }
 
   EventLockPositive = new boolean [EventsPositive];
@@ -74,61 +45,6 @@ boolean Accessory::SETUP(String Type, String Version, int Interval, String Event
   }
   
   return true;
-}
-
-void Accessory::updateScenes(int value)
-{
-  for(int i = 0; i < EventsNegative; i++)
-  {
-    //Serial.println(String(value) + " - " + String(EventControlNegative[i]) + " - " + String(EventLockNegative[i]) + String(i));
-    
-    if(value < EventControlNegative[i] && !EventLockNegative[i])
-    {
-      int response = safeFetch(BridgeIP + ":" + String(WebhookPort) + "/devices?mac=" + WiFi.macAddress() + "&event=" + i, Interval, false);
-
-      if(response == HTTP_CODE_OK)
-      {
-        for(int j = 0; j < EventsPositive; j++)
-        {
-          EventLockPositive[j] = false;
-        }
-        
-        EventLockNegative[i] = true;
-
-        Serial.println("( " + String(i) + " ) Scene wird aktiviert!");
-      }
-      else
-      {
-        Serial.println("( " + String(i) + " ) Scene konnte nicht aktiviert werden!");
-      }
-    }
-  }
-    
-  for(int i = 0; i < EventsPositive; i++)
-  {  
-    //Serial.println(String(value) + " - " + String(EventControlPositive[i]) + " - " + String(EventLockPositive[i]) + String(i));
-    
-    if(value > EventControlPositive[i] && !EventLockPositive[i])
-    {
-      int response = safeFetch(BridgeIP + ":" + String(WebhookPort) + "/devices?mac=" + WiFi.macAddress() + "&event=" + String(i + EventsNegative), Interval, false);
-
-      if(response == HTTP_CODE_OK)
-      {
-        for(int j = 0; j < EventsNegative; j++)
-        {
-          EventLockNegative[j] = false;
-        }
-        
-        EventLockPositive[i] = true;
-        
-        Serial.println("( " + String(i + EventsNegative) + " ) Scene wird aktiviert!");
-      }
-      else
-      {
-        Serial.println("( " + String(i + EventsNegative) + " ) Scene konnte nicht aktiviert werden!");
-      }
-    }
-  }
 }
 
 int Accessory::safeFetch(String URL, int Time, boolean Dots)

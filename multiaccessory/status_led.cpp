@@ -32,9 +32,11 @@ void StatusLED::setupRGB()
   analogWrite(b, 255);
 }
 
+boolean offline;
+
 void StatusLED::UPDATE()
 {
-  if(WiFi.status() != WL_CONNECTED)
+  if(WiFi.status() != WL_CONNECTED && !offline)
   {
     blinkMillis = millis();
     Blink = 1000;
@@ -47,6 +49,8 @@ void StatusLED::UPDATE()
     tmp[0] = 255;
     tmp[1] = 0;
     tmp[2] = 0;
+
+    offline = true;
   }
   else if(!LED)
   {
@@ -55,6 +59,11 @@ void StatusLED::UPDATE()
     next[0] = 0;
     next[1] = 0;
     next[2] = 0;
+  }
+
+  if(WiFi.status() == WL_CONNECTED)
+  {
+    offline = false;
   }
 
   if(next[0] != color[0] || next[1] != color[1] || next[2] != color[2])

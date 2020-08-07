@@ -6,9 +6,9 @@ Accessory contactAccessory;
 
 Contact::Contact() {}
 
-void Contact::SETUP(String ip, String port, int interval, String events, boolean led)
+void Contact::SETUP(String ip, String port, int interval, boolean led)
 {
-  contactAccessory.SETUP("contact", "1.0.0", interval, events, ip, port, led);
+  contactAccessory.SETUP("contact", "1.0.1", interval, "[]", ip, port, led);
   
   activated = true;
 }

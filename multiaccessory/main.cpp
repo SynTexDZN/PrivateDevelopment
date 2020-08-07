@@ -171,8 +171,6 @@ boolean SynTexMain::loadDatabaseSettings()
 
   safeName.replace(" ", "%");
 
-  Serial.println(BridgeIP + ":1711/serverside/init?mac=" + WiFi.macAddress() + "&ip=" + WiFi.localIP().toString() + "&type=" + Type + "&name=" + safeName + "&version=" + Version + "&refresh=" + Interval + "&buttons=" + Events);
-
   Serial.print("Mit der SynTex Bridge verbinden ..");
 
   int response = safeFetch(BridgeIP + ":1711/serverside/init?mac=" + WiFi.macAddress() + "&ip=" + WiFi.localIP().toString() + "&type=" + Type + "&name=" + safeName + "&version=" + Version + "&refresh=" + Interval + "&buttons=" + Events, 10, true);

@@ -6,9 +6,9 @@ Accessory motionAccessory;
 
 Motion::Motion() {}
 
-void Motion::SETUP(String ip, String port, int interval, String events, boolean led)
+void Motion::SETUP(String ip, String port, int interval, boolean led)
 {
-  motionAccessory.SETUP("motion", "1.0.0", interval, events, ip, port, led);
+  motionAccessory.SETUP("motion", "1.0.1", interval, "[]", ip, port, led);
   
   activated = true;
 }

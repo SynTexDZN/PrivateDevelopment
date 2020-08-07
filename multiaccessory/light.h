@@ -9,7 +9,7 @@ class Light
   public:
     Light();
     
-    void SETUP(String ip, String port, int interval, String events, boolean led);
+    void SETUP(String ip, String port, int interval, boolean led);
     void UPDATE(boolean force);
     
     unsigned long previousMillis;

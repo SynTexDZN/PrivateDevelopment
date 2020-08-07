@@ -6,9 +6,9 @@ Accessory relaisAccessory;
 
 Relais::Relais() {}
 
-void Relais::SETUP(String ip, String port, String events, boolean led, ESP8266WebServer &server)
+void Relais::SETUP(String ip, String port, boolean led, ESP8266WebServer &server)
 {
-  relaisAccessory.SETUP("motion", "1.0.0", 10000, events, ip, port, led);
+  relaisAccessory.SETUP("motion", "1.0.1", 10000, "[]", ip, port, led);
 
   pinMode(5, OUTPUT);
   

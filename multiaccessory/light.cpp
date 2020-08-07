@@ -9,9 +9,9 @@ BH1750 lightMeter;
 
 Light::Light() {}
 
-void Light::SETUP(String ip, String port, int interval, String events, boolean led)
+void Light::SETUP(String ip, String port, int interval, boolean led)
 {
-  lightAccessory.SETUP("light", "1.1.0", interval, events, ip, port, led);
+  lightAccessory.SETUP("light", "1.1.2", interval, "[]", ip, port, led);
 
   Wire.begin();
   
@@ -39,8 +39,6 @@ void Light::UPDATE(boolean force)
       light = lighttmp;
 
       lightAccessory.safeFetch(lightAccessory.BridgeIP + ":" + String(lightAccessory.WebhookPort) + "/devices?mac=" + WiFi.macAddress() + "&type=light&value=" + String(light), lightAccessory.Interval, false);
-
-      lightAccessory.updateScenes(light);
     }
   }
 }
