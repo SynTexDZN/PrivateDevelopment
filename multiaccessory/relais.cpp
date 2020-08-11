@@ -10,20 +10,20 @@ void Relais::SETUP(String ip, String port, boolean led, ESP8266WebServer &server
 {
   relaisAccessory.SETUP("motion", "1.0.1", 10000, "[]", ip, port, led);
 
-  pinMode(5, OUTPUT);
+  pinMode(2, OUTPUT);
   
   server.on("/switch", [&] ()
   {
     if(server.hasArg("value"))
     {
-      digitalWrite(5, server.arg("value") == "true" ? HIGH : LOW);
+      digitalWrite(2, server.arg("value") == "true" ? HIGH : LOW);
     }
     else
     {
-      digitalWrite(5, digitalRead(5) ? LOW : HIGH);
+      digitalWrite(2, digitalRead(2) ? LOW : HIGH);
     }
 
-    boolean relais = digitalRead(5);
+    boolean relais = digitalRead(2);
 
     Serial.print("Relais: ");
     Serial.println(relais ? "An" : "Aus");

@@ -256,7 +256,7 @@ void SynTexMain::resetDevice()
 
   int response = safeFetch(BridgeIP + ":1711/serverside/remove-device?mac=" + WiFi.macAddress() + "&type=" + Type, 10, true);
   
-  if(response == HTTP_CODE_OK && sender.getString() == "Success")
+  if(server.hasArg("force") || (response == HTTP_CODE_OK && sender.getString() == "Success"))
   {
     WiFiName = "";
     WiFiPass = "";

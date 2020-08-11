@@ -24,11 +24,11 @@ void setup()
 {
   /* Custom Status LED Part */
 
-  sLED.setupRGB();
+  //sLED.setupRGB();
   
-  if(m.SETUP("motion", "5.2.3", 10000, "[]") && m.checkConnection())
+  if(m.SETUP("motion", "6.0.0", 10000, "[]") && m.checkConnection())
   {
-    sLED.SETUP(m.LED, 2);
+    //sLED.SETUP(m.LED, 2);
 
     if(sLED.activated)
     {
@@ -36,11 +36,11 @@ void setup()
     }
     
     //climate.SETUP(m.BridgeIP, m.WebhookPort, m.Interval, m.LED);
-    //light.SETUP(m.BridgeIP, m.WebhookPort, m.Interval, m.LED);
+    light.SETUP(m.BridgeIP, m.WebhookPort, m.Interval, m.LED);
     //rain.SETUP(m.BridgeIP, m.WebhookPort, m.Interval, m.LED);
     motion.SETUP(m.BridgeIP, m.WebhookPort, m.Interval, m.LED);
     //contact.SETUP(m.BridgeIP, m.WebhookPort, m.Interval, m.LED);
-    //relais.SETUP(m.BridgeIP, m.WebhookPort, m.LED, m.server);
+    relais.SETUP(m.BridgeIP, m.WebhookPort, m.LED, m.server);
     //button.SETUP(m.BridgeIP, m.WebhookPort, m.Events, m.LED, m.server);
     //lDisplay.SETUP(m.BridgeIP, m.WebhookPort, m.Interval, m.LED, m.Name, m.Version);
 
