@@ -4,7 +4,10 @@
 
 Accessory motionAccessory;
 
-Motion::Motion() {}
+Motion::Motion(int Pin)
+{
+  this -> Pin = Pin;
+}
 
 void Motion::SETUP(String ip, String port, int interval, boolean led)
 {
@@ -17,7 +20,7 @@ void Motion::UPDATE(boolean force)
 {
   unsigned long currentMillis = millis();
 
-  boolean motiontmp = digitalRead(14);
+  boolean motiontmp = digitalRead(Pin);
 
   if(motiontmp)
   {

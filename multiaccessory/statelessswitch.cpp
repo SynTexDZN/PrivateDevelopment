@@ -4,26 +4,29 @@
 
 Accessory statelessswitchAccessory;
 
-StatelessSwitch::StatelessSwitch() {}
+StatelessSwitch::StatelessSwitch(int Pin)
+{
+  this -> Pin = Pin;
+}
 
 void StatelessSwitch::SETUP(String ip, String port, String events, boolean led, ESP8266WebServer &server)
 {
   statelessswitchAccessory.SETUP("motion", "1.0.0", 10000, events, ip, port, led);
 
-  pinMode(5, OUTPUT);
+  pinMode(Pin, OUTPUT);
   
   server.on("/switch", [&] ()
   {
     if(server.hasArg("value"))
     {
-      digitalWrite(5, server.arg("value") == "true" ? HIGH : LOW);
+      digitalWrite(Pin, server.arg("value") == "true" ? HIGH : LOW);
     }
     else
     {
-      digitalWrite(5, digitalRead(5) ? LOW : HIGH);
+      digitalWrite(Pin, digitalRead(Pin) ? LOW : HIGH);
     }
 
-    boolean relais = digitalRead(5);
+    boolean relais = digitalRead(Pin);
 
     Serial.print("Relais: ");
     Serial.println(relais ? "An" : "Aus");

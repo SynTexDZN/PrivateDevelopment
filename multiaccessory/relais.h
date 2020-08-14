@@ -7,8 +7,11 @@
 
 class Relais
 {
+  private:
+    int Pin;
+  
   public:
-    Relais();
+    Relais(int Pin);
     
     void SETUP(String ip, String port, boolean led, ESP8266WebServer &server);
 

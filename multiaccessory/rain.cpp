@@ -4,7 +4,10 @@
 
 Accessory rainAccessory;
 
-Rain::Rain() {}
+Rain::Rain(int Pin)
+{
+  this -> Pin = Pin;
+}
 
 void Rain::SETUP(String ip, String port, int interval, boolean led)
 {
@@ -15,7 +18,7 @@ void Rain::SETUP(String ip, String port, int interval, boolean led)
 
 void Rain::UPDATE(boolean force)
 {
-  boolean raintmp = digitalRead(16);
+  boolean raintmp = digitalRead(Pin);
     
   if(force || raintmp != rain)
   {

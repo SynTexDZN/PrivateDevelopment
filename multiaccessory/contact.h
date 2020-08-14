@@ -6,8 +6,11 @@
 
 class Contact
 {
+  private:
+    int Pin;
+  
   public:
-    Contact();
+    Contact(int Pin);
     
     void SETUP(String ip, String port, int interval, boolean led);
     void UPDATE(boolean force);

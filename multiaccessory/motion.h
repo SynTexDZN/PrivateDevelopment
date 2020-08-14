@@ -6,8 +6,11 @@
 
 class Motion
 {
+  private:
+    int Pin;
+  
   public:
-    Motion();
+    Motion(int Pin);
     
     void SETUP(String ip, String port, int interval, boolean led);
     void UPDATE(boolean force);

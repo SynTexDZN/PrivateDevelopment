@@ -138,6 +138,8 @@ void LCD::SETUP(String IP, String Port, int Interval, boolean Backlight, String 
   delay(1500);
 
   //lcd.clear();
+
+  activated = true;
 }
 
 int counter = 0;

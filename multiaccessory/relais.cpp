@@ -4,26 +4,29 @@
 
 Accessory relaisAccessory;
 
-Relais::Relais() {}
+Relais::Relais(int Pin)
+{
+  this -> Pin = Pin;
+}
 
 void Relais::SETUP(String ip, String port, boolean led, ESP8266WebServer &server)
 {
   relaisAccessory.SETUP("motion", "1.0.1", 10000, "[]", ip, port, led);
 
-  pinMode(2, OUTPUT);
+  pinMode(Pin, OUTPUT);
   
   server.on("/switch", [&] ()
   {
     if(server.hasArg("value"))
     {
-      digitalWrite(2, server.arg("value") == "true" ? HIGH : LOW);
+      digitalWrite(Pin, server.arg("value") == "true" ? HIGH : LOW);
     }
     else
     {
-      digitalWrite(2, digitalRead(2) ? LOW : HIGH);
+      digitalWrite(Pin, digitalRead(Pin) ? LOW : HIGH);
     }
 
-    boolean relais = digitalRead(2);
+    boolean relais = digitalRead(Pin);
 
     Serial.print("Relais: ");
     Serial.println(relais ? "An" : "Aus");

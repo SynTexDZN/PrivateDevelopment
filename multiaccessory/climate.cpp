@@ -6,7 +6,10 @@
 Accessory climateAccessory;
 DHT dht(2, DHT11);
 
-Climate::Climate() {}
+Climate::Climate(int Pin)
+{
+  this -> Pin = Pin;
+}
 
 void Climate::SETUP(String ip, String port, int interval, boolean led)
 {

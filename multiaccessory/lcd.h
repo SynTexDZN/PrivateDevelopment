@@ -6,17 +6,19 @@
 
 class LCD
 {
+  private:    
+    unsigned long timeMillis;
+    unsigned long previousMillis;
+
+    int Interval;
+    
   public:
     LCD();
     
     void SETUP(String IP, String Port, int Interval, boolean Backlight, String Name, String Version);
     void UPDATE(int i, String* Infos);
 
-  private:    
-    unsigned long timeMillis;
-    unsigned long previousMillis;
-
-    int Interval;
+    boolean activated;
 };
 
 #endif

@@ -6,8 +6,11 @@
 
 class Rain
 {
+  private:
+    int Pin;
+  
   public:
-    Rain();
+    Rain(int Pin);
     
     void SETUP(String ip, String port, int interval, boolean led);
     void UPDATE(boolean force);

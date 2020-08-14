@@ -4,7 +4,10 @@
 
 Accessory contactAccessory;
 
-Contact::Contact() {}
+Contact::Contact(int Pin)
+{
+  this -> Pin = Pin;
+}
 
 void Contact::SETUP(String ip, String port, int interval, boolean led)
 {
@@ -17,7 +20,7 @@ void Contact::UPDATE(boolean force)
 {
   unsigned long currentMillis = millis();
 
-  boolean contacttmp = digitalRead(14);
+  boolean contacttmp = digitalRead(Pin);
 
   if(force || contacttmp != contact)
   {

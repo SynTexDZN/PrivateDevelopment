@@ -6,8 +6,11 @@
 
 class Climate
 {
+  private:
+    int Pin;
+  
   public:
-    Climate();
+    Climate(int Pin);
     
     void SETUP(String ip, String port, int interval, boolean led);
     void UPDATE(boolean force);
