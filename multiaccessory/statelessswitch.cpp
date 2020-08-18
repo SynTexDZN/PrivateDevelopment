@@ -15,7 +15,7 @@ void StatelessSwitch::SETUP(String ip, String port, String events, boolean led, 
 
   pinMode(Pin, OUTPUT);
   
-  server.on("/switch", [&] ()
+  server.on("/statelessswitch", [&] ()
   {
     if(server.hasArg("value"))
     {

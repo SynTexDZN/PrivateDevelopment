@@ -33,7 +33,7 @@ String split(String s, char parser, int index)
 
 LCD::LCD() {}
 
-void LCD::SETUP(String IP, String Port, int Interval, boolean Backlight, String Name, String Version)
+void LCD::SETUP(String IP, String Port, int Interval, boolean Backlight, String Name, String Version, ESP8266WebServer &server)
 {
   this -> Interval = Interval;
 
@@ -137,6 +137,52 @@ void LCD::SETUP(String IP, String Port, int Interval, boolean Backlight, String 
 
   delay(1500);
 
+  text = "";
+
+  server.on("/lcd", [&] ()
+  {
+    if(server.hasArg("get"))
+    {
+      server.sendHeader("Access-Control-Allow-Origin", "*");
+      server.send(200, "text/plain", text);
+    }
+    else if(server.hasArg("set"))
+    {
+      text = server.arg("set");
+
+      lcd.clear();
+
+      lcd.setCursor(0, 0);
+      lcd.print(text);
+      
+      server.sendHeader("Access-Control-Allow-Origin", "*");
+      server.send(200, "text/plain", "Neuer Text: " + text);
+    }
+    else if(server.hasArg("clear"))
+    {
+      text = "";
+
+      lcd.clear();
+      
+      server.sendHeader("Access-Control-Allow-Origin", "*");
+      server.send(200, "text/plain", "Success");
+    }
+    else if(server.hasArg("led"))
+    {
+      if(server.arg("led") == "true")
+      {
+        lcd.backlight();
+      }
+      else if(server.arg("led") == "false")
+      {
+        lcd.noBacklight();
+      }
+      
+      server.sendHeader("Access-Control-Allow-Origin", "*");
+      server.send(200, "text/plain", "Success");
+    }
+  });
+
   //lcd.clear();
 
   activated = true;
@@ -146,109 +192,112 @@ int counter = 0;
 
 void LCD::UPDATE(int i, String* Infos)
 {
-  unsigned long currentMillis = millis();
-  
-  if(currentMillis - timeMillis >= 1000)
+  if(text == "")
   {
-    timeMillis = currentMillis;
-    
-    date = rtc.now();
-    
-    String realTime = "";
-
-    if(date.hour() < 10)
-    {
-      realTime += "0";
-    }
-
-    realTime += String(date.hour()) + ":";
-
-    if(date.minute() < 10)
-    {
-      realTime += "0";
-    }
-    
-    realTime += String(date.minute()) + ":";
+    unsigned long currentMillis = millis();
   
-    if(date.second() < 10)
+    if(currentMillis - timeMillis >= 1000)
     {
-      realTime += "0";
-    }
-    
-    realTime += String(date.second());
-    
-    lcd.setCursor(8, 0);
-    lcd.print(realTime);
-  }
-
-  if(currentMillis - previousMillis >= Interval / (i + 1))
-  {
-    previousMillis = currentMillis;
-
-    lcd.setCursor(0, 0);
-    lcd.print("        ");
-    lcd.setCursor(0, 0);
-    
-    if(counter != i)
-    {
-      lcd.print(split(Infos[counter], ':', 0));
-    }
-    else
-    {
-      lcd.print("Datum");
-    }
-
-    String value = Infos[counter];
-
-    value.replace(split(Infos[counter], ':', 0) + ": ", "");
-
-    lcd.setCursor(0, 1);
-    lcd.print("                ");
-    lcd.setCursor(0, 1);
-
-    if(counter != i)
-    {
-      lcd.print(value);
-    }
-    else
-    {
-      String realDate = "";
-
-      String weekDays[] = { "So", "Mo", "Di", "Mi", "Do", "Fr", "Sa" };
-      realDate += weekDays[date.dayOfTheWeek()] + " ";
-
-      if(date.day() < 10)
+      timeMillis = currentMillis;
+      
+      date = rtc.now();
+      
+      String realTime = "";
+  
+      if(date.hour() < 10)
       {
-        realDate += "0";
+        realTime += "0";
       }
   
-      realDate += String(date.day()) + ".";
+      realTime += String(date.hour()) + ":";
   
-      if(date.month() < 10)
+      if(date.minute() < 10)
       {
-        realDate += "0";
+        realTime += "0";
       }
       
-      realDate += String(date.month()) + ".";
-      realDate += String(date.year());
+      realTime += String(date.minute()) + ":";
+    
+      if(date.second() < 10)
+      {
+        realTime += "0";
+      }
       
-      lcd.print(realDate);
-/*
+      realTime += String(date.second());
+      
+      lcd.setCursor(8, 0);
+      lcd.print(realTime);
+    }
+  
+    if(currentMillis - previousMillis >= Interval / (i + 1))
+    {
+      previousMillis = currentMillis;
+  
+      lcd.setCursor(0, 0);
+      lcd.print("        ");
+      lcd.setCursor(0, 0);
+      
+      if(counter != i)
+      {
+        lcd.print(split(Infos[counter], ':', 0));
+      }
+      else
+      {
+        lcd.print("Datum");
+      }
+  
+      String value = Infos[counter];
+  
+      value.replace(split(Infos[counter], ':', 0) + ": ", "");
+  
       lcd.setCursor(0, 1);
-      lcd.write((byte)0);
-      lcd.print(" 27.1 \337C ");
-      lcd.write((byte)2);
-      lcd.print(" 34 %");
-      */
-    }
-
-    if(counter < i)
-    {
-      counter++;
-    }
-    else
-    {
-      counter = 0;
+      lcd.print("                ");
+      lcd.setCursor(0, 1);
+  
+      if(counter != i)
+      {
+        lcd.print(value);
+      }
+      else
+      {
+        String realDate = "";
+  
+        String weekDays[] = { "So", "Mo", "Di", "Mi", "Do", "Fr", "Sa" };
+        realDate += weekDays[date.dayOfTheWeek()] + " ";
+  
+        if(date.day() < 10)
+        {
+          realDate += "0";
+        }
+    
+        realDate += String(date.day()) + ".";
+    
+        if(date.month() < 10)
+        {
+          realDate += "0";
+        }
+        
+        realDate += String(date.month()) + ".";
+        realDate += String(date.year());
+        
+        lcd.print(realDate);
+  /*
+        lcd.setCursor(0, 1);
+        lcd.write((byte)0);
+        lcd.print(" 27.1 \337C ");
+        lcd.write((byte)2);
+        lcd.print(" 34 %");
+        */
+      }
+  
+      if(counter < i)
+      {
+        counter++;
+      }
+      else
+      {
+        counter = 0;
+      }
     }
   }
 }

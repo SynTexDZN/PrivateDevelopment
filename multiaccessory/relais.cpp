@@ -15,7 +15,7 @@ void Relais::SETUP(String ip, String port, boolean led, ESP8266WebServer &server
 
   pinMode(Pin, OUTPUT);
   
-  server.on("/switch", [&] ()
+  server.on("/relais", [&] ()
   {
     if(server.hasArg("value"))
     {

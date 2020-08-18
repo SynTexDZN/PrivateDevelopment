@@ -3,6 +3,7 @@
 
 #include "main.h"
 #include "Arduino.h"
+#include <ESP8266WebServer.h>
 
 class LCD
 {
@@ -15,9 +16,10 @@ class LCD
   public:
     LCD();
     
-    void SETUP(String IP, String Port, int Interval, boolean Backlight, String Name, String Version);
+    void SETUP(String IP, String Port, int Interval, boolean Backlight, String Name, String Version, ESP8266WebServer &server);
     void UPDATE(int i, String* Infos);
 
+    String text;
     boolean activated;
 };
 
