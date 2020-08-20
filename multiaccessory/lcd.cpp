@@ -150,9 +150,12 @@ void LCD::SETUP(String IP, String Port, int Interval, boolean Backlight, String 
     {
       text = server.arg("set");
 
-      lcd.clear();
-
       lcd.setCursor(0, 0);
+      lcd.print("Info    ");
+
+      lcd.setCursor(0, 1);
+      lcd.print("                ");
+      lcd.setCursor(0, 1);
       lcd.print(text);
       
       server.sendHeader("Access-Control-Allow-Origin", "*");
@@ -161,8 +164,6 @@ void LCD::SETUP(String IP, String Port, int Interval, boolean Backlight, String 
     else if(server.hasArg("clear"))
     {
       text = "";
-
-      lcd.clear();
       
       server.sendHeader("Access-Control-Allow-Origin", "*");
       server.send(200, "text/plain", "Success");
@@ -192,43 +193,43 @@ int counter = 0;
 
 void LCD::UPDATE(int i, String* Infos)
 {
+  unsigned long currentMillis = millis();
+  
+  if(currentMillis - timeMillis >= 1000)
+  {
+    timeMillis = currentMillis;
+    
+    date = rtc.now();
+    
+    String realTime = "";
+
+    if(date.hour() < 10)
+    {
+      realTime += "0";
+    }
+
+    realTime += String(date.hour()) + ":";
+
+    if(date.minute() < 10)
+    {
+      realTime += "0";
+    }
+    
+    realTime += String(date.minute()) + ":";
+  
+    if(date.second() < 10)
+    {
+      realTime += "0";
+    }
+    
+    realTime += String(date.second());
+    
+    lcd.setCursor(8, 0);
+    lcd.print(realTime);
+  }
+  
   if(text == "")
   {
-    unsigned long currentMillis = millis();
-  
-    if(currentMillis - timeMillis >= 1000)
-    {
-      timeMillis = currentMillis;
-      
-      date = rtc.now();
-      
-      String realTime = "";
-  
-      if(date.hour() < 10)
-      {
-        realTime += "0";
-      }
-  
-      realTime += String(date.hour()) + ":";
-  
-      if(date.minute() < 10)
-      {
-        realTime += "0";
-      }
-      
-      realTime += String(date.minute()) + ":";
-    
-      if(date.second() < 10)
-      {
-        realTime += "0";
-      }
-      
-      realTime += String(date.second());
-      
-      lcd.setCursor(8, 0);
-      lcd.print(realTime);
-    }
-  
     if(currentMillis - previousMillis >= Interval / (i + 1))
     {
       previousMillis = currentMillis;

@@ -6,7 +6,7 @@
 
 SynTexMain::SynTexMain() {}
 
-boolean SynTexMain::SETUP(String Type, String Version, int Interval, String Events)
+boolean SynTexMain::SETUP(String Type, String Version, int Interval, String Events, String Services)
 {
   Serial.begin(115200);
   Serial.println();
@@ -17,6 +17,8 @@ boolean SynTexMain::SETUP(String Type, String Version, int Interval, String Even
   Serial.println("-------------");
 
   pinMode(LED_BUILTIN, OUTPUT);
+
+  this -> Services = Services;
 
   if(!SPIFFS.begin())
   {
@@ -109,6 +111,7 @@ boolean SynTexMain::SETUP(String Type, String Version, int Interval, String Even
   server.on("/version", [this]{ server.sendHeader("Access-Control-Allow-Origin", "*"); server.send(200, "text/plain", this -> Version); });
   server.on("/update", [this]{ updateDevice(); });
   server.on("/refresh", [this]{ loadDatabaseSettings(); });
+  server.on("/config", [this]{ serviceOverride(); });
   server.begin();
 
   return true;
@@ -117,6 +120,29 @@ boolean SynTexMain::SETUP(String Type, String Version, int Interval, String Even
 void SynTexMain::LOOP()
 {
   server.handleClient();
+}
+
+void SynTexMain::serviceOverride()
+{
+  if(server.hasArg("services"))
+  {
+    Services = server.arg("services");
+
+    saveFileSystem();
+
+    server.sendHeader("Access-Control-Allow-Origin", "*");
+    server.send(200, "text/plain", "Success");
+
+    delay(2000);
+
+    ESP.restart();
+  }
+
+  if(server.hasArg("view-services"))
+  {
+    server.sendHeader("Access-Control-Allow-Origin", "*");
+    server.send(200, "text/plain", Services);
+  }
 }
 
 void SynTexMain::updateDevice()
@@ -173,7 +199,7 @@ boolean SynTexMain::loadDatabaseSettings()
 
   Serial.print("Mit der SynTex Bridge verbinden ..");
 
-  int response = safeFetch(BridgeIP + ":1711/serverside/init?mac=" + WiFi.macAddress() + "&ip=" + WiFi.localIP().toString() + "&type=" + Type + "&name=" + safeName + "&version=" + Version + "&refresh=" + Interval + "&buttons=" + Events, 10, true);
+  int response = safeFetch(BridgeIP + ":1711/serverside/init?mac=" + WiFi.macAddress() + "&ip=" + WiFi.localIP().toString() + "&type=" + Type + "&name=" + safeName + "&version=" + Version + "&refresh=" + Interval + "&services=" + Services + "&buttons=" + Events, 10, true);
   
   if(response == HTTP_CODE_OK)
   {    
@@ -333,6 +359,11 @@ boolean SynTexMain::loadFileSystem()
     BridgeIP = obj["bridge"].as<String>();
   }
 
+  if(obj["services"].as<String>() != "")
+  {
+    Services = obj["services"].as<String>();
+  }
+
   return true;
 }
 
@@ -343,6 +374,7 @@ boolean SynTexMain::saveFileSystem()
   doc["pass"] = WiFiPass;
   doc["name"] = Name;
   doc["bridge"] = BridgeIP;
+  doc["services"] = Services;
 
   File configFile = SPIFFS.open("/config.json", "w");
   

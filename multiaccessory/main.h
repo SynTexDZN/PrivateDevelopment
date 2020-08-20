@@ -16,6 +16,7 @@ class SynTexMain
     void scanWiFi();
     void updateDevice();
     boolean loadDatabaseSettings();
+    void serviceOverride();
     
   public:
     String WebhookPort;
@@ -33,12 +34,13 @@ class SynTexMain
   
     SynTexMain();
 
-    boolean SETUP(String Type, String Version, int Interval, String Events);
+    boolean SETUP(String Type, String Version, int Interval, String Events, String Services);
     void LOOP();
     boolean checkConnection();
     int safeFetch(String URL, int Time, boolean Dots);
 
     String Events;
+    String Services;
     
     ESP8266WebServer server;
     HTTPClient sender;
