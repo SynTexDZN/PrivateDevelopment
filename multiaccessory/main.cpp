@@ -72,11 +72,21 @@ boolean SynTexMain::SETUP(String Type, String Version, int Interval, String Even
 
     int i = 0;
     
-    while(WiFi.status() != WL_CONNECTED && i < 120)
+    while(WiFi.status() != WL_CONNECTED && i < 120 * 30)
     {
       delay(500);
       Serial.print(".");
       ++i;
+
+      if(i % 120 == 0)
+      {
+        delay(300000);
+
+        Serial.println();
+        Serial.print("Verbindung wird hergestellt ..");
+
+        i = 0;
+      }
     }
     
     Serial.println();
@@ -95,6 +105,7 @@ boolean SynTexMain::SETUP(String Type, String Version, int Interval, String Even
     else
     {
       Serial.println("Verbindung zum Netzwerk konnte nicht hergestellt werden!");
+      
       startAccessPoint();
     }
   }
@@ -403,31 +414,55 @@ void SynTexMain::startAccessPoint()
 
 void SynTexMain::saveWiFiSettings()
 {
-  BridgeIP = "http://syntex.local";
-
-  if(server.hasArg("bridge-ip"))
-  {
-    BridgeIP = server.arg("bridge-ip");
-  }
-
-  if(server.hasArg("device-name"))
-  {
-    Name = server.arg("device-name");
-  }
-  
-  if(server.hasArg("wifissid") && server.hasArg("wifipass"))
-  {   
-    WiFiName = server.arg("wifissid");
-    WiFiPass = server.arg("wifipass");
-    saveFileSystem();
-  }
-
   server.sendHeader("Access-Control-Allow-Origin", "*");
   server.send(200, "text/html", WiFi.macAddress());
 
   delay(2000);
 
-  setup();
+  if(server.hasArg("wifissid") && server.hasArg("wifipass"))
+  {
+    WiFi.begin(server.arg("wifissid"), server.arg("wifipass"));
+    Serial.print("Verbindung wird getestet ..");
+
+    int i = 0;
+    
+    while(WiFi.status() != WL_CONNECTED && i < 120)
+    {
+      delay(500);
+      Serial.print(".");
+      ++i;
+    }
+    
+    Serial.println();
+
+    if(WiFi.status() == WL_CONNECTED)
+    {
+      BridgeIP = "http://syntex.local";
+
+      if(server.hasArg("bridge-ip"))
+      {
+        BridgeIP = server.arg("bridge-ip");
+      }
+
+      if(server.hasArg("device-name"))
+      {
+        Name = server.arg("device-name");
+      }
+      
+      WiFiName = server.arg("wifissid");
+      WiFiPass = server.arg("wifipass");
+
+      saveFileSystem();
+
+      ESP.restart();
+    }
+    else
+    {
+      Serial.println("Verbindung zum Netzwerk konnte nicht hergestellt werden!");
+
+      startAccessPoint();
+    }
+  }
 }
 
 boolean SynTexMain::checkConnection()
