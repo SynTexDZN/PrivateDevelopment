@@ -13,14 +13,13 @@ class Accessory
     String Version;
     String Name;
   
-    String Type;
     boolean Active;
     int Interval;
     boolean LED;
   
     Accessory();
 
-    boolean SETUP(String Type, String Version, int Interval, String Events, String BridgeIP, String WebhookPort, boolean LED);
+    boolean SETUP(String Version, int Interval, String Events, String BridgeIP, String WebhookPort, boolean LED);
     int safeFetch(String URL, int Time, boolean Dots);
     
     HTTPClient sender;

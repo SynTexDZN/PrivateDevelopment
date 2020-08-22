@@ -11,7 +11,7 @@ StatelessSwitch::StatelessSwitch(int Pin)
 
 void StatelessSwitch::SETUP(String ip, String port, String events, boolean led, ESP8266WebServer &server)
 {
-  statelessswitchAccessory.SETUP("motion", "1.0.0", 10000, events, ip, port, led);
+  statelessswitchAccessory.SETUP("statelessswitch", "1.0.0", 10000, events, ip, port, led);
 
   pinMode(Pin, OUTPUT);
   

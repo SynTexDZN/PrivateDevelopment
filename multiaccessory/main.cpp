@@ -280,7 +280,7 @@ void SynTexMain::resetDevice()
 {
   Serial.print("Das Gerät wird zurückgesetzt ..");
 
-  int response = safeFetch(BridgeIP + ":1711/serverside/remove-device?mac=" + WiFi.macAddress() + "&type=" + Type, 10, true);
+  int response = safeFetch(BridgeIP + ":1711/serverside/remove-device?mac=" + WiFi.macAddress(), 10, true);
   
   if(server.hasArg("force") || (response == HTTP_CODE_OK && sender.getString() == "Success"))
   {

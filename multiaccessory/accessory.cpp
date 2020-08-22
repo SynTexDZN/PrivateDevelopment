@@ -5,12 +5,11 @@
 
 Accessory::Accessory() {}
 
-boolean Accessory::SETUP(String Type, String Version, int Interval, String Events, String BridgeIP, String WebhookPort, boolean LED)
+boolean Accessory::SETUP(String Version, int Interval, String Events, String BridgeIP, String WebhookPort, boolean LED)
 {
   this -> BridgeIP = BridgeIP;
   this -> WebhookPort = WebhookPort;
   this -> Interval = Interval;
-  this -> Type = Type;
   this -> Version = Version;
   this -> LED = LED;
   
