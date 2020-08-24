@@ -11,7 +11,7 @@ Relais::Relais(int Pin)
 
 void Relais::SETUP(String ip, String port, boolean led, ESP8266WebServer &server)
 {
-  relaisAccessory.SETUP("relais", "1.0.1", 10000, "[]", ip, port, led);
+  relaisAccessory.SETUP("1.0.1", 10000, "[]", ip, port, led);
 
   pinMode(Pin, OUTPUT);
   

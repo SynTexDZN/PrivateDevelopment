@@ -11,7 +11,7 @@ Contact::Contact(int Pin)
 
 void Contact::SETUP(String ip, String port, int interval, boolean led)
 {
-  contactAccessory.SETUP("contact", "1.0.1", interval, "[]", ip, port, led);
+  contactAccessory.SETUP("1.0.1", interval, "[]", ip, port, led);
   
   activated = true;
 }

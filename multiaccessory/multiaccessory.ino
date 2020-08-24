@@ -27,7 +27,7 @@ void setup()
 
   //sLED.setupRGB();
   
-  if(m.SETUP("statelessswitch", "5.2.0", 10000, "[]", "[\"button\", \"lcd\"]") && m.checkConnection())
+  if(m.SETUP("special", "5.2.0", 10000, "[]", "") && m.checkConnection())
   {
     //sLED.SETUP(m.LED, 2);
 
@@ -38,6 +38,8 @@ void setup()
 
     StaticJsonDocument<400> doc;
     deserializeJson(doc, m.Services);
+
+    Serial.println(m.Services);
 
     for(JsonVariant v : doc.as<JsonArray>())
     {
@@ -81,16 +83,7 @@ void setup()
         lDisplay.SETUP(m.BridgeIP, m.WebhookPort, m.Interval, m.LED, m.Name, m.Version, m.server);
       }
     }
-    /*
-    climate.SETUP(m.BridgeIP, m.WebhookPort, m.Interval, m.LED);
-    light.SETUP(m.BridgeIP, m.WebhookPort, m.Interval, m.LED);
-    //rain.SETUP(m.BridgeIP, m.WebhookPort, m.Interval, m.LED);
-    //motion.SETUP(m.BridgeIP, m.WebhookPort, m.Interval, m.LED);
-    //contact.SETUP(m.BridgeIP, m.WebhookPort, m.Interval, m.LED);
-    //relais.SETUP(m.BridgeIP, m.WebhookPort, m.LED, m.server);
-    //button.SETUP(m.BridgeIP, m.WebhookPort, m.Events, m.LED, m.server);
-    lDisplay.SETUP(m.BridgeIP, m.WebhookPort, m.Interval, m.LED, m.Name, m.Version, m.server);
-    */
+
     if(m.Active)
     {
       if(climate.activated)
@@ -127,9 +120,9 @@ void setup()
 
       if(lDisplay.activated)
       {
-        //String info[] = {"Klima: " + String(climate.temp).substring(0, String(climate.temp).length() - 1) + " \337C - " + String((int)climate.hum) + " %", "Licht: " + String((int)light.light) + " Lux"};
-        String info[] = {"Bitte: Klingeln!"};
-        lDisplay.UPDATE(1, info);
+        String info[] = {"Klima: " + String(climate.temp).substring(0, String(climate.temp).length() - 1) + " \337C - " + String((int)climate.hum) + " %", "Licht: " + String((int)light.light) + " Lux"};
+        //String info[] = {"Bitte: Klingeln!"};
+        lDisplay.UPDATE(2, info);
       }
     }
   }
@@ -177,9 +170,9 @@ void loop()
 
     if(lDisplay.activated)
     {
-      //String info[] = {"Klima: " + String(climate.temp).substring(0, String(climate.temp).length() - 1) + " \337C - " + String((int)climate.hum) + " %", "Licht: " + String((int)light.light) + " Lux"};
-      String info[] = {"Bitte: Klingeln!"};
-      lDisplay.UPDATE(1, info);
+      String info[] = {"Klima: " + String(climate.temp).substring(0, String(climate.temp).length() - 1) + " \337C - " + String((int)climate.hum) + " %", "Licht: " + String((int)light.light) + " Lux"};
+      //String info[] = {"Bitte: Klingeln!"};
+      lDisplay.UPDATE(2, info);
     }
 
     /* Custom Status LED Part */

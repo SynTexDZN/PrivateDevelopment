@@ -11,7 +11,7 @@ Rain::Rain(int Pin)
 
 void Rain::SETUP(String ip, String port, int interval, boolean led)
 {
-  rainAccessory.SETUP("rain", "1.0.1", interval, "[]", ip, port, led);
+  rainAccessory.SETUP("1.0.1", interval, "[]", ip, port, led);
   
   activated = true;
 }

@@ -37,7 +37,7 @@ void LCD::SETUP(String IP, String Port, int Interval, boolean Backlight, String 
 {
   this -> Interval = Interval;
 
-  displayAccessory.SETUP("display", "1.0.0", Interval, "[]", IP, Port, Backlight);
+  displayAccessory.SETUP("1.0.0", Interval, "[]", IP, Port, Backlight);
 
   lcd.init();
   lcd.clear();

@@ -13,7 +13,7 @@ Climate::Climate(int Pin)
 
 void Climate::SETUP(String ip, String port, int interval, boolean led)
 {
-  climateAccessory.SETUP("climate", "1.1.2", interval, "[]", ip, port, led);
+  climateAccessory.SETUP("1.1.2", interval, "[]", ip, port, led);
 
   dht.begin();
 

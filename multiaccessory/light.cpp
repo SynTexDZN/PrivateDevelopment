@@ -11,7 +11,7 @@ Light::Light() {}
 
 void Light::SETUP(String ip, String port, int interval, boolean led)
 {
-  lightAccessory.SETUP("light", "1.1.2", interval, "[]", ip, port, led);
+  lightAccessory.SETUP("1.1.2", interval, "[]", ip, port, led);
 
   Wire.begin();
   
