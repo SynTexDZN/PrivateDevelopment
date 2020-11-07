@@ -5,7 +5,7 @@
 
 Accessory::Accessory() {}
 
-boolean Accessory::SETUP(String Version, int Interval, String Events, String BridgeIP, String WebhookPort, boolean LED)
+boolean Accessory::SETUP(String Version, int Interval, String Buttons, String BridgeIP, String WebhookPort, boolean LED)
 {
   this -> BridgeIP = BridgeIP;
   this -> WebhookPort = WebhookPort;
@@ -14,33 +14,33 @@ boolean Accessory::SETUP(String Version, int Interval, String Events, String Bri
   this -> LED = LED;
   
   StaticJsonDocument<400> doc;
-  deserializeJson(doc, Events);
-  JsonArray events = doc.as<JsonArray>();
+  deserializeJson(doc, Buttons);
+  JsonArray buttons = doc.as<JsonArray>();
   
-  EventsPositive = 0; 
+  ButtonCount = 0; 
   
-  for(JsonVariant v : events)
+  for(JsonVariant v : buttons)
   {
-    EventsPositive++;
+    ButtonCount++;
   }
 
-  EventControlPositive = new int [EventsPositive];
+  ButtonControlPositive = new int [ButtonCount];
   int c = 0;
   
-  for(int j = 0; j < EventsPositive; j++)
+  for(int j = 0; j < ButtonCount; j++)
   {
-    if(events[j].as<int>() > 0)
+    if(buttons[j].as<int>() > 0)
     {
-      EventControlPositive[c] = events[j].as<int>();
+      ButtonControlPositive[c] = buttons[j].as<int>();
       c++;
     }
   }
 
-  EventLockPositive = new boolean [EventsPositive];
+  ButtonLockPositive = new boolean [ButtonCount];
   
-  for(int i = 0; i < EventsPositive; i++)
+  for(int i = 0; i < ButtonCount; i++)
   {
-    EventLockPositive[i] = false;
+    ButtonLockPositive[i] = false;
   }
   
   return true;

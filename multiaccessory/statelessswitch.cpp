@@ -9,9 +9,9 @@ StatelessSwitch::StatelessSwitch(int Pin)
   this -> Pin = Pin;
 }
 
-void StatelessSwitch::SETUP(String ip, String port, String events, boolean led, ESP8266WebServer &server)
+void StatelessSwitch::SETUP(String ip, String port, String buttons, boolean led, ESP8266WebServer &server)
 {
-  statelessswitchAccessory.SETUP("1.0.0", 10000, events, ip, port, led);
+  statelessswitchAccessory.SETUP("1.0.0", 10000, buttons, ip, port, led);
 
   pinMode(Pin, OUTPUT);
   
@@ -40,9 +40,9 @@ void StatelessSwitch::SETUP(String ip, String port, String events, boolean led, 
     }
   });
 
-  button = new boolean[statelessswitchAccessory.EventsPositive];
+  button = new boolean[statelessswitchAccessory.ButtonCount];
     
-  for(int i = 0; i < statelessswitchAccessory.EventsPositive; i++)
+  for(int i = 0; i < statelessswitchAccessory.ButtonCount; i++)
   {
     button[i] = false;
   }
@@ -52,26 +52,26 @@ void StatelessSwitch::SETUP(String ip, String port, String events, boolean led, 
 
 void StatelessSwitch::UPDATE(boolean force)
 {
-  for(int i = 0; i < statelessswitchAccessory.EventsPositive; i++)
+  for(int i = 0; i < statelessswitchAccessory.ButtonCount; i++)
   {
-    boolean buttontmp = digitalRead(statelessswitchAccessory.EventControlPositive[i]);
+    boolean buttontmp = digitalRead(statelessswitchAccessory.ButtonControlPositive[i]);
     
-    if(buttontmp && !button[i] && !statelessswitchAccessory.EventLockPositive[i])
+    if(buttontmp && !button[i] && !statelessswitchAccessory.ButtonLockPositive[i])
     {
       button[i] = true;
-      statelessswitchAccessory.EventLockPositive[i] = true;
+      statelessswitchAccessory.ButtonLockPositive[i] = true;
     }
-    else if(buttontmp && button[i] && !statelessswitchAccessory.EventLockPositive[i])
+    else if(buttontmp && button[i] && !statelessswitchAccessory.ButtonLockPositive[i])
     {
       button[i] = false;
-      statelessswitchAccessory.EventLockPositive[i] = true;
+      statelessswitchAccessory.ButtonLockPositive[i] = true;
     }
     
-    if(!buttontmp && statelessswitchAccessory.EventLockPositive[i])
+    if(!buttontmp && statelessswitchAccessory.ButtonLockPositive[i])
     {
       if(!buttontmp)
       {
-        statelessswitchAccessory.EventLockPositive[i] = false;
+        statelessswitchAccessory.ButtonLockPositive[i] = false;
       }
   
       Serial.println("Schalter Nr. " + String(i + 1) + ": " + (button[i] ? "An" : "Aus"));
@@ -80,7 +80,7 @@ void StatelessSwitch::UPDATE(boolean force)
   
       if(response == HTTP_CODE_OK && statelessswitchAccessory.LED)
       {
-        if(statelessswitchAccessory.EventsPositive == 1)
+        if(statelessswitchAccessory.ButtonCount == 1)
         {
           digitalWrite(LED_BUILTIN, button[i] ? HIGH : LOW);
         }

@@ -27,7 +27,7 @@ void setup()
 
   //sLED.setupRGB();
   
-  if(m.SETUP("special", "5.2.0", 10000, "[]", "") && m.checkConnection())
+  if(m.SETUP("6.0.0", "[]", "[]", "") && m.checkConnection())
   {
     //sLED.SETUP(m.LED, 2);
 
@@ -38,8 +38,6 @@ void setup()
 
     StaticJsonDocument<400> doc;
     deserializeJson(doc, m.Services);
-
-    Serial.println(m.Services);
 
     for(JsonVariant v : doc.as<JsonArray>())
     {
@@ -75,7 +73,7 @@ void setup()
 
       if(v.as<String>() == "button")
       {
-        button.SETUP(m.BridgeIP, m.WebhookPort, m.Events, m.LED, m.server);
+        button.SETUP(m.BridgeIP, m.WebhookPort, m.Buttons, m.LED, m.server);
       }
 
       if(v.as<String>() == "lcd")
@@ -114,15 +112,6 @@ void setup()
       if(button.activated)
       {
         button.UPDATE(true);
-      }
-
-      /* Custom LCD Display Part */
-
-      if(lDisplay.activated)
-      {
-        String info[] = {"Klima: " + String(climate.temp).substring(0, String(climate.temp).length() - 1) + " \337C - " + String((int)climate.hum) + " %", "Licht: " + String((int)light.light) + " Lux"};
-        //String info[] = {"Bitte: Klingeln!"};
-        lDisplay.UPDATE(2, info);
       }
     }
   }
@@ -170,9 +159,16 @@ void loop()
 
     if(lDisplay.activated)
     {
-      String info[] = {"Klima: " + String(climate.temp).substring(0, String(climate.temp).length() - 1) + " \337C - " + String((int)climate.hum) + " %", "Licht: " + String((int)light.light) + " Lux"};
-      //String info[] = {"Bitte: Klingeln!"};
-      lDisplay.UPDATE(2, info);
+      if(m.Suffix == "base")
+      {
+        String info[] = {"Klima: " + String(climate.temp).substring(0, String(climate.temp).length() - 1) + " \337C - " + String((int)climate.hum) + " %", "Licht: " + String((int)light.light) + " Lux"};
+        lDisplay.UPDATE(2, info);
+      }
+      else if(m.Suffix == "doorbell")
+      {
+        String info[] = {"Bitte: Klingeln!"};
+        lDisplay.UPDATE(1, info);
+      }
     }
 
     /* Custom Status LED Part */

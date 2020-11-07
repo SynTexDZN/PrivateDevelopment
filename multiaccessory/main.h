@@ -27,20 +27,20 @@ class SynTexMain
     String Version;
     String Name;
   
-    String Type;
     boolean Active;
     int Interval;
     boolean LED;
   
     SynTexMain();
 
-    boolean SETUP(String Type, String Version, int Interval, String Events, String Services);
+    boolean SETUP(String Version, String Services, String Buttons, String Suffix);
     void LOOP();
     boolean checkConnection();
     int safeFetch(String URL, int Time, boolean Dots);
 
-    String Events;
     String Services;
+    String Buttons;
+    String Suffix;
     
     ESP8266WebServer server;
     HTTPClient sender;

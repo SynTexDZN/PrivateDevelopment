@@ -6,7 +6,7 @@
 
 SynTexMain::SynTexMain() {}
 
-boolean SynTexMain::SETUP(String Type, String Version, int Interval, String Events, String Services)
+boolean SynTexMain::SETUP(String Version, String Services, String Buttons, String Suffix)
 {
   Serial.begin(115200);
   Serial.println();
@@ -18,8 +18,6 @@ boolean SynTexMain::SETUP(String Type, String Version, int Interval, String Even
 
   pinMode(LED_BUILTIN, OUTPUT);
 
-  this -> Services = Services;
-
   if(!SPIFFS.begin())
   {
     Serial.println("Es konnte nicht auf das Dateisystem zugegriffen werden");
@@ -29,6 +27,10 @@ boolean SynTexMain::SETUP(String Type, String Version, int Interval, String Even
   if(!loadFileSystem())
   {
     Serial.println("Eine leere Config wurde geladen!");
+
+    this -> Services = Services;
+    this -> Buttons = Buttons;
+    this -> Suffix = Suffix;
   }
   else
   {
@@ -40,6 +42,15 @@ boolean SynTexMain::SETUP(String Type, String Version, int Interval, String Even
     Serial.println(WiFiPass);
     Serial.print("Bridge IP: ");
     Serial.println(BridgeIP);
+
+    Serial.println("-------------");
+    
+    Serial.print("Services: ");
+    Serial.println(this -> Services);
+    Serial.print("Buttons: ");
+    Serial.println(this -> Buttons);
+    Serial.print("Suffix: ");
+    Serial.println(this -> Suffix);
   }
   
   Serial.println("-------------");
@@ -55,15 +66,12 @@ boolean SynTexMain::SETUP(String Type, String Version, int Interval, String Even
       rnd += letters[randomValue];
     }
 
-    Name = char(toupper(Type.charAt(0))) + Type.substring(1) + "-" + rnd;
+    Name = "SynTex-" + rnd;
 
     saveFileSystem();
   }
 
   this -> Version = Version;
-  this -> Type = Type;
-  this -> Interval = Interval;
-  this -> Events = Events;
   
   if(WiFiName != "")
   {
@@ -154,6 +162,46 @@ void SynTexMain::serviceOverride()
     server.sendHeader("Access-Control-Allow-Origin", "*");
     server.send(200, "text/plain", Services);
   }
+
+  if(server.hasArg("buttons"))
+  {
+    Buttons = server.arg("buttons");
+
+    saveFileSystem();
+
+    server.sendHeader("Access-Control-Allow-Origin", "*");
+    server.send(200, "text/plain", "Success");
+
+    delay(2000);
+
+    ESP.restart();
+  }
+
+  if(server.hasArg("view-buttons"))
+  {
+    server.sendHeader("Access-Control-Allow-Origin", "*");
+    server.send(200, "text/plain", Buttons);
+  }
+
+  if(server.hasArg("suffix"))
+  {
+    Suffix = server.arg("suffix");
+
+    saveFileSystem();
+
+    server.sendHeader("Access-Control-Allow-Origin", "*");
+    server.send(200, "text/plain", "Success");
+
+    delay(2000);
+
+    ESP.restart();
+  }
+
+  if(server.hasArg("view-suffix"))
+  {
+    server.sendHeader("Access-Control-Allow-Origin", "*");
+    server.send(200, "text/plain", Suffix);
+  }
 }
 
 void SynTexMain::updateDevice()
@@ -165,40 +213,43 @@ void SynTexMain::updateDevice()
   ESPhttpUpdate.onError(update_error);
   */
 
-  Serial.print("Nach Updates suchen ..");
-
-  int response = safeFetch("http://syntex.sytes.net/smarthome/check-version.php?device=" + Type, 10, true);
-
-  if(response == HTTP_CODE_OK)
-  {    
-    String newVersion = sender.getString();
-
-    server.sendHeader("Access-Control-Allow-Origin", "*");
-    server.send(200, "text/html", "Success");
-
-    Serial.println("http://syntex.sytes.net/smarthome/ota/" + Type + newVersion + ".bin");
-
-    t_httpUpdate_return ret = ESPhttpUpdate.update("http://syntex.sytes.net/smarthome/ota/" + Type + newVersion + ".bin");
-
-    switch(ret)
-    {
-      case HTTP_UPDATE_FAILED:
-        Serial.printf("HTTP_UPDATE_FAILD Error (%d): %s\n", ESPhttpUpdate.getLastError(), ESPhttpUpdate.getLastErrorString().c_str());
-        break;
-  
-      case HTTP_UPDATE_NO_UPDATES:
-        Serial.println("HTTP_UPDATE_NO_UPDATES");
-        break;
-  
-      case HTTP_UPDATE_OK:
-        Serial.println("HTTP_UPDATE_OK");
-        break;
-    }
-  }
-  else
+  if(server.hasArg("type"))
   {
-    server.sendHeader("Access-Control-Allow-Origin", "*");
-    server.send(200, "text/html", "Error");
+    Serial.print("Nach Updates suchen ..");
+  
+    int response = safeFetch("http://syntex.sytes.net/smarthome/check-version.php?device=" + server.arg("type"), 10, true);
+  
+    if(response == HTTP_CODE_OK)
+    {    
+      String newVersion = sender.getString();
+  
+      server.sendHeader("Access-Control-Allow-Origin", "*");
+      server.send(200, "text/html", "Success");
+  
+      Serial.println("http://syntex.sytes.net/smarthome/ota/" + server.arg("type") + newVersion + ".bin");
+  
+      t_httpUpdate_return ret = ESPhttpUpdate.update("http://syntex.sytes.net/smarthome/ota/" + server.arg("type") + newVersion + ".bin");
+  
+      switch(ret)
+      {
+        case HTTP_UPDATE_FAILED:
+          Serial.printf("HTTP_UPDATE_FAILD Error (%d): %s\n", ESPhttpUpdate.getLastError(), ESPhttpUpdate.getLastErrorString().c_str());
+          break;
+    
+        case HTTP_UPDATE_NO_UPDATES:
+          Serial.println("HTTP_UPDATE_NO_UPDATES");
+          break;
+    
+        case HTTP_UPDATE_OK:
+          Serial.println("HTTP_UPDATE_OK");
+          break;
+      }
+    }
+    else
+    {
+      server.sendHeader("Access-Control-Allow-Origin", "*");
+      server.send(200, "text/html", "Error");
+    }
   }
 }
 
@@ -210,7 +261,7 @@ boolean SynTexMain::loadDatabaseSettings()
 
   Serial.print("Mit der SynTex Bridge verbinden ..");
 
-  int response = safeFetch(BridgeIP + ":1711/serverside/init?mac=" + WiFi.macAddress() + "&ip=" + WiFi.localIP().toString() + "&type=" + Type + "&name=" + safeName + "&version=" + Version + "&refresh=" + Interval + "&services=" + Services + "&buttons=" + Events, 10, true);
+  int response = safeFetch(BridgeIP + ":1711/serverside/init?mac=" + WiFi.macAddress() + "&ip=" + WiFi.localIP().toString() + "&name=" + safeName + "&version=" + Version + "&services=" + Services + "&buttons=" + Buttons, 10, true);
   
   if(response == HTTP_CODE_OK)
   {    
@@ -241,32 +292,7 @@ boolean SynTexMain::loadDatabaseSettings()
     Serial.println(Interval);
     Serial.print("LED: ");
     Serial.println(LED ? "An" : "Aus");
-    Serial.print("Events: ");
-
-    Events = obj["events"].as<String>();
-
-    int counter = 0;
-
-    for(JsonVariant v : obj["events"].as<JsonArray>())
-    {
-      if(v.as<int>() < 0)
-      {
-        Serial.print("< " + String(abs(v.as<int>())) + "  ");
-        counter++;
-      }
-      else
-      {
-        Serial.print("> " + String(abs(v.as<int>())) + "  ");
-        counter++;
-      }
-    }
-
-    if(counter == 0)
-    {
-      Serial.print("/");
-    }
     
-    Serial.println("");
     Serial.println("-------------");
 
     saveFileSystem();
@@ -289,34 +315,37 @@ boolean SynTexMain::loadDatabaseSettings()
 
 void SynTexMain::resetDevice()
 {
-  Serial.print("Das Gerät wird zurückgesetzt ..");
-
-  int response = safeFetch(BridgeIP + ":1711/serverside/remove-device?mac=" + WiFi.macAddress(), 10, true);
-  
-  if(server.hasArg("force") || (response == HTTP_CODE_OK && sender.getString() == "Success"))
+  if(server.hasArg("type"))
   {
-    WiFiName = "";
-    WiFiPass = "";
-    Name = "";
+    Serial.print("Das Gerät wird zurückgesetzt ..");
   
-    saveFileSystem();
+    int response = safeFetch(BridgeIP + ":1711/serverside/remove-device?mac=" + WiFi.macAddress(), 10, true);
     
-    server.sendHeader("Access-Control-Allow-Origin", "*");
-    server.send(200, "text/html", "Success");
-
-    ESPhttpUpdate.update("http://syntex.sytes.net/smarthome/ota/" + Type + Version + ".bin");
-  
-    delay(2000);
+    if(server.hasArg("force") || (response == HTTP_CODE_OK && sender.getString() == "Success"))
+    {
+      WiFiName = "";
+      WiFiPass = "";
+      Name = "";
     
-    ESP.reset();
-  }
-  else
-  {
-    server.sendHeader("Access-Control-Allow-Origin", "*");
-    server.send(200, "text/html", "Error");
-  }
+      saveFileSystem();
+      
+      server.sendHeader("Access-Control-Allow-Origin", "*");
+      server.send(200, "text/html", "Success");
   
-  sender.end();
+      ESPhttpUpdate.update("http://syntex.sytes.net/smarthome/ota/" + server.arg("type") + Version + ".bin");
+    
+      delay(2000);
+      
+      ESP.reset();
+    }
+    else
+    {
+      server.sendHeader("Access-Control-Allow-Origin", "*");
+      server.send(200, "text/html", "Error");
+    }
+    
+    sender.end();
+  }
 }
 
 boolean SynTexMain::loadFileSystem()
@@ -339,7 +368,7 @@ boolean SynTexMain::loadFileSystem()
   std::unique_ptr<char[]> buf(new char[size]);
   configFile.readBytes(buf.get(), size);
 
-  StaticJsonDocument<200> doc;
+  StaticJsonDocument<400> doc;
   DeserializationError error = deserializeJson(doc, buf.get());
   
   if(error)
@@ -375,17 +404,29 @@ boolean SynTexMain::loadFileSystem()
     Services = obj["services"].as<String>();
   }
 
+  if(obj["events"].as<String>() != "")
+  {
+    Buttons = obj["events"].as<String>();
+  }
+
+  if(obj["suffix"].as<String>() != "")
+  {
+    Suffix = obj["suffix"].as<String>();
+  }
+
   return true;
 }
 
 boolean SynTexMain::saveFileSystem()
 {
-  StaticJsonDocument<200> doc;
+  StaticJsonDocument<400> doc;
   doc["ssid"] = WiFiName;
   doc["pass"] = WiFiPass;
   doc["name"] = Name;
   doc["bridge"] = BridgeIP;
   doc["services"] = Services;
+  doc["events"] = Buttons;
+  doc["suffix"] = Suffix;
 
   File configFile = SPIFFS.open("/config.json", "w");
   
