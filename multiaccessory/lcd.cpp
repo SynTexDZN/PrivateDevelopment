@@ -37,7 +37,7 @@ void LCD::SETUP(String IP, String Port, int Interval, boolean Backlight, String 
 {
   this -> Interval = Interval;
 
-  displayAccessory.SETUP("1.0.0", Interval, "[]", IP, Port, Backlight);
+  displayAccessory.SETUP("1.0.1", Interval, "[]", IP, Port, Backlight);
 
   lcd.init();
   lcd.clear();
@@ -247,16 +247,16 @@ void LCD::UPDATE(int i, String* Infos)
         lcd.print("Datum");
       }
   
-      String value = Infos[counter];
-  
-      value.replace(split(Infos[counter], ':', 0) + ": ", "");
-  
       lcd.setCursor(0, 1);
       lcd.print("                ");
       lcd.setCursor(0, 1);
   
       if(counter != i)
       {
+        String value = Infos[counter];
+  
+        value.replace(split(Infos[counter], ':', 0) + ": ", "");
+
         lcd.print(value);
       }
       else
@@ -282,13 +282,6 @@ void LCD::UPDATE(int i, String* Infos)
         realDate += String(date.year());
         
         lcd.print(realDate);
-  /*
-        lcd.setCursor(0, 1);
-        lcd.write((byte)0);
-        lcd.print(" 27.1 \337C ");
-        lcd.write((byte)2);
-        lcd.print(" 34 %");
-        */
       }
   
       if(counter < i)
