@@ -41,7 +41,7 @@ void setup()
 
     for(JsonVariant v : doc.as<JsonArray>())
     {
-      if(v.as<String>() == "climate")
+      if((v.as<String>() == "temperature" || v.as<String>() == "humidity") && !climate.activated)
       {
         climate.SETUP(m.BridgeIP, m.WebhookPort, m.Interval, m.LED);
       }
