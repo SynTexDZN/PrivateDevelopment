@@ -15,27 +15,25 @@ Climate climate(2);
 Light light;
 Rain rain(16);
 Motion motion(14);
-Contact contact(12);
-Relais relais(15);
+Contact contact(5);
+Relais relais(4);
 StatelessSwitch button(5);
 LCD lDisplay;
 StatusLED sLED;
 
 void setup()
 {
-  /* Custom Status LED Part */
-
-  //sLED.setupRGB();
+  sLED.setupRGB();
   
-  if(m.SETUP("6.0.2", "[]", "[]", "") && m.checkConnection())
+  if(m.SETUP("6.0.3", "[]", "[]", "") && m.checkConnection())
   {
-    //sLED.SETUP(m.LED, 2);
-
-    if(sLED.activated)
+    sLED.SETUP(m.LED, 2);
+    
+    if(m.Suffix == "status-led")
     {
       m.LED = false;
     }
-
+    
     StaticJsonDocument<400> doc;
     deserializeJson(doc, m.Services);
 
@@ -155,8 +153,6 @@ void loop()
       button.UPDATE(false);
     }
 
-    /* Custom LCD Display Part */
-
     if(lDisplay.activated)
     {
       if(m.Suffix == "base")
@@ -170,8 +166,6 @@ void loop()
         lDisplay.UPDATE(1, info);
       }
     }
-
-    /* Custom Status LED Part */
 
     boolean device = motion.motion;
 
