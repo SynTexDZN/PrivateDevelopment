@@ -12,6 +12,7 @@ class StatusLED
     void SETUP(boolean LED, int Fade);
     void UPDATE();
     void setupRGB();
+    void finishSetupRGB();
     void setRGB(int red, int green, int blue);
     void flashRGB(int red, int green, int blue, int t);
     void blinkRGB(int red, int green, int blue, int s);

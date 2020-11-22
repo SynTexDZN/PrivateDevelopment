@@ -25,14 +25,16 @@ void setup()
 {
   sLED.setupRGB();
   
-  if(m.SETUP("6.0.3", "[]", "[]", "") && m.checkConnection())
+  if(m.SETUP("6.0.4", "[]", "[]", "") && m.checkConnection())
   {
-    sLED.SETUP(m.LED, 2);
-    
     if(m.Suffix == "status-led")
     {
+      sLED.SETUP(m.LED, 2);
+      
       m.LED = false;
     }
+
+    sLED.finishSetupRGB();
     
     StaticJsonDocument<400> doc;
     deserializeJson(doc, m.Services);

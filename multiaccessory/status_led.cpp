@@ -32,6 +32,22 @@ void StatusLED::setupRGB()
   analogWrite(b, 255);
 }
 
+void StatusLED::finishSetupRGB()
+{
+  if(activated)
+  {
+    next[0] = 0;
+    next[1] = 0;
+    next[2] = 0;
+  }
+  else
+  {
+    analogWrite(r, 0);
+    analogWrite(g, 0);
+    analogWrite(b, 0);
+  }
+}
+
 boolean offline;
 
 void StatusLED::UPDATE()
