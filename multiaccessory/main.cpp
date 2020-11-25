@@ -80,11 +80,16 @@ boolean SynTexMain::SETUP(String Version, String Services, String Buttons, Strin
 
     int i = 0;
     
-    while(WiFi.status() != WL_CONNECTED && i < 120 * 30)
+    while(WiFi.status() != WL_CONNECTED)
     {
       delay(500);
       Serial.print(".");
       ++i;
+
+      if(i == 120 * 30)
+      {
+         digitalWrite(LED_BUILTIN, HIGH);
+      }
 
       if(i % 120 == 0)
       {
@@ -92,8 +97,6 @@ boolean SynTexMain::SETUP(String Version, String Services, String Buttons, Strin
 
         Serial.println();
         Serial.print("Verbindung wird hergestellt ..");
-
-        i = 0;
       }
     }
     
@@ -113,7 +116,7 @@ boolean SynTexMain::SETUP(String Version, String Services, String Buttons, Strin
     else
     {
       Serial.println("Verbindung zum Netzwerk konnte nicht hergestellt werden!");
-      
+
       startAccessPoint();
     }
   }
