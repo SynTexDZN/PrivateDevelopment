@@ -34,7 +34,7 @@ void Motion::UPDATE(boolean force)
     Serial.print("Bewegung: ");
     Serial.println(motion ? "Ja" : "Nein");
 
-    int response = motionAccessory.safeFetch(motionAccessory.BridgeIP + ":" + String(motionAccessory.WebhookPort) + "/devices?mac=" + WiFi.macAddress() + "&type=motion&value=" + (motion ? "true" : "false"), 10000, false);
+    int response = motionAccessory.safeFetch(motionAccessory.BridgeIP + ":" + String(motionAccessory.WebhookPort) + "/devices?mac=" + WiFi.macAddress() + "&type=motion&value=" + (motion ? "true" : "false"), 298500, false);
 
     if(response == HTTP_CODE_OK && motionAccessory.LED)
     {
