@@ -40,7 +40,7 @@ void Relais::SETUP(String ip, String port, boolean led, ESP8266WebServer &server
     }
   });
 
-  relaisAccessory.safeFetch(relaisAccessory.BridgeIP + ":" + String(relaisAccessory.WebhookPort) + "/devices?mac=" + WiFi.macAddress() + "&type=relais&value=false", 10000, false);
+  relaisAccessory.safeFetch(relaisAccessory.BridgeIP + ":" + String(relaisAccessory.WebhookPort) + "/devices?id=" + WiFi.macAddress() + "&type=relais&value=false", 10000, false);
   
   activated = true;
 }

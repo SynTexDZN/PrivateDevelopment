@@ -76,7 +76,7 @@ void StatelessSwitch::UPDATE(boolean force)
   
       Serial.println("Schalter Nr. " + String(i + 1) + ": " + (button[i] ? "An" : "Aus"));
   
-      int response = statelessswitchAccessory.safeFetch(statelessswitchAccessory.BridgeIP + ":" + statelessswitchAccessory.WebhookPort + "/devices?mac=" + WiFi.macAddress() + "&event=" + i + "&value=" + (button[i] ? 0 : 1), 10000, false);
+      int response = statelessswitchAccessory.safeFetch(statelessswitchAccessory.BridgeIP + ":" + statelessswitchAccessory.WebhookPort + "/devices?id=" + WiFi.macAddress() + "&event=" + i + "&value=" + (button[i] ? 0 : 1), 10000, false);
   
       if(response == HTTP_CODE_OK && statelessswitchAccessory.LED)
       {

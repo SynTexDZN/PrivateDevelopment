@@ -27,6 +27,6 @@ void Rain::UPDATE(boolean force)
     Serial.print("Regen: ");
     Serial.println(rain ? "Nein" : "Ja");
 
-    rainAccessory.safeFetch(rainAccessory.BridgeIP + ":" + String(rainAccessory.WebhookPort) + "/devices?mac=" + WiFi.macAddress() + "&type=rain&value=" + (rain ? "false" : "true"), rainAccessory.Interval, false);
+    rainAccessory.safeFetch(rainAccessory.BridgeIP + ":" + String(rainAccessory.WebhookPort) + "/devices?id=" + WiFi.macAddress() + "&type=rain&value=" + (rain ? "false" : "true"), rainAccessory.Interval, false);
   }
 }

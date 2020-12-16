@@ -38,7 +38,7 @@ void Light::UPDATE(boolean force)
     {
       light = lighttmp;
 
-      lightAccessory.safeFetch(lightAccessory.BridgeIP + ":" + String(lightAccessory.WebhookPort) + "/devices?mac=" + WiFi.macAddress() + "&type=light&value=" + String(light), lightAccessory.Interval, false);
+      lightAccessory.safeFetch(lightAccessory.BridgeIP + ":" + String(lightAccessory.WebhookPort) + "/devices?id=" + WiFi.macAddress() + "&type=light&value=" + String(light), lightAccessory.Interval, false);
     }
   }
 }

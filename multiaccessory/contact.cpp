@@ -29,7 +29,7 @@ void Contact::UPDATE(boolean force)
     Serial.print("Kontakt: ");
     Serial.println(contact ? "Nein" : "Ja");
 
-    int response = contactAccessory.safeFetch(contactAccessory.BridgeIP + ":" + String(contactAccessory.WebhookPort) + "/devices?mac=" + WiFi.macAddress() + "&type=contact&value=" + (contact ? "true" : "false"), 10000, false);
+    int response = contactAccessory.safeFetch(contactAccessory.BridgeIP + ":" + String(contactAccessory.WebhookPort) + "/devices?id=" + WiFi.macAddress() + "&type=contact&value=" + (contact ? "true" : "false"), 10000, false);
 
     if(response == HTTP_CODE_OK && contactAccessory.LED)
     {
