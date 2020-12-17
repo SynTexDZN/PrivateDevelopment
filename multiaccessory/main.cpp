@@ -264,7 +264,7 @@ boolean SynTexMain::loadDatabaseSettings()
 
   Serial.print("Mit der SynTex Bridge verbinden ..");
 
-  int response = safeFetch(BridgeIP + ":1711/serverside/init?mac=" + WiFi.macAddress() + "&ip=" + WiFi.localIP().toString() + "&name=" + safeName + "&version=" + Version + "&services=" + Services + "&buttons=" + Buttons, 10, true);
+  int response = safeFetch(BridgeIP + ":1711/serverside/init?id=" + WiFi.macAddress() + "&ip=" + WiFi.localIP().toString() + "&name=" + safeName + "&version=" + Version + "&services=" + Services + "&buttons=" + Buttons, 10, true);
   
   if(response == HTTP_CODE_OK)
   {    
@@ -322,7 +322,7 @@ void SynTexMain::resetDevice()
   {
     Serial.print("Das Gerät wird zurückgesetzt ..");
   
-    int response = safeFetch(BridgeIP + ":1711/serverside/remove-device?mac=" + WiFi.macAddress(), 10, true);
+    int response = safeFetch(BridgeIP + ":1711/serverside/remove-device?id=" + WiFi.macAddress(), 10, true);
     
     if(server.hasArg("force") || (response == HTTP_CODE_OK && sender.getString() == "Success"))
     {
