@@ -322,7 +322,7 @@ void SynTexMain::resetDevice()
   {
     Serial.print("Das Gerät wird zurückgesetzt ..");
   
-    int response = safeFetch(BridgeIP + ":1711/serverside/remove-device?id=" + WiFi.macAddress(), 10, true);
+    int response = safeFetch(BridgeIP + ":" + WebhookPort + "/devices?id=" + WiFi.macAddress() + "&remove=CONFIRM", 10, true);
     
     if(server.hasArg("force") || (response == HTTP_CODE_OK && sender.getString() == "Success"))
     {
