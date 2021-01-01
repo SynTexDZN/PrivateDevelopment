@@ -23,6 +23,17 @@ boolean SynTexMain::SETUP(String Version, String Services, String Buttons, Strin
     Serial.println("Es konnte nicht auf das Dateisystem zugegriffen werden");
     //return;
   }
+
+  server.on("/wifi", [this]{ scanWiFi(); });
+  server.on("/settings", HTTP_POST, [this]{ saveWiFiSettings(); });
+  server.on("/", [this]{ server.sendHeader("Access-Control-Allow-Origin", "*"); server.send(200, "text/plain", ""); });
+  server.on("/reset", [this]{ resetDevice(); });
+  server.on("/restart", [this]{ server.sendHeader("Access-Control-Allow-Origin", "*"); server.send(200, "text/plain", "Success"); delay(2000); ESP.restart(); });
+  server.on("/version", [this]{ server.sendHeader("Access-Control-Allow-Origin", "*"); server.send(200, "text/plain", this -> Version); });
+  server.on("/update", [this]{ updateDevice(); });
+  server.on("/refresh", [this]{ loadDatabaseSettings(); });
+  server.on("/config", [this]{ serviceOverride(); });
+  server.begin();
   
   if(!loadFileSystem())
   {
@@ -72,7 +83,7 @@ boolean SynTexMain::SETUP(String Version, String Services, String Buttons, Strin
   }
 
   this -> Version = Version;
-  
+
   if(WiFiName != "")
   {
     WiFi.begin(WiFiName, WiFiPass);
@@ -124,17 +135,6 @@ boolean SynTexMain::SETUP(String Version, String Services, String Buttons, Strin
   {
     startAccessPoint();
   }
-
-  server.on("/wifi", [this]{ scanWiFi(); });
-  server.on("/settings", HTTP_POST, [this]{ saveWiFiSettings(); });
-  server.on("/", [this]{ server.sendHeader("Access-Control-Allow-Origin", "*"); server.send(200, "text/plain", ""); });
-  server.on("/reset", [this]{ resetDevice(); });
-  server.on("/restart", [this]{ server.sendHeader("Access-Control-Allow-Origin", "*"); server.send(200, "text/plain", "Success"); delay(2000); ESP.restart(); });
-  server.on("/version", [this]{ server.sendHeader("Access-Control-Allow-Origin", "*"); server.send(200, "text/plain", this -> Version); });
-  server.on("/update", [this]{ updateDevice(); });
-  server.on("/refresh", [this]{ loadDatabaseSettings(); });
-  server.on("/config", [this]{ serviceOverride(); });
-  server.begin();
 
   return true;
 }
