@@ -16,7 +16,7 @@ Light light;
 Rain rain(16);
 Motion motion(14);
 Contact contact(5);
-Relais relais(4);
+Relais relais(0);
 StatelessSwitch button(5);
 LCD lDisplay;
 StatusLED sLED;
