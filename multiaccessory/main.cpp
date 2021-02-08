@@ -568,7 +568,7 @@ void SynTexMain::scanWiFi()
   
         if(WiFi.status() == WL_CONNECTED)
         {
-          html += "{" + String('"') + "ssid" + String('"') + ":" + String('"') + WiFiName + String('"') + "," + String('"') + "rssi" + String('"') + ":" + WiFi.RSSI(0) + "}";
+          html += "{" + String('"') + "ssid" + String('"') + ":" + String('"') + WiFiName + String('"') + "," + String('"') + "rssi" + String('"') + ":" + WiFi.RSSI() + "}";
         }
         else
         {
