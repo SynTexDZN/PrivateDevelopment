@@ -9,6 +9,7 @@
 #include "statelessswitch.h"
 #include "lcd.h"
 #include "status_led.h"
+#include "buzzer.h"
 
 SynTexMain m;
 Climate climate(2);
@@ -20,12 +21,13 @@ Relais relais(0);
 StatelessSwitch button(5);
 LCD lDisplay;
 StatusLED sLED;
+Buzzer buzzer(13);
 
 void setup()
 {
   sLED.setupRGB();
   
-  if(m.SETUP("6.1.3", "[]", "[]", "") && m.checkConnection())
+  if(m.SETUP("6.2.0", "[]", "[]", "") && m.checkConnection())
   {
     if(m.Suffix == "status-led")
     {
@@ -79,6 +81,11 @@ void setup()
       if(v.as<String>() == "lcd")
       {
         lDisplay.SETUP(m.BridgeIP, m.WebhookPort, m.Interval, m.LED, m.Name, m.Version, m.server);
+      }
+
+      if(v.as<String>() == "buzzer")
+      {
+        buzzer.SETUP(m.BridgeIP, m.WebhookPort, m.LED, m.server);
       }
     }
 
