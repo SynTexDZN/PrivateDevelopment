@@ -519,59 +519,82 @@ boolean SynTexMain::checkConnection()
   return false;
 }
 
-String netze[64];
+String netze[64][3];
 int found = 0;
 
 void SynTexMain::scanWiFi()
 {
-  Serial.println("WLAN Netzwerke suchen ..");
-
-  found = WiFi.scanNetworks();
-  
-  if(found == 0)
+  if(server.hasArg("view-current"))
   {
-    Serial.println("Keine Netzwerke gefunden!");
+    server.sendHeader("Access-Control-Allow-Origin", "*");
+    server.send(200, "text/plain", "{" + String('"') + "ssid" + String('"') + ":" + String('"') + WiFiName + String('"') + "," + String('"') + "rssi" + String('"') + ":" + String(WiFi.RSSI()) + "}");
   }
   else
   {
-    Serial.print(found);
-    Serial.println(" Netzwerke gefunden!");
+    Serial.println("WLAN Netzwerke suchen ..");
+
+    found = WiFi.scanNetworks();
     
-    for(int i = 0; i < found; ++i)
+    if(found == 0)
     {
-      Serial.print(i + 1);
-      Serial.print(": ");
-      Serial.print(WiFi.SSID(i));
-
-      netze[i] = WiFi.SSID(i);
-      
-      Serial.print(" (");
-      Serial.print(WiFi.RSSI(i));
-      Serial.print(")");
-      Serial.println((WiFi.encryptionType(i) == ENC_TYPE_NONE) ? " " : "*");
+      Serial.println("Keine Netzwerke gefunden!");
     }
-
-    String html = "";
-
-    if(found != 0)
+    else
     {
-      html += "[";
-
+      Serial.print(found);
+      Serial.println(" Netzwerke gefunden!");
+      
       for(int i = 0; i < found; ++i)
       {
-        html += '"' + netze[i] + '"';
+        Serial.print(i + 1);
+        Serial.print(": ");
+        Serial.print(WiFi.SSID(i));
   
-        if(i < found - 1)
-        {
-          html += ",";
-        }
+        netze[i][0] = WiFi.SSID(i);
+        netze[i][1] = WiFi.RSSI(i);
+        netze[i][2] = WiFi.encryptionType(i);
+        
+        Serial.print(" (");
+        Serial.print(WiFi.RSSI(i));
+        Serial.print(")");
+        Serial.println((WiFi.encryptionType(i) == ENC_TYPE_NONE) ? " " : "*");
       }
   
-      html += "]";
-    }
+      String html = "{";
+  
+      if(found != 0)
+      {
+        html += String('"') + "connected" + String('"') + ":";
+  
+        if(WiFi.status() == WL_CONNECTED)
+        {
+          html += "{" + String('"') + "ssid" + String('"') + ":" + String('"') + WiFiName + String('"') + "," + String('"') + "rssi" + String('"') + ":" + WiFi.RSSI(0) + "}";
+        }
+        else
+        {
+          html += "null";
+        }
+  
+        html += "," + String('"') + "available" + String('"') + ":[";
+  
+        for(int i = 0; i < found; ++i)
+        {
+          html += "{" + String('"') + "ssid" + String('"') + ":" + String('"') + netze[i][0] + String('"') + "," + String('"') + "rssi" + String('"') + ":" + netze[i][1] + "," + String('"') + "pass" + String('"') + ":" + String('"') + netze[i][2] +String('"') + "}";
+    
+          if(i < found - 1)
+          {
+            html += ",";
+          }
+        }
+    
+        html += "]";
+      }
 
-    server.sendHeader("Access-Control-Allow-Origin", "*");
-    server.send(200, "text/plain", html);
+      html += "}";
+  
+      server.sendHeader("Access-Control-Allow-Origin", "*");
+      server.send(200, "text/plain", html);
+    }
   }
 }
 
