@@ -27,7 +27,7 @@ void setup()
 {
   sLED.setupRGB();
   
-  if(m.SETUP("6.2.0", "[]", "[]", "") && m.checkConnection())
+  if(m.SETUP("6.2.1", "[]", "[]", "") && m.checkConnection())
   {
     if(m.Suffix == "status-led")
     {
@@ -168,6 +168,11 @@ void loop()
       {
         String info[] = {"Klima: " + String(climate.temp).substring(0, String(climate.temp).length() - 1) + " \337C - " + String((int)climate.hum) + " %", "Licht: " + String((int)light.light) + " Lux"};
         lDisplay.UPDATE(2, info);
+      }
+      else if(m.Suffix == "climate")
+      {
+        String info[] = {"Klima: " + String(climate.temp).substring(0, String(climate.temp).length() - 1) + " \337C - " + String((int)climate.hum) + " %"};
+        lDisplay.UPDATE(1, info);
       }
       else if(m.Suffix == "doorbell")
       {
