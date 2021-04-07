@@ -43,41 +43,41 @@ void LCD::SETUP(String IP, String Port, int Interval, boolean Backlight, String 
   lcd.clear();
 
   byte ArrowUp[] = {
-        B00100,
-        B01110,
-        B10101,
-        B00100,
-        B00100,
-        B00100,
-        B00100,
-        B00000
-      };
+    B00100,
+    B01110,
+    B10101,
+    B00100,
+    B00100,
+    B00100,
+    B00100,
+    B00000
+  };
 
-      byte ArrowDown[] = {
-        B00100,
-        B00100,
-        B00100,
-        B00100,
-        B10101,
-        B01110,
-        B00100,
-        B00000
-      };
+  byte ArrowDown[] = {
+    B00100,
+    B00100,
+    B00100,
+    B00100,
+    B10101,
+    B01110,
+    B00100,
+    B00000
+  };
 
-      byte Stable[] = {
-        B01110,
-        B00100,
-        B00100,
-        B00100,
-        B00100,
-        B00100,
-        B01110,
-        B00000
-      };
+  byte Stable[] = {
+    B01110,
+    B00100,
+    B00100,
+    B00100,
+    B00100,
+    B00100,
+    B01110,
+    B00000
+  };
 
-      lcd.createChar(0, ArrowUp);
-      lcd.createChar(1, ArrowDown);
-      lcd.createChar(2, Stable);
+  lcd.createChar(0, ArrowUp);
+  lcd.createChar(1, ArrowDown);
+  lcd.createChar(2, Stable);
 
   int response = displayAccessory.safeFetch(displayAccessory.BridgeIP + ":1711/serverside/time", 10000, false);
   
