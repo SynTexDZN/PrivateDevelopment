@@ -20,6 +20,11 @@ class Climate
     float temp;
     float hum;
 
+    float tempExact;
+    float humExact;
+
+    float humPrevious;
+
     boolean activated;
 };
 

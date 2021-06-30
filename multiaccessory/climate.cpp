@@ -13,7 +13,7 @@ Climate::Climate(int Pin)
 
 void Climate::SETUP(String ip, String port, int interval, boolean led)
 {
-  climateAccessory.SETUP("1.1.2", interval, "[]", ip, port, led);
+  climateAccessory.SETUP("1.1.3", interval, "[]", ip, port, led);
 
   dht.begin();
 
@@ -40,6 +40,9 @@ void Climate::UPDATE(boolean force)
       Serial.print("Temperatur: " + String(temptmp) + " - Feuchtigkeit: " + String((int)humtmp) + "%");
       
       Serial.println(" ( " + String(temp - temptmp >= 0.5 || temp - temptmp <= -0.5 ? "X" : "O") + " | " + String(humtmp != hum ? "X" : "O") + " )");
+
+      tempExact = temptmp;
+      humExact = humtmp;
       
       if(temp - temptmp >= 0.5 || temp - temptmp <= -0.5)
       {
@@ -47,11 +50,15 @@ void Climate::UPDATE(boolean force)
 
         climateAccessory.safeFetch(climateAccessory.BridgeIP + ":" + String(climateAccessory.WebhookPort) + "/devices?id=" + WiFi.macAddress() + "&type=temperature&value=" + String(temp), climateAccessory.Interval, false);
       }
-      
-      if(humtmp != hum)
+
+      if(humtmp != humPrevious && (hum - humtmp == 1 || hum - humtmp == 0 || hum - humtmp == -1))
+      {
+        humPrevious = humtmp;
+      }
+      else if((humtmp == humPrevious && hum != humtmp) || hum - humtmp > 1 || hum - humtmp < -1)
       {
         hum = humtmp;
-
+        
         climateAccessory.safeFetch(climateAccessory.BridgeIP + ":" + String(climateAccessory.WebhookPort) + "/devices?id=" + WiFi.macAddress() + "&type=humidity&value=" + String((int)hum), climateAccessory.Interval, false);
       }
     }
