@@ -12,6 +12,8 @@ class LCD
     unsigned long previousMillis;
 
     int Interval;
+
+    String text;
     
   public:
     LCD();
@@ -19,7 +21,6 @@ class LCD
     void SETUP(String IP, String Port, int Interval, boolean Backlight, String Name, String Version, ESP8266WebServer &server);
     void UPDATE(int i, String* Infos);
 
-    String text;
     boolean activated;
 };
 

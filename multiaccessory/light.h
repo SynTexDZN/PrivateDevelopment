@@ -6,14 +6,15 @@
 
 class Light
 {
+  private:
+    unsigned long previousMillis;
+
   public:
     Light();
     
     void SETUP(String ip, String port, int interval, boolean led);
     void UPDATE(boolean force);
     
-    unsigned long previousMillis;
-
     float light;
 
     boolean activated;

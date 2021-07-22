@@ -8,14 +8,13 @@ class Motion
 {
   private:
     int Pin;
+    unsigned long previousMillis;
   
   public:
     Motion(int Pin);
     
     void SETUP(String ip, String port, int interval, boolean led);
     void UPDATE(boolean force);
-    
-    unsigned long previousMillis;
 
     float motion;
 

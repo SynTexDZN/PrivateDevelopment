@@ -6,6 +6,17 @@
 
 class StatusLED
 {
+  private:    
+    unsigned long fadeMicros;
+    unsigned long flashMillis;
+    unsigned long blinkMillis;
+
+    boolean LED;
+    
+    int Fade;
+    int Flash;
+    int Blink;
+
   public:
     StatusLED();
     
@@ -18,15 +29,6 @@ class StatusLED
     void blinkRGB(int red, int green, int blue, int s);
 
     boolean activated;
-
-  private:    
-    unsigned long fadeMicros;
-    unsigned long flashMillis;
-    unsigned long blinkMillis;
-    boolean LED;
-    int Fade;
-    int Flash;
-    int Blink;
 };
 
 #endif

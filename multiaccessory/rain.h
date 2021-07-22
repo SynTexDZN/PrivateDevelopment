@@ -8,6 +8,7 @@ class Rain
 {
   private:
     int Pin;
+    unsigned long previousMillis;
   
   public:
     Rain(int Pin);
@@ -15,8 +16,6 @@ class Rain
     void SETUP(String ip, String port, int interval, boolean led);
     void UPDATE(boolean force);
     
-    unsigned long previousMillis;
-
     float rain;
 
     boolean activated;
