@@ -1,6 +1,7 @@
 #include <ArduinoJson.h>
 #include "main.h"
 #include "climate.h"
+#include "temperature.h"
 #include "light.h"
 #include "rain.h"
 #include "motion.h"
@@ -13,6 +14,7 @@
 
 SynTexMain m;
 Climate climate(2);
+Temperature temperature(2);
 Light light;
 Rain rain(16);
 Motion motion(14);
@@ -27,9 +29,9 @@ void setup()
 {
   sLED.setupRGB();
   
-  if(m.SETUP("6.2.2", "[]", "[]", "") && m.checkConnection())
+  if(m.SETUP("6.3.0", "[]", "[]", "") && m.checkConnection())
   {
-    if(m.Suffix == "status-led")
+    if(hasConfig("status-led"))
     {
       sLED.SETUP(m.LED, 2);
       
@@ -37,56 +39,64 @@ void setup()
     }
 
     sLED.finishSetupRGB();
-    
-    StaticJsonDocument<400> doc;
-    deserializeJson(doc, m.Services);
 
-    for(JsonVariant v : doc.as<JsonArray>())
+    if(hasConfig("hall-sensor"))
     {
-      if((v.as<String>() == "temperature" || v.as<String>() == "humidity") && !climate.activated)
-      {
-        climate.SETUP(m.BridgeIP, m.WebhookPort, m.Interval, m.LED);
-      }
+      contact.isHallSensor = true;
+    }
 
-      if(v.as<String>() == "light")
-      {
-        light.SETUP(m.BridgeIP, m.WebhookPort, m.Interval, m.LED);
-      }
+    if(hasConfig("dht22"))
+    {
+      climate.setDHT22();
+    }
 
-      if(v.as<String>() == "rain")
-      {
-        rain.SETUP(m.BridgeIP, m.WebhookPort, m.Interval, m.LED);
-      }
-      
-      if(v.as<String>() == "motion")
-      {
-        motion.SETUP(m.BridgeIP, m.WebhookPort, m.Interval, m.LED);
-      }
+    if(hasService("temperature") && hasService("humidity"))
+    {
+      climate.SETUP(m.BridgeIP, m.WebhookPort, m.Interval, m.LED);
+    }
+    else if(hasService("temperature"))
+    {
+      temperature.SETUP(m.BridgeIP, m.WebhookPort, m.Interval, m.LED);
+    }
 
-      if(v.as<String>() == "contact")
-      {
-        contact.SETUP(m.BridgeIP, m.WebhookPort, m.Interval, m.LED);
-      }
+    if(hasService("light"))
+    {
+      light.SETUP(m.BridgeIP, m.WebhookPort, m.Interval, m.LED);
+    }
 
-      if(v.as<String>() == "relais")
-      {
-        relais.SETUP(m.BridgeIP, m.WebhookPort, m.LED, m.server);
-      }
+    if(hasService("rain"))
+    {
+      rain.SETUP(m.BridgeIP, m.WebhookPort, m.Interval, m.LED);
+    }
+    
+    if(hasService("motion"))
+    {
+      motion.SETUP(m.BridgeIP, m.WebhookPort, m.Interval, m.LED);
+    }
 
-      if(v.as<String>() == "button")
-      {
-        button.SETUP(m.BridgeIP, m.WebhookPort, m.Buttons, m.LED, m.server);
-      }
+    if(hasService("contact"))
+    {
+      contact.SETUP(m.BridgeIP, m.WebhookPort, m.Interval, m.LED);
+    }
 
-      if(v.as<String>() == "lcd")
-      {
-        lDisplay.SETUP(m.BridgeIP, m.WebhookPort, m.Interval, m.LED, m.Name, m.Version, m.server);
-      }
+    if(hasService("relais"))
+    {
+      relais.SETUP(m.BridgeIP, m.WebhookPort, m.LED, m.server);
+    }
 
-      if(v.as<String>() == "buzzer")
-      {
-        buzzer.SETUP(m.BridgeIP, m.WebhookPort, m.LED, m.server);
-      }
+    if(hasService("button"))
+    {
+      button.SETUP(m.BridgeIP, m.WebhookPort, m.Buttons, m.LED, m.server);
+    }
+
+    if(hasService("lcd"))
+    {
+      lDisplay.SETUP(m.BridgeIP, m.WebhookPort, m.Interval, m.LED, m.Name, m.Version, m.server);
+    }
+
+    if(hasService("buzzer"))
+    {
+      buzzer.SETUP(m.BridgeIP, m.WebhookPort, m.LED, m.server);
     }
 
     if(m.Active)
@@ -94,6 +104,11 @@ void setup()
       if(climate.activated)
       {
         climate.UPDATE(true);
+      }
+
+      if(temperature.activated)
+      {
+        temperature.UPDATE(true);
       }
 
       if(light.activated)
@@ -137,6 +152,11 @@ void loop()
       climate.UPDATE(false);
     }
 
+    if(temperature.activated)
+    {
+      temperature.UPDATE(false);
+    }
+
     if(light.activated)
     {
       light.UPDATE(false);
@@ -164,17 +184,17 @@ void loop()
 
     if(lDisplay.activated)
     {
-      if(m.Suffix == "base")
+      if(climate.activated && light.activated)
       {
         String info[] = {"Klima: " + String(climate.tempExact).substring(0, String(climate.tempExact).length() - 1) + " \337C - " + String((int)climate.humExact) + " %", "Licht: " + String((int)light.light) + " Lux"};
         lDisplay.UPDATE(2, info);
       }
-      else if(m.Suffix == "climate")
+      else if(climate.activated)
       {
         String info[] = {"Klima: " + String(climate.tempExact).substring(0, String(climate.tempExact).length() - 1) + " \337C - " + String((int)climate.humExact) + " %"};
         lDisplay.UPDATE(1, info);
       }
-      else if(m.Suffix == "doorbell")
+      else if(hasConfig("doorbell"))
       {
         String info[] = {"Bitte: Klingeln!"};
         lDisplay.UPDATE(1, info);
@@ -202,4 +222,36 @@ void loop()
   {
     sLED.UPDATE();
   }
+}
+
+boolean hasConfig(String key)
+{
+  StaticJsonDocument<400> doc;
+  deserializeJson(doc, m.Suffix);
+
+  for(JsonVariant k : doc.as<JsonArray>())
+  {
+    if(k.as<String>() == key)
+    {
+      return true;
+    }
+  }
+  
+  return false;
+}
+
+boolean hasService(String key)
+{
+  StaticJsonDocument<400> doc;
+  deserializeJson(doc, m.Services);
+
+  for(JsonVariant k : doc.as<JsonArray>())
+  {
+    if(k.as<String>() == key)
+    {
+      return true;
+    }
+  }
+  
+  return false;
 }
