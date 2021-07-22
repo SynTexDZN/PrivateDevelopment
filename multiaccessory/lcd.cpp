@@ -37,7 +37,7 @@ void LCD::SETUP(String IP, String Port, int Interval, boolean Backlight, String 
 {
   this -> Interval = Interval;
 
-  displayAccessory.SETUP("1.0.1", Interval, "[]", IP, Port, Backlight);
+  displayAccessory.SETUP("1.0.2", Interval, "[]", IP, Port, Backlight);
 
   lcd.init();
   lcd.clear();
@@ -79,11 +79,11 @@ void LCD::SETUP(String IP, String Port, int Interval, boolean Backlight, String 
   lcd.createChar(1, ArrowDown);
   lcd.createChar(2, Stable);
 
-  int response = displayAccessory.safeFetch(displayAccessory.BridgeIP + ":1711/serverside/time", 10000, false);
+  String* request = displayAccessory.safeFetch(displayAccessory.BridgeIP + ":1711/serverside/time", 10000, false);
   
-  if(response == HTTP_CODE_OK)
+  if(request[0] == "OK")
   {    
-    DateTime ti = DateTime(displayAccessory.sender.getString().toInt());
+    DateTime ti = DateTime(request[1].toInt());
     
     rtc.begin(ti);
   }

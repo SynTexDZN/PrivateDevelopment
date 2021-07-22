@@ -20,10 +20,8 @@ class Accessory
     Accessory();
 
     boolean SETUP(String Version, int Interval, String Buttons, String BridgeIP, String WebhookPort, boolean LED);
-    int safeFetch(String URL, int Time, boolean Dots);
+    String* safeFetch(String URL, int Time, boolean Dots);
     
-    HTTPClient sender;
-
     int ButtonCount;
     boolean *ButtonLockPositive;
     int *ButtonControlPositive;    

@@ -11,7 +11,7 @@ StatelessSwitch::StatelessSwitch(int Pin)
 
 void StatelessSwitch::SETUP(String ip, String port, String buttons, boolean led, ESP8266WebServer &server)
 {
-  statelessswitchAccessory.SETUP("1.0.0", 10000, buttons, ip, port, led);
+  statelessswitchAccessory.SETUP("1.0.1", 10000, buttons, ip, port, led);
 
   pinMode(Pin, OUTPUT);
   
@@ -76,9 +76,9 @@ void StatelessSwitch::UPDATE(boolean force)
   
       Serial.println("Schalter Nr. " + String(i + 1) + ": " + (button[i] ? "An" : "Aus"));
   
-      int response = statelessswitchAccessory.safeFetch(statelessswitchAccessory.BridgeIP + ":" + statelessswitchAccessory.WebhookPort + "/devices?id=" + WiFi.macAddress() + "&event=" + i + "&value=" + (button[i] ? 0 : 1), 10000, false);
+      String response = statelessswitchAccessory.safeFetch(statelessswitchAccessory.BridgeIP + ":" + statelessswitchAccessory.WebhookPort + "/devices?id=" + WiFi.macAddress() + "&event=" + i + "&value=" + (button[i] ? 0 : 1), 10000, false)[0];
   
-      if(response == HTTP_CODE_OK && statelessswitchAccessory.LED)
+      if(response == "OK" && statelessswitchAccessory.LED)
       {
         if(statelessswitchAccessory.ButtonCount == 1)
         {

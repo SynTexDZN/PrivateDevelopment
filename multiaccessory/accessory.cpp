@@ -46,8 +46,11 @@ boolean Accessory::SETUP(String Version, int Interval, String Buttons, String Br
   return true;
 }
 
-int Accessory::safeFetch(String URL, int Time, boolean Dots)
+String* Accessory::safeFetch(String URL, int Time, boolean Dots)
 {
+  WiFiClient client;
+  HTTPClient sender;
+  
   int response;
   int counter = 0;
   unsigned long fetchMillis;
@@ -60,7 +63,8 @@ int Accessory::safeFetch(String URL, int Time, boolean Dots)
     {
       fetchMillis = currentMillis;
       
-      sender.begin(URL);
+      sender.begin(client, URL);
+      
       response = sender.GET();
 
       if(response != HTTP_CODE_OK)
@@ -87,5 +91,12 @@ int Accessory::safeFetch(String URL, int Time, boolean Dots)
     Serial.println();
   }
 
-  return response;
+  String* request = new String[2];
+
+  request[0] = (response == HTTP_CODE_OK) ? "OK" : "ERROR";
+  request[1] = sender.getString();
+
+  sender.end();
+
+  return request;
 }

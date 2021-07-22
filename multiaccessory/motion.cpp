@@ -11,7 +11,7 @@ Motion::Motion(int Pin)
 
 void Motion::SETUP(String ip, String port, int interval, boolean led)
 {
-  motionAccessory.SETUP("1.0.2", interval, "[]", ip, port, led);
+  motionAccessory.SETUP("1.0.3", interval, "[]", ip, port, led);
   
   activated = true;
 }
@@ -34,9 +34,9 @@ void Motion::UPDATE(boolean force)
     Serial.print("Bewegung: ");
     Serial.println(motion ? "Ja" : "Nein");
 
-    int response = motionAccessory.safeFetch(motionAccessory.BridgeIP + ":" + String(motionAccessory.WebhookPort) + "/devices?id=" + WiFi.macAddress() + "&type=motion&value=" + (motion ? "true" : "false"), motionAccessory.Interval, false);
+    String response = motionAccessory.safeFetch(motionAccessory.BridgeIP + ":" + String(motionAccessory.WebhookPort) + "/devices?id=" + WiFi.macAddress() + "&type=motion&value=" + (motion ? "true" : "false"), motionAccessory.Interval, false)[0];
 
-    if(response == HTTP_CODE_OK && motionAccessory.LED)
+    if(response == "OK" && motionAccessory.LED)
     {
       digitalWrite(LED_BUILTIN, motion ? LOW : HIGH);
     }

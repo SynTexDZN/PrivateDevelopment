@@ -219,19 +219,19 @@ void SynTexMain::updateDevice()
   if(server.hasArg("type"))
   {
     Serial.print("Nach Updates suchen ..");
+
+    String* request = safeFetch("http://syntex.sytes.net/smarthome/check-version.php?device=" + server.arg("type"), 10, true);
   
-    int response = safeFetch("http://syntex.sytes.net/smarthome/check-version.php?device=" + server.arg("type"), 10, true);
-  
-    if(response == HTTP_CODE_OK)
+    if(request[0] == "OK")
     {    
-      String newVersion = sender.getString();
+      String newVersion = request[1];
   
       server.sendHeader("Access-Control-Allow-Origin", "*");
       server.send(200, "text/html", "Success");
   
       Serial.println("http://syntex.sytes.net/smarthome/ota/" + server.arg("type") + newVersion + ".bin");
-  
-      t_httpUpdate_return ret = ESPhttpUpdate.update("http://syntex.sytes.net/smarthome/ota/" + server.arg("type") + newVersion + ".bin");
+
+      t_httpUpdate_return ret = ESPhttpUpdate.update(client, "http://syntex.sytes.net/smarthome/ota/" + server.arg("type") + newVersion + ".bin");
   
       switch(ret)
       {
@@ -264,14 +264,14 @@ boolean SynTexMain::loadDatabaseSettings()
 
   Serial.print("Mit der SynTex Bridge verbinden ..");
 
-  int response = safeFetch(BridgeIP + ":1711/serverside/init?id=" + WiFi.macAddress() + "&ip=" + WiFi.localIP().toString() + "&name=" + safeName + "&version=" + Version + "&services=" + Services + "&buttons=" + Buttons, 10, true);
+  String* request = safeFetch(BridgeIP + ":1711/serverside/init?id=" + WiFi.macAddress() + "&ip=" + WiFi.localIP().toString() + "&name=" + safeName + "&version=" + Version + "&services=" + Services + "&buttons=" + Buttons, 10, true);
   
-  if(response == HTTP_CODE_OK)
+  if(request[0] == "OK")
   {    
     Serial.println("SynTex Bridge erfolgreich verbunden!");
 
     StaticJsonDocument<400> doc;
-    deserializeJson(doc, sender.getString());
+    deserializeJson(doc, request[1]);
     JsonObject obj = doc.as<JsonObject>();
 
     Name = obj["name"].as<String>();
@@ -312,8 +312,6 @@ boolean SynTexMain::loadDatabaseSettings()
     
     return false;
   }
-  
-  sender.end();
 }
 
 void SynTexMain::resetDevice()
@@ -322,9 +320,9 @@ void SynTexMain::resetDevice()
   {
     Serial.print("Das Gerät wird zurückgesetzt ..");
   
-    int response = safeFetch(BridgeIP + ":" + WebhookPort + "/devices?id=" + WiFi.macAddress() + "&remove=CONFIRM", 10, true);
+    String* request = safeFetch(BridgeIP + ":" + WebhookPort + "/devices?id=" + WiFi.macAddress() + "&remove=CONFIRM", 10, true);
     
-    if(server.hasArg("force") || (response == HTTP_CODE_OK && sender.getString() == "Success"))
+    if(server.hasArg("force") || (request[0] == "OK" && request[1] == "Success"))
     {
       WiFiName = "";
       WiFiPass = "";
@@ -334,8 +332,8 @@ void SynTexMain::resetDevice()
       
       server.sendHeader("Access-Control-Allow-Origin", "*");
       server.send(200, "text/html", "Success");
-  
-      ESPhttpUpdate.update("http://syntex.sytes.net/smarthome/ota/" + server.arg("type") + Version + ".bin");
+
+      ESPhttpUpdate.update(client, "http://syntex.sytes.net/smarthome/ota/" + server.arg("type") + Version + ".bin");
     
       delay(2000);
       
@@ -346,8 +344,6 @@ void SynTexMain::resetDevice()
       server.sendHeader("Access-Control-Allow-Origin", "*");
       server.send(200, "text/html", "Error");
     }
-    
-    sender.end();
   }
 }
 
@@ -598,14 +594,16 @@ void SynTexMain::scanWiFi()
   }
 }
 
-int SynTexMain::safeFetch(String URL, int Time, boolean Dots)
+String* SynTexMain::safeFetch(String URL, int Time, boolean Dots)
 {
+  HTTPClient sender;
+  
   int response;
   int counter = 0;
   
   do
   {
-    sender.begin(URL);
+    sender.begin(client, URL);
     response = sender.GET();
 
     if(response != HTTP_CODE_OK)
@@ -626,5 +624,11 @@ int SynTexMain::safeFetch(String URL, int Time, boolean Dots)
     Serial.println();
   }
 
-  return response;
+  String* request = new String[2];
+  request[0] = (response == HTTP_CODE_OK) ? "OK" : "ERROR";
+  request[1] = sender.getString();
+
+  sender.end();
+
+  return request;
 }

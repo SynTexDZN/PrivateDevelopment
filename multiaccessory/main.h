@@ -18,6 +18,8 @@ class SynTexMain
     boolean loadDatabaseSettings();
     void serviceOverride();
     
+    WiFiClient client;
+    
   public:
     String WebhookPort;
     String BridgeIP;
@@ -36,14 +38,13 @@ class SynTexMain
     boolean SETUP(String Version, String Services, String Buttons, String Suffix);
     void LOOP();
     boolean checkConnection();
-    int safeFetch(String URL, int Time, boolean Dots);
+    String* safeFetch(String URL, int Time, boolean Dots);
 
     String Services;
     String Buttons;
     String Suffix;
     
     ESP8266WebServer server;
-    HTTPClient sender;
 };
 
 #endif
