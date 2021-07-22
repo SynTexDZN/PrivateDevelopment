@@ -8,6 +8,7 @@ class Contact
 {
   private:
     int Pin;
+    unsigned long previousMillis;
   
   public:
     Contact(int Pin);
@@ -15,8 +16,8 @@ class Contact
     void SETUP(String ip, String port, int interval, boolean led);
     void UPDATE(boolean force);
     
-    unsigned long previousMillis;
-
+    boolean isHallSensor;
+    
     float contact;
 
     boolean activated;

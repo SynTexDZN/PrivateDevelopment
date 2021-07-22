@@ -11,7 +11,7 @@ Contact::Contact(int Pin)
 
 void Contact::SETUP(String ip, String port, int interval, boolean led)
 {
-  contactAccessory.SETUP("1.0.1", interval, "[]", ip, port, led);
+  contactAccessory.SETUP("1.0.2", interval, "[]", ip, port, led);
   
   activated = true;
 }
@@ -22,6 +22,11 @@ void Contact::UPDATE(boolean force)
 
   boolean contacttmp = digitalRead(Pin);
 
+  if(isHallSensor)
+  {
+    contacttmp = !contacttmp;
+  }
+
   if(force || contacttmp != contact)
   {
     contact = contacttmp;
@@ -29,9 +34,9 @@ void Contact::UPDATE(boolean force)
     Serial.print("Kontakt: ");
     Serial.println(contact ? "Nein" : "Ja");
 
-    int response = contactAccessory.safeFetch(contactAccessory.BridgeIP + ":" + String(contactAccessory.WebhookPort) + "/devices?id=" + WiFi.macAddress() + "&type=contact&value=" + (contact ? "true" : "false"), 10000, false);
+    String response = contactAccessory.safeFetch(contactAccessory.BridgeIP + ":" + String(contactAccessory.WebhookPort) + "/devices?id=" + WiFi.macAddress() + "&type=contact&value=" + (contact ? "true" : "false"), 10000, false)[0];
 
-    if(response == HTTP_CODE_OK && contactAccessory.LED)
+    if(response == "OK" && contactAccessory.LED)
     {
       digitalWrite(LED_BUILTIN, contact ? LOW : HIGH);
     }
