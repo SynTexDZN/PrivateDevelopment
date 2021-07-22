@@ -8,6 +8,8 @@ class Climate
 {
   private:
     int Pin;
+    float humPrevious;
+    unsigned long previousMillis;
   
   public:
     Climate(int Pin);
@@ -15,15 +17,13 @@ class Climate
     void SETUP(String ip, String port, int interval, boolean led);
     void UPDATE(boolean force);
 
-    unsigned long previousMillis;
+    void setDHT22();
 
     float temp;
-    float hum;
-
     float tempExact;
-    float humExact;
 
-    float humPrevious;
+    float hum;
+    float humExact;
 
     boolean activated;
 };

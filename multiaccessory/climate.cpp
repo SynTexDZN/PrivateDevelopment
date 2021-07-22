@@ -4,16 +4,18 @@
 #include <DHT.h>
 
 Accessory climateAccessory;
-DHT dht(2, DHT11);
+DHT dht = DHT(2, DHT11);
 
 Climate::Climate(int Pin)
 {
   this -> Pin = Pin;
+
+  dht = DHT(Pin, DHT11);
 }
 
 void Climate::SETUP(String ip, String port, int interval, boolean led)
 {
-  climateAccessory.SETUP("1.1.3", interval, "[]", ip, port, led);
+  climateAccessory.SETUP("1.2.0", interval, "[]", ip, port, led);
 
   dht.begin();
 
@@ -63,4 +65,9 @@ void Climate::UPDATE(boolean force)
       }
     }
   }
+}
+
+void Climate::setDHT22()
+{
+  dht = DHT(Pin, DHT22);
 }
