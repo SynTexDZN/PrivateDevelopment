@@ -547,8 +547,8 @@ void SynTexMain::scanWiFi()
         Serial.print(WiFi.SSID(i));
   
         netze[i][0] = WiFi.SSID(i);
-        netze[i][1] = WiFi.RSSI(i);
-        netze[i][2] = WiFi.encryptionType(i);
+        netze[i][1] = String(WiFi.RSSI(i));
+        netze[i][2] = String(WiFi.encryptionType(i));
         
         Serial.print(" (");
         Serial.print(WiFi.RSSI(i));
