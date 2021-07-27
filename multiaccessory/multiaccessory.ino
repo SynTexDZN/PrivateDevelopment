@@ -29,7 +29,7 @@ void setup()
 {
   sLED.setupRGB();
   
-  if(m.SETUP("6.3.0", "[]", "[]", "") && m.checkConnection())
+  if(m.SETUP("6.3.1", "[]", "[]", "") && m.checkConnection())
   {
     if(hasConfig("status-led"))
     {
