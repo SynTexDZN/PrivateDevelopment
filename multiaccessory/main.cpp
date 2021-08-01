@@ -46,7 +46,7 @@ boolean SynTexMain::SETUP(String Version, String Services, String Buttons, Strin
   else
   {
     Serial.println("Config geladen!");
-    
+
     Serial.print("WiFi Name: ");
     Serial.println(WiFiName);
     Serial.print("WiFi Pass: ");
@@ -454,54 +454,71 @@ void SynTexMain::startAccessPoint()
 
 void SynTexMain::saveWiFiSettings()
 {
-  server.sendHeader("Access-Control-Allow-Origin", "*");
-  server.send(200, "text/html", WiFi.macAddress());
-
-  delay(2000);
-
-  if(server.hasArg("wifissid") && server.hasArg("wifipass"))
+  if(server.hasArg("plain"))
   {
-    WiFi.begin(server.arg("wifissid"), server.arg("wifipass"));
-    Serial.print("Verbindung wird getestet ..");
-
-    int i = 0;
+    StaticJsonDocument<400> doc;
+    deserializeJson(doc, server.arg("plain"));
+    JsonObject obj = doc.as<JsonObject>();
     
-    while(WiFi.status() != WL_CONNECTED && i < 120)
+    if(obj["wifissid"].as<String>() != "null" && obj["wifipass"].as<String>() != "null")
     {
-      delay(500);
-      Serial.print(".");
-      ++i;
-    }
+      server.sendHeader("Access-Control-Allow-Origin", "*");
+      server.send(200, "text/html", WiFi.macAddress());
     
-    Serial.println();
-
-    if(WiFi.status() == WL_CONNECTED)
-    {
-      BridgeIP = "http://syntex.local";
-
-      if(server.hasArg("bridge-ip"))
+      delay(2000);
+    
+      WiFi.begin(obj["wifissid"].as<String>(), obj["wifipass"].as<String>());
+      Serial.print("Verbindung wird getestet ..");
+  
+      int i = 0;
+      
+      while(WiFi.status() != WL_CONNECTED && i < 120)
       {
-        BridgeIP = server.arg("bridge-ip");
-      }
-
-      if(server.hasArg("device-name"))
-      {
-        Name = server.arg("device-name");
+        delay(500);
+        Serial.print(".");
+        ++i;
       }
       
-      WiFiName = server.arg("wifissid");
-      WiFiPass = server.arg("wifipass");
-
-      saveFileSystem();
-
-      ESP.restart();
+      Serial.println();
+  
+      if(WiFi.status() == WL_CONNECTED)
+      {
+        BridgeIP = "http://syntex.local";
+  
+        if(obj["bridge-ip"].as<String>() != "null")
+        {
+          BridgeIP = obj["bridge-ip"].as<String>();
+        }
+  
+        if(obj["device-name"].as<String>() != "null")
+        {
+          Name = obj["device-name"].as<String>();
+        }
+        
+        WiFiName = obj["wifissid"].as<String>();
+        WiFiPass = obj["wifipass"].as<String>();
+  
+        saveFileSystem();
+  
+        ESP.restart();
+      }
+      else
+      {
+        Serial.println("Verbindung zum Netzwerk konnte nicht hergestellt werden!");
+  
+        startAccessPoint();
+      }
     }
     else
     {
-      Serial.println("Verbindung zum Netzwerk konnte nicht hergestellt werden!");
-
-      startAccessPoint();
+      server.sendHeader("Access-Control-Allow-Origin", "*");
+      server.send(200, "text/html", "Error");
     }
+  }
+  else
+  {
+    server.sendHeader("Access-Control-Allow-Origin", "*");
+    server.send(200, "text/html", "Error");
   }
 }
 
