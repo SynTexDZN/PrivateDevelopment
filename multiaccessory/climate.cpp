@@ -11,11 +11,14 @@ Climate::Climate(int Pin)
   this -> Pin = Pin;
 
   dht = DHT(Pin, DHT11);
+
+  tempPuffer = 0.5;
+  humPuffer = 1;
 }
 
 void Climate::SETUP(String ip, String port, int interval, boolean led)
 {
-  climateAccessory.SETUP("1.2.0", interval, "[]", ip, port, led);
+  climateAccessory.SETUP("1.3.0", interval, "[]", ip, port, led);
 
   dht.begin();
 
@@ -33,7 +36,7 @@ void Climate::UPDATE(boolean force)
     float humtmp = dht.readHumidity();
     float temptmp = dht.readTemperature();
 
-    if(isnan(humtmp) || isnan(temptmp))
+    if(isnan(humtmp) || isnan(temptmp) || humtmp < 0 || humtmp > 100 || temptmp < -100 || temptmp > 140)
     {
       Serial.println("Fehler beim Lesen des DHT Sensors!");
     }
@@ -41,12 +44,12 @@ void Climate::UPDATE(boolean force)
     {
       Serial.print("Temperatur: " + String(temptmp) + " - Feuchtigkeit: " + String((int)humtmp) + "%");
       
-      Serial.println(" ( " + String(temp - temptmp >= 0.5 || temp - temptmp <= -0.5 ? "X" : "O") + " | " + String(humtmp != hum ? "X" : "O") + " )");
+      Serial.println(" ( " + String(temp - temptmp >= tempPuffer || temp - temptmp <= -tempPuffer ? "X" : "O") + " | " + String(humtmp != hum ? "X" : "O") + " )");
 
       tempExact = temptmp;
       humExact = humtmp;
       
-      if(temp - temptmp >= 0.5 || temp - temptmp <= -0.5)
+      if(temp - temptmp >= tempPuffer || temp - temptmp <= -tempPuffer)
       {
         temp = temptmp;
 
@@ -70,4 +73,6 @@ void Climate::UPDATE(boolean force)
 void Climate::setDHT22()
 {
   dht = DHT(Pin, DHT22);
+
+  tempPuffer = 0.2;
 }
