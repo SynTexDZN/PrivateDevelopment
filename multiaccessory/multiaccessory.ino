@@ -5,6 +5,7 @@
 #include "light.h"
 #include "rain.h"
 #include "motion.h"
+#include "occupancy.h"
 #include "contact.h"
 #include "relais.h"
 #include "statelessswitch.h"
@@ -18,6 +19,7 @@ Temperature temperature(2);
 Light light;
 Rain rain(16);
 Motion motion(14);
+Occupancy occupancy(14);
 Contact contact(5);
 Relais relais(0);
 StatelessSwitch button(5);
@@ -29,7 +31,7 @@ void setup()
 {
   sLED.setupRGB();
   
-  if(m.SETUP("6.3.2", "[]", "[]", "") && m.checkConnection())
+  if(m.SETUP("6.4.0", "[]", "[]", "") && m.checkConnection())
   {
     if(hasConfig("status-led"))
     {
@@ -72,6 +74,11 @@ void setup()
     if(hasService("motion"))
     {
       motion.SETUP(m.BridgeIP, m.WebhookPort, m.Interval, m.LED);
+    }
+
+    if(hasService("occupancy"))
+    {
+      occupancy.SETUP(m.BridgeIP, m.WebhookPort, m.Interval, m.LED);
     }
 
     if(hasService("contact"))
@@ -126,6 +133,11 @@ void setup()
         motion.UPDATE(true);
       }
 
+      if(occupancy.activated)
+      {
+        occupancy.UPDATE(true);
+      }
+
       if(contact.activated)
       {
         contact.UPDATE(true);
@@ -170,6 +182,11 @@ void loop()
     if(motion.activated)
     {
       motion.UPDATE(false);
+    }
+
+    if(occupancy.activated)
+    {
+      occupancy.UPDATE(false);
     }
 
     if(contact.activated)
