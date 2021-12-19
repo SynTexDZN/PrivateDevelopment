@@ -108,7 +108,5 @@ void Buzzer::SETUP(String ip, String port, boolean led, ESP8266WebServer &server
     }
   });
 
-  buzzerAccessory.safeFetch(buzzerAccessory.BridgeIP + ":" + String(buzzerAccessory.WebhookPort) + "/devices?id=" + WiFi.macAddress() + "&type=buzzer&value=false", 10000, false);
-  
   activated = true;
 }
