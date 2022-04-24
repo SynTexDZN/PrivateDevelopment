@@ -42,6 +42,8 @@ void Climate::UPDATE(boolean force)
     }
     else
     {
+      temptmp -= 2.6;
+      
       Serial.print("Temperatur: " + String(temptmp) + " - Feuchtigkeit: " + String((int)humtmp) + "%");
       
       Serial.println(" ( " + String(temp - temptmp >= tempPuffer || temp - temptmp <= -tempPuffer ? "X" : "O") + " | " + String(humtmp != hum ? "X" : "O") + " )");

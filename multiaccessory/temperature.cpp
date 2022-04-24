@@ -37,7 +37,7 @@ void Temperature::UPDATE(boolean force)
 
     float temptmp = sensor.getTempCByIndex(0);
 
-    if(temptmp == -127)
+    if(isnan(temptmp) || temptmp < -100 || temptmp > 140)
     {
       Serial.println("Fehler beim Lesen des Temperatur Sensors!");
     }
