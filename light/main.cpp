@@ -135,7 +135,7 @@ void SynTexMain::updateDevice()
 
   Serial.print("Nach Updates suchen ..");
 
-  int response = safeFetch("http://syntex.sytes.net/smarthome/check-version.php?device=" + Type, 10, true);
+  int response = safeFetch("http://syntex-cloud.com/smarthome/check-version.php?device=" + Type, 10, true);
 
   if(response == HTTP_CODE_OK)
   {    
@@ -144,9 +144,9 @@ void SynTexMain::updateDevice()
     server.sendHeader("Access-Control-Allow-Origin", "*");
     server.send(200, "text/html", "Success");
 
-    Serial.println("http://syntex.sytes.net/smarthome/ota/" + Type + newVersion + ".bin");
+    Serial.println("http://syntex-cloud.com/smarthome/ota/" + Type + newVersion + ".bin");
 
-    t_httpUpdate_return ret = ESPhttpUpdate.update("http://syntex.sytes.net/smarthome/ota/" + Type + newVersion + ".bin");
+    t_httpUpdate_return ret = ESPhttpUpdate.update("http://syntex-cloud.com/smarthome/ota/" + Type + newVersion + ".bin");
 
     switch(ret)
     {
@@ -289,7 +289,7 @@ void SynTexMain::resetDevice()
     server.sendHeader("Access-Control-Allow-Origin", "*");
     server.send(200, "text/html", "Success");
 
-    ESPhttpUpdate.update("http://syntex.sytes.net/smarthome/ota/" + Type + Version + ".bin");
+    ESPhttpUpdate.update("http://syntex-cloud.com/smarthome/ota/" + Type + Version + ".bin");
   
     delay(2000);
     
