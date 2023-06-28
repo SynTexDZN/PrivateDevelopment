@@ -220,7 +220,7 @@ void SynTexMain::updateDevice()
   {
     Serial.print("Nach Updates suchen ..");
 
-    String* request = safeFetch("http://syntex.sytes.net:8800/check-version?type=" + server.arg("type"), 10, true);
+    String* request = safeFetch("http://syntex-cloud.com:8888/check-version?type=" + server.arg("type"), 10, true);
   
     if(request[0] == "OK")
     {    
@@ -229,9 +229,9 @@ void SynTexMain::updateDevice()
       server.sendHeader("Access-Control-Allow-Origin", "*");
       server.send(200, "text/html", "Success");
   
-      Serial.println("http://syntex.sytes.net:8800/bin/" + server.arg("type") + newVersion + ".bin");
+      Serial.println("http://syntex-cloud.com:8800/bin/" + server.arg("type") + newVersion + ".bin");
 
-      t_httpUpdate_return ret = ESPhttpUpdate.update(client, "http://syntex.sytes.net:8800/bin/" + server.arg("type") + newVersion + ".bin");
+      t_httpUpdate_return ret = ESPhttpUpdate.update(client, "http://syntex-cloud.com:8800/bin/" + server.arg("type") + newVersion + ".bin");
   
       switch(ret)
       {
@@ -333,7 +333,7 @@ void SynTexMain::resetDevice()
       server.sendHeader("Access-Control-Allow-Origin", "*");
       server.send(200, "text/html", "Success");
 
-      ESPhttpUpdate.update(client, "http://syntex.sytes.net:8800/bin/" + server.arg("type") + Version + ".bin");
+      ESPhttpUpdate.update(client, "http://syntex-cloud.com:8800/bin/" + server.arg("type") + Version + ".bin");
     
       delay(2000);
       
