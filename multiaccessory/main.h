@@ -37,6 +37,7 @@ class SynTexMain
 
     boolean SETUP(String Version, String Services, String Buttons, String Suffix);
     void LOOP();
+    void setupWiFi();
     boolean checkConnection();
     String* safeFetch(String URL, int Time, boolean Dots);
 

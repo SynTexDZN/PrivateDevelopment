@@ -84,6 +84,16 @@ boolean SynTexMain::SETUP(String Version, String Services, String Buttons, Strin
 
   this -> Version = Version;
 
+  return true;
+}
+
+void SynTexMain::LOOP()
+{
+  server.handleClient();
+}
+
+void SynTexMain::setupWiFi()
+{
   if(WiFiName != "")
   {
     WiFi.begin(WiFiName, WiFiPass);
@@ -135,13 +145,6 @@ boolean SynTexMain::SETUP(String Version, String Services, String Buttons, Strin
   {
     startAccessPoint();
   }
-
-  return true;
-}
-
-void SynTexMain::LOOP()
-{
-  server.handleClient();
 }
 
 void SynTexMain::serviceOverride()

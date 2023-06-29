@@ -30,122 +30,127 @@ Buzzer buzzer(13);
 void setup()
 {
   sLED.setupRGB();
-  
-  if(m.SETUP("6.4.4", "[]", "[]", "") && m.checkConnection())
+
+  if(m.SETUP("6.4.4", "[]", "[]", ""))
   {
-    if(hasConfig("status-led"))
-    {
-      sLED.SETUP(m.LED, 2);
-      
-      m.LED = false;
-    }
+    m.setupWiFi();
 
-    sLED.finishSetupRGB();
-
-    if(hasConfig("hall-sensor"))
+    if(m.checkConnection())
     {
-      contact.isHallSensor = true;
-    }
-
-    if(hasConfig("dht22"))
-    {
-      climate.setDHT22();
-    }
-
-    if(hasService("temperature") && hasService("humidity"))
-    {
-      climate.SETUP(m.BridgeIP, m.WebhookPort, m.Interval, m.LED);
-    }
-    else if(hasService("temperature"))
-    {
-      temperature.SETUP(m.BridgeIP, m.WebhookPort, m.Interval, m.LED);
-    }
-
-    if(hasService("light"))
-    {
-      light.SETUP(m.BridgeIP, m.WebhookPort, m.Interval, m.LED);
-    }
-
-    if(hasService("rain"))
-    {
-      rain.SETUP(m.BridgeIP, m.WebhookPort, m.Interval, m.LED);
-    }
-    
-    if(hasService("motion"))
-    {
-      motion.SETUP(m.BridgeIP, m.WebhookPort, m.Interval, m.LED);
-    }
-
-    if(hasService("occupancy"))
-    {
-      occupancy.SETUP(m.BridgeIP, m.WebhookPort, m.Interval, m.LED);
-    }
-
-    if(hasService("contact"))
-    {
-      contact.SETUP(m.BridgeIP, m.WebhookPort, m.Interval, m.LED);
-    }
-
-    if(hasService("relais"))
-    {
-      relais.SETUP(m.BridgeIP, m.WebhookPort, m.LED, m.server);
-    }
-
-    if(hasService("button"))
-    {
-      button.SETUP(m.BridgeIP, m.WebhookPort, m.Buttons, m.LED, m.server);
-    }
-
-    if(hasService("lcd"))
-    {
-      lDisplay.SETUP(m.BridgeIP, m.WebhookPort, m.Interval, m.LED, m.Name, m.Version, m.server);
-    }
-
-    if(hasService("buzzer"))
-    {
-      buzzer.SETUP(m.BridgeIP, m.WebhookPort, m.LED, m.server);
-    }
-
-    if(m.Active)
-    {
-      if(climate.activated)
+      if(hasConfig("status-led"))
       {
-        climate.UPDATE(true);
+        sLED.SETUP(m.LED, 2);
+        
+        m.LED = false;
       }
 
-      if(temperature.activated)
+      sLED.finishSetupRGB();
+
+      if(hasConfig("hall-sensor"))
       {
-        temperature.UPDATE(true);
+        contact.isHallSensor = true;
       }
 
-      if(light.activated)
+      if(hasConfig("dht22"))
       {
-        light.UPDATE(true);
+        climate.setDHT22();
       }
 
-      if(rain.activated)
+      if(hasService("temperature") && hasService("humidity"))
       {
-        rain.UPDATE(true);
+        climate.SETUP(m.BridgeIP, m.WebhookPort, m.Interval, m.LED);
+      }
+      else if(hasService("temperature"))
+      {
+        temperature.SETUP(m.BridgeIP, m.WebhookPort, m.Interval, m.LED);
+      }
+
+      if(hasService("light"))
+      {
+        light.SETUP(m.BridgeIP, m.WebhookPort, m.Interval, m.LED);
+      }
+
+      if(hasService("rain"))
+      {
+        rain.SETUP(m.BridgeIP, m.WebhookPort, m.Interval, m.LED);
       }
       
-      if(motion.activated)
+      if(hasService("motion"))
       {
-        motion.UPDATE(true);
+        motion.SETUP(m.BridgeIP, m.WebhookPort, m.Interval, m.LED);
       }
 
-      if(occupancy.activated)
+      if(hasService("occupancy"))
       {
-        occupancy.UPDATE(true);
+        occupancy.SETUP(m.BridgeIP, m.WebhookPort, m.Interval, m.LED);
       }
 
-      if(contact.activated)
+      if(hasService("contact"))
       {
-        contact.UPDATE(true);
+        contact.SETUP(m.BridgeIP, m.WebhookPort, m.Interval, m.LED);
       }
 
-      if(button.activated)
+      if(hasService("relais"))
       {
-        button.UPDATE(true);
+        relais.SETUP(m.BridgeIP, m.WebhookPort, m.LED, m.server);
+      }
+
+      if(hasService("button"))
+      {
+        button.SETUP(m.BridgeIP, m.WebhookPort, m.Buttons, m.LED, m.server);
+      }
+
+      if(hasService("lcd"))
+      {
+        lDisplay.SETUP(m.BridgeIP, m.WebhookPort, m.Interval, m.LED, m.Name, m.Version, m.server);
+      }
+
+      if(hasService("buzzer"))
+      {
+        buzzer.SETUP(m.BridgeIP, m.WebhookPort, m.LED, m.server);
+      }
+
+      if(m.Active)
+      {
+        if(climate.activated)
+        {
+          climate.UPDATE(true);
+        }
+
+        if(temperature.activated)
+        {
+          temperature.UPDATE(true);
+        }
+
+        if(light.activated)
+        {
+          light.UPDATE(true);
+        }
+
+        if(rain.activated)
+        {
+          rain.UPDATE(true);
+        }
+        
+        if(motion.activated)
+        {
+          motion.UPDATE(true);
+        }
+
+        if(occupancy.activated)
+        {
+          occupancy.UPDATE(true);
+        }
+
+        if(contact.activated)
+        {
+          contact.UPDATE(true);
+        }
+
+        if(button.activated)
+        {
+          button.UPDATE(true);
+        }
       }
     }
   }
