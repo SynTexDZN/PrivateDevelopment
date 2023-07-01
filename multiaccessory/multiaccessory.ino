@@ -29,7 +29,10 @@ Buzzer buzzer(13);
 
 void setup()
 {
-  sLED.setupRGB();
+  if(hasConfig("status-led"))
+  {
+    sLED.setupRGB();
+  }
 
   if(m.SETUP("6.4.4", "[]", "[]", "[]", 10000))
   {
@@ -40,9 +43,9 @@ void setup()
       sLED.SETUP(m.LED, 2);
       
       m.LED = false;
-    }
 
-    sLED.finishSetupRGB();
+      sLED.finishSetupRGB();
+    }
 
     if(hasConfig("hall-sensor"))
     {
