@@ -30,20 +30,20 @@ class SynTexMain
     String Name;
   
     boolean Active;
-    int Interval;
     boolean LED;
+    int Interval;
   
     SynTexMain();
 
-    boolean SETUP(String Version, String Services, String Buttons, String Suffix);
+    boolean SETUP(String Version, String Services, String Suffix, String Buttons, int Inverval);
     void LOOP();
     void setupWiFi();
     boolean checkConnection();
     String* safeFetch(String URL, int Time, boolean Dots);
 
     String Services;
-    String Buttons;
     String Suffix;
+    String Buttons;
     
     ESP8266WebServer server;
 };

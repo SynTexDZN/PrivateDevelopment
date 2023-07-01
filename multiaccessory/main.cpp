@@ -6,7 +6,7 @@
 
 SynTexMain::SynTexMain() {}
 
-boolean SynTexMain::SETUP(String Version, String Services, String Buttons, String Suffix)
+boolean SynTexMain::SETUP(String Version, String Services, String Suffix, String Buttons, int Interval)
 {
   Serial.begin(115200);
   Serial.println();
@@ -40,8 +40,9 @@ boolean SynTexMain::SETUP(String Version, String Services, String Buttons, Strin
     Serial.println("Eine leere Config wurde geladen!");
 
     this -> Services = Services;
-    this -> Buttons = Buttons;
     this -> Suffix = Suffix;
+    this -> Buttons = Buttons;
+    this -> Interval = Interval;
   }
   else
   {
@@ -56,12 +57,29 @@ boolean SynTexMain::SETUP(String Version, String Services, String Buttons, Strin
 
     Serial.println("-------------");
     
+    if(this -> Services != "null")
+    {
     Serial.print("Services: ");
     Serial.println(this -> Services);
+    }
+    
+    if(this -> Suffix != "null")
+    {
+      Serial.print("Suffix: ");
+      Serial.println(this -> Suffix);
+    }
+
+    if(this -> Buttons != 0)
+    {
     Serial.print("Buttons: ");
     Serial.println(this -> Buttons);
-    Serial.print("Suffix: ");
-    Serial.println(this -> Suffix);
+    }
+
+    if(this -> Interval != 0)
+    {
+      Serial.print("Interval: ");
+      Serial.println(this -> Interval);
+    }
   }
   
   Serial.println("-------------");
@@ -406,14 +424,19 @@ boolean SynTexMain::loadFileSystem()
     Services = obj["services"].as<String>();
   }
 
+  if(obj["suffix"].as<String>() != "")
+  {
+    Suffix = obj["suffix"].as<String>();
+  }
+
   if(obj["events"].as<String>() != "")
   {
     Buttons = obj["events"].as<String>();
   }
 
-  if(obj["suffix"].as<String>() != "")
+  if(obj["interval"].as<String>() != "")
   {
-    Suffix = obj["suffix"].as<String>();
+    Interval = obj["interval"].as<int>();
   }
 
   return true;
@@ -427,8 +450,9 @@ boolean SynTexMain::saveFileSystem()
   doc["name"] = Name;
   doc["bridge"] = BridgeIP;
   doc["services"] = Services;
-  doc["events"] = Buttons;
   doc["suffix"] = Suffix;
+  doc["events"] = Buttons;
+  doc["interval"] = Interval;
 
   File configFile = SPIFFS.open("/config.json", "w");
   

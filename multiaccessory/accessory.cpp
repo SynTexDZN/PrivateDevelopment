@@ -48,55 +48,58 @@ boolean Accessory::SETUP(String Version, int Interval, String Buttons, String Br
 
 String* Accessory::safeFetch(String URL, int Time, boolean Dots)
 {
-  WiFiClient client;
-  HTTPClient sender;
-  
-  int response;
-  int counter = 0;
-  unsigned long fetchMillis;
-  
-  do
+  String* request = new String[2];
+
+  if(WiFi.status() == WL_CONNECTED)
   {
-    unsigned long currentMillis = millis();
+    WiFiClient client;
+    HTTPClient sender;
     
-    if(currentMillis - fetchMillis >= 500)
+    int response;
+    int counter = 0;
+    unsigned long fetchMillis;
+    
+    do
     {
-      fetchMillis = currentMillis;
+      unsigned long currentMillis = millis();
       
-      sender.begin(client, URL);
-      
-      response = sender.GET();
-
-      if(response != HTTP_CODE_OK)
+      if(currentMillis - fetchMillis >= 500)
       {
-        //delay(500);
-        counter++;
+        fetchMillis = currentMillis;
+        
+        sender.begin(client, URL);
+        
+        response = sender.GET();
 
-        if(Dots)
+        if(response != HTTP_CODE_OK)
         {
-          Serial.print(".");
+          //delay(500);
+          counter++;
+
+          if(Dots)
+          {
+            Serial.print(".");
+          }
         }
       }
     }
+    while(response != HTTP_CODE_OK && counter < Time / 500);
+
+    if(response != HTTP_CODE_OK)
+    {
+      Serial.println("Fetch Fehlgeschlagen!");
+    }
+
+    if(Dots)
+    {
+      Serial.println();
+    }
+
+    request[0] = (response == HTTP_CODE_OK) ? "OK" : "ERROR";
+    request[1] = sender.getString();
+
+    sender.end();
   }
-  while(response != HTTP_CODE_OK && counter < Time / 500);
-
-  if(response != HTTP_CODE_OK)
-  {
-    Serial.println("Fetch Fehlgeschlagen!");
-  }
-
-  if(Dots)
-  {
-    Serial.println();
-  }
-
-  String* request = new String[2];
-
-  request[0] = (response == HTTP_CODE_OK) ? "OK" : "ERROR";
-  request[1] = sender.getString();
-
-  sender.end();
-
+  
   return request;
 }

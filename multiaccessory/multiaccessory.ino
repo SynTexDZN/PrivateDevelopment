@@ -31,126 +31,124 @@ void setup()
 {
   sLED.setupRGB();
 
-  if(m.SETUP("6.4.4", "[]", "[]", ""))
+  if(m.SETUP("6.4.4", "[]", "[]", "[]", 10000))
   {
     m.setupWiFi();
 
-    if(m.checkConnection())
+    if(hasConfig("status-led"))
     {
-      if(hasConfig("status-led"))
+      sLED.SETUP(m.LED, 2);
+      
+      m.LED = false;
+    }
+
+    sLED.finishSetupRGB();
+
+    if(hasConfig("hall-sensor"))
+    {
+      contact.isHallSensor = true;
+    }
+
+    if(hasConfig("dht22"))
+    {
+      climate.setDHT22();
+    }
+
+    if(hasService("temperature") && hasService("humidity"))
+    {
+      climate.SETUP(m.BridgeIP, m.WebhookPort, m.Interval, m.LED);
+    }
+    else if(hasService("temperature"))
+    {
+      temperature.SETUP(m.BridgeIP, m.WebhookPort, m.Interval, m.LED);
+    }
+
+    if(hasService("light"))
+    {
+      light.SETUP(m.BridgeIP, m.WebhookPort, m.Interval, m.LED);
+    }
+
+    if(hasService("rain"))
+    {
+      rain.SETUP(m.BridgeIP, m.WebhookPort, m.Interval, m.LED);
+    }
+    
+    if(hasService("motion"))
+    {
+      motion.SETUP(m.BridgeIP, m.WebhookPort, m.Interval, m.LED);
+    }
+
+    if(hasService("occupancy"))
+    {
+      occupancy.SETUP(m.BridgeIP, m.WebhookPort, m.Interval, m.LED);
+    }
+
+    if(hasService("contact"))
+    {
+      contact.SETUP(m.BridgeIP, m.WebhookPort, m.Interval, m.LED);
+    }
+
+    if(hasService("relais"))
+    {
+      relais.SETUP(m.BridgeIP, m.WebhookPort, m.LED, m.server);
+    }
+
+    if(hasService("button"))
+    {
+      button.SETUP(m.BridgeIP, m.WebhookPort, m.Buttons, m.LED, m.server);
+    }
+
+    if(hasService("lcd"))
+    {
+      lDisplay.INIT();
+      lDisplay.SETUP(m.BridgeIP, m.WebhookPort, m.Interval, m.LED, m.Name, m.Version, m.server);
+    }
+
+    if(hasService("buzzer"))
+    {
+      buzzer.SETUP(m.BridgeIP, m.WebhookPort, m.LED, m.server);
+    }
+
+    if(m.Active || WiFi.status() != WL_CONNECTED)
+    {
+      if(climate.activated)
       {
-        sLED.SETUP(m.LED, 2);
-        
-        m.LED = false;
+        climate.UPDATE(true);
       }
 
-      sLED.finishSetupRGB();
-
-      if(hasConfig("hall-sensor"))
+      if(temperature.activated)
       {
-        contact.isHallSensor = true;
+        temperature.UPDATE(true);
       }
 
-      if(hasConfig("dht22"))
+      if(light.activated)
       {
-        climate.setDHT22();
+        light.UPDATE(true);
       }
 
-      if(hasService("temperature") && hasService("humidity"))
+      if(rain.activated)
       {
-        climate.SETUP(m.BridgeIP, m.WebhookPort, m.Interval, m.LED);
-      }
-      else if(hasService("temperature"))
-      {
-        temperature.SETUP(m.BridgeIP, m.WebhookPort, m.Interval, m.LED);
-      }
-
-      if(hasService("light"))
-      {
-        light.SETUP(m.BridgeIP, m.WebhookPort, m.Interval, m.LED);
-      }
-
-      if(hasService("rain"))
-      {
-        rain.SETUP(m.BridgeIP, m.WebhookPort, m.Interval, m.LED);
+        rain.UPDATE(true);
       }
       
-      if(hasService("motion"))
+      if(motion.activated)
       {
-        motion.SETUP(m.BridgeIP, m.WebhookPort, m.Interval, m.LED);
+        motion.UPDATE(true);
       }
 
-      if(hasService("occupancy"))
+      if(occupancy.activated)
       {
-        occupancy.SETUP(m.BridgeIP, m.WebhookPort, m.Interval, m.LED);
+        occupancy.UPDATE(true);
       }
 
-      if(hasService("contact"))
+      if(contact.activated)
       {
-        contact.SETUP(m.BridgeIP, m.WebhookPort, m.Interval, m.LED);
+        contact.UPDATE(true);
       }
 
-      if(hasService("relais"))
+      if(button.activated)
       {
-        relais.SETUP(m.BridgeIP, m.WebhookPort, m.LED, m.server);
-      }
-
-      if(hasService("button"))
-      {
-        button.SETUP(m.BridgeIP, m.WebhookPort, m.Buttons, m.LED, m.server);
-      }
-
-      if(hasService("lcd"))
-      {
-        lDisplay.SETUP(m.BridgeIP, m.WebhookPort, m.Interval, m.LED, m.Name, m.Version, m.server);
-      }
-
-      if(hasService("buzzer"))
-      {
-        buzzer.SETUP(m.BridgeIP, m.WebhookPort, m.LED, m.server);
-      }
-
-      if(m.Active)
-      {
-        if(climate.activated)
-        {
-          climate.UPDATE(true);
-        }
-
-        if(temperature.activated)
-        {
-          temperature.UPDATE(true);
-        }
-
-        if(light.activated)
-        {
-          light.UPDATE(true);
-        }
-
-        if(rain.activated)
-        {
-          rain.UPDATE(true);
-        }
-        
-        if(motion.activated)
-        {
-          motion.UPDATE(true);
-        }
-
-        if(occupancy.activated)
-        {
-          occupancy.UPDATE(true);
-        }
-
-        if(contact.activated)
-        {
-          contact.UPDATE(true);
-        }
-
-        if(button.activated)
-        {
-          button.UPDATE(true);
-        }
+        button.UPDATE(true);
       }
     }
   }
@@ -162,7 +160,7 @@ void loop()
 {
   m.LOOP();
 
-  if(m.checkConnection() && m.Active)
+  if(m.Active || WiFi.status() != WL_CONNECTED)
   {
     if(climate.activated)
     {

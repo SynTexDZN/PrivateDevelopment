@@ -33,14 +33,16 @@ String split(String s, char parser, int index)
 
 LCD::LCD() {}
 
+void LCD::INIT()
+{
+  lcd.init();
+}
+
 void LCD::SETUP(String IP, String Port, int Interval, boolean Backlight, String Name, String Version, ESP8266WebServer &server)
 {
   this -> Interval = Interval;
 
   displayAccessory.SETUP("1.0.2", Interval, "[]", IP, Port, Backlight);
-
-  lcd.init();
-  lcd.clear();
 
   byte ArrowUp[] = {
     B00100,
@@ -87,6 +89,8 @@ void LCD::SETUP(String IP, String Port, int Interval, boolean Backlight, String 
     
     rtc.begin(ti);
   }
+
+  lcd.clear();
 
   if(Backlight)
   {
@@ -293,5 +297,29 @@ void LCD::UPDATE(int i, String* Infos)
         counter = 0;
       }
     }
+  }
+}
+
+void LCD::setText(String text)
+{
+  lcd.clear();
+
+  if(text.length() < 16)
+  {
+    lcd.setCursor(0, 1);
+    lcd.print(text);
+  }
+  else
+  {
+    String lineOne = split(text, ' ', 0);
+    String lineTwo = text;
+
+    lineTwo.replace(lineOne + " ", "");
+
+    lcd.setCursor(0, 0);
+    lcd.print(lineOne);
+    
+    lcd.setCursor(0, 1);
+    lcd.print(lineTwo);
   }
 }

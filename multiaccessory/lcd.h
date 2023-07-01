@@ -18,8 +18,11 @@ class LCD
   public:
     LCD();
     
+    void INIT();
     void SETUP(String IP, String Port, int Interval, boolean Backlight, String Name, String Version, ESP8266WebServer &server);
     void UPDATE(int i, String* Infos);
+
+    void setText(String text);
 
     boolean activated;
 };
