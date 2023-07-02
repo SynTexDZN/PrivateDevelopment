@@ -69,10 +69,10 @@ boolean SynTexMain::SETUP(String Version, String Services, String Suffix, String
       Serial.println(this -> Suffix);
     }
 
-    if(this -> Buttons != 0)
+    if(this -> Buttons != "null")
     {
-    Serial.print("Buttons: ");
-    Serial.println(this -> Buttons);
+      Serial.print("Buttons: ");
+      Serial.println(this -> Buttons);
     }
 
     if(this -> Interval != 0)
