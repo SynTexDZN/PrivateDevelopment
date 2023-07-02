@@ -81,14 +81,19 @@ void LCD::SETUP(String IP, String Port, int Interval, boolean Backlight, String 
   lcd.createChar(1, ArrowDown);
   lcd.createChar(2, Stable);
 
-  String* request = displayAccessory.safeFetch(displayAccessory.BridgeIP + ":1711/serverside/time", 10000, false);
+  DateTime ti = DateTime();
+
+  if(WiFi.status() == WL_CONNECTED)
+  {
+    String* request = displayAccessory.safeFetch(displayAccessory.BridgeIP + ":1711/serverside/time", 10000, false);
   
-  if(request[0] == "OK")
-  {    
-    DateTime ti = DateTime(request[1].toInt());
-    
-    rtc.begin(ti);
+    if(request[0] == "OK")
+    {    
+      ti = DateTime(request[1].toInt());
+    }
   }
+
+  rtc.begin(ti);
 
   lcd.clear();
 
@@ -96,7 +101,7 @@ void LCD::SETUP(String IP, String Port, int Interval, boolean Backlight, String 
   {
     lcd.backlight();
   }
-  
+
   if(Name.length() < 16)
   {
     lcd.setCursor(0, 0);
@@ -198,7 +203,7 @@ int counter = 0;
 void LCD::UPDATE(int i, String* Infos)
 {
   unsigned long currentMillis = millis();
-  
+
   if(currentMillis - timeMillis >= 1000)
   {
     timeMillis = currentMillis;
