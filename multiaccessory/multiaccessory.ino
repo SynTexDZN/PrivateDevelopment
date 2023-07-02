@@ -36,7 +36,37 @@ void setup()
 
   if(m.SETUP("6.4.4", "[]", "[]", "[]", 10000))
   {
+    if(hasService("lcd"))
+    {
+      lDisplay.INIT();
+
+      if(m.WiFiName != "")
+      {
+        lDisplay.setText("Verbinden ..");
+
+        delay(1000);
+      }
+    }
+
     m.setupWiFi();
+
+    if(hasService("lcd"))
+    {
+      if(m.WiFiName == "")
+      {
+        lDisplay.setText("Access Point gestartet!");
+      }
+      else if(m.checkConnection())
+      {
+        lDisplay.setText("Verbindung hergestellt!");
+      }
+      else
+      {
+        lDisplay.setText("Verbindung fehlgeschlagen!");
+      }
+
+      delay(2000);
+    }
 
     if(hasConfig("status-led"))
     {
@@ -103,7 +133,6 @@ void setup()
 
     if(hasService("lcd"))
     {
-      lDisplay.INIT();
       lDisplay.SETUP(m.BridgeIP, m.WebhookPort, m.Interval, m.LED, m.Name, m.Version, m.server);
     }
 
