@@ -34,7 +34,7 @@ void setup()
     sLED.setupRGB();
   }
 
-  if(m.SETUP("6.4.4", "[]", "[]", "[]", 10000))
+  if(m.SETUP("6.4.5", "[]", "[]", "[]", 10000))
   {
     if(hasService("lcd"))
     {
