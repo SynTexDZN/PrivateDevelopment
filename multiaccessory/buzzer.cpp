@@ -92,6 +92,73 @@ void Buzzer::SETUP(String ip, String port, boolean led, ESP8266WebServer &server
           delay(100);
         }
       }
+
+      if(server.arg("preset") == "alarm1")
+      {
+        for(int i = 0; i < 40; i++)
+        {
+          tone(Pin, 2000);
+
+          delay(500);
+
+          tone(Pin, 1950);
+
+          delay(500);
+
+          tone(Pin, 1900);
+
+          delay(500);
+        }
+
+        noTone(Pin);
+      }
+
+      if(server.arg("preset") == "alarm2")
+      {
+        for(int i = 0; i < 80; i++)
+        {
+          for(int j = 10000; j >= 2400; j -= 100)
+          {
+            tone(Pin, j);
+
+            delay(10);
+          }
+        }
+
+        noTone(Pin);
+      }
+
+      if(server.arg("preset") == "alarm3")
+      {
+        for(int i = 0; i < 100; i++)
+        {
+          tone(Pin, 22400);
+
+          delay(100);
+          
+          tone(Pin, 11200);
+
+          delay(100);
+
+          tone(Pin, 5600);
+
+          delay(100);
+
+          tone(Pin, 2800);
+
+          delay(100);
+
+          tone(Pin, 1900);
+
+          delay(100);
+
+          tone(Pin, 950);
+
+          delay(100);
+        }
+
+        noTone(Pin);
+      }
     }
 
     boolean buzzer = digitalRead(Pin);
