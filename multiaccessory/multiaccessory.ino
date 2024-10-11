@@ -43,9 +43,13 @@ void setup()
       if(m.WiFiName != "")
       {
         lDisplay.setText("Verbinden ..");
-
-        delay(1000);
       }
+      else
+      {
+        lDisplay.setText("Starten ..");
+      }
+
+      delay(1000);
     }
 
     m.setupWiFi();
@@ -131,7 +135,7 @@ void setup()
       button.SETUP(m.BridgeIP, m.WebhookPort, m.Buttons, m.LED, m.server);
     }
 
-    if(hasService("lcd"))
+    if(hasService("lcd") && m.Active)
     {
       lDisplay.SETUP(m.BridgeIP, m.WebhookPort, m.Interval, m.LED, m.Name, m.Version, m.server);
     }
@@ -233,7 +237,7 @@ void loop()
     {
       button.UPDATE(false);
     }
-
+    
     if(lDisplay.activated)
     {
       if(climate.activated && light.activated)
