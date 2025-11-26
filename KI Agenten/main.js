@@ -8,13 +8,13 @@ class Main
     {
         this.Supervisor = new Supervisor();
 
-        //this.Supervisor.run('Wie viel Uhr haben wir gerade?');
+        this.Supervisor.run('Wie viel Uhr haben wir gerade?').then(() => this.Supervisor.run('Wer bist du?'));
 
         //new Benchmark(100, this.Supervisor, 'Wie viel Uhr haben wir gerade?', 'internal');
 
         //new Benchmark(10, this.Supervisor, 'Wer bist du?', 'internal');
 
-        new Benchmark(10, this.Supervisor, 'Wer war Angela Merkel?', 'external');
+        //new Benchmark(10, this.Supervisor, 'Wer war Angela Merkel?', 'external');
     }
 
     async demo()
