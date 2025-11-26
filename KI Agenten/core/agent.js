@@ -2,21 +2,31 @@ const { spawn } = require('child_process');
 
 module.exports = class Agent
 {
-    constructor(basePrompt)
+    constructor(name, prompt)
     {
-        console.log('Agent wurde gestartet!');
+        console.log(`${name}-Agent wurde gestartet!`);
 
-        this.basePrompt = basePrompt;
+        this.name = name;
+        this.prompt = prompt;
     }
 
     run(prompt)
     {
         const p = spawn('ollama', ['run', 'llama3.2:3b'], { stdio : ['pipe', 'pipe', 'inherit'] });
 
-        console.log(`Agent führt LLM Anfrage aus .. ( ${prompt} )`);
+        console.log(`${this.name}-Agent führt eine LLM Anfrage aus .. ( ${prompt} )`);
 
-        p.stdin.write(this.basePrompt);
+        p.stdin.write(this.prompt);
+
+        p.stdin.write(`
+            
+            ---
+            
+            INPUT:
+        `);
+
         p.stdin.write(prompt);
+
         p.stdin.end();
 
         let out = '';
@@ -25,7 +35,7 @@ module.exports = class Agent
 
         return new Promise((resolve) => p.stdout.on('end', () => {
 
-            console.log(`Agent hat eine Antwort vom LLM erhalten: ${out}`);
+            console.log(`${this.name}-Agent hat eine Antwort vom LLM erhalten: ${out}`);
             
             resolve(out);
         }));
