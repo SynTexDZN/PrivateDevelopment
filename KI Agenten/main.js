@@ -1,28 +1,40 @@
+const Basic = require('syntex-basic')
+
 const DemoAgent = require('./core/agent');
 
 const Supervisor = require('./agents/supervisor');
+
+const Weather = require('./agents/tools/weather');
 
 class Main
 {
     constructor()
     {
-        this.Supervisor = new Supervisor();
+        this.Basic = new Basic(this, { path : __dirname });
 
-        console.log('1 Frage:', 'Wie viel Uhr haben wir gerade?');
+		this.RequestManager = this.Basic.getRequestManager();
+
+        this.Weather = new Weather(this);
+
+        this.Weather.run();
+
+        //this.Supervisor = new Supervisor();
+        /*
+        console.log('1) Frage:', 'Wie viel Uhr haben wir gerade?');
 
         this.Supervisor.run('Wie viel Uhr haben wir gerade?').then((out) => {
 
-            console.log('1 Antwort:', out);
+            console.log('1) Antwort:', out);
 
-            console.log('2 Frage:', 'Wer bist du?');
+            console.log('2) Frage:', 'Wer bist du?');
             
             this.Supervisor.run('Wer bist du?').then((out) => {
                 
-                console.log('2 Antwort:', out);
+                console.log('2) Antwort:', out);
             });
         });
-
-        //new Benchmark(100, this.Supervisor, 'Wie viel Uhr haben wir gerade?', 'internal');
+        */
+        //new Benchmark(20, this.Supervisor, 'Wie viel Uhr haben wir gerade?', 'internal');
 
         //new Benchmark(10, this.Supervisor, 'Wer bist du?', 'internal');
 
@@ -65,6 +77,8 @@ class Benchmark
             promiseArray.push(new Promise((callback) => this.agent.run(this.prompt).then((out) => {
 
                 if(out.includes(this.filter)) this.result.push(out);
+
+                console.log(out);
 
                 callback();
             })));

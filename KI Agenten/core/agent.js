@@ -4,7 +4,7 @@ module.exports = class Agent
 {
     constructor(name, prompt)
     {
-        //console.log(`${name}-Agent wurde gestartet!`);
+        console.log(`${name}-Agent wurde gestartet!`);
 
         this.name = name;
         this.prompt = prompt;
@@ -14,7 +14,7 @@ module.exports = class Agent
     {
         const p = spawn('ollama', ['run', 'llama3.2:3b'], { stdio : ['pipe', 'pipe', 'inherit'] });
 
-        //console.log(`${this.name}-Agent führt eine LLM Anfrage aus .. ( ${prompt} )`);
+        console.log(`${this.name}-Agent führt eine LLM Anfrage aus .. ( ${prompt} )`);
 
         p.stdin.write(this.prompt);
 
@@ -35,7 +35,7 @@ module.exports = class Agent
 
         return new Promise((resolve) => p.stdout.on('end', () => {
 
-            //console.log(`${this.name}-Agent hat eine Antwort vom LLM erhalten: ${out}`);
+            console.log(`${this.name}-Agent hat eine Antwort vom LLM erhalten: ${out}`);
             
             resolve(out);
         }));
