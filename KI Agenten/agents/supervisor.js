@@ -1,4 +1,4 @@
-const Agent = require('../core/agent');
+const Agent = require('../core/agent'), ErrorAgent = require('./error');
 
 module.exports = class Supervisor extends Agent
 {
@@ -81,16 +81,22 @@ module.exports = class Supervisor extends Agent
                 }
                 else
                 {
-                    const a = new Agent('Interner', 'Antworte in Deutsch!');
+                    const a = new ErrorAgent();
 
-                    a.run('Schreibe einem kurzen Satz mit folgendem Inhalt: Ich kann aktuell auf keine externen Daten zugreifen!').then((res) => resolve(res));
+                    a.run(`
+                        Frage: ${prompt}
+                        Antwort: Ich kann aktuell auf keine externen Daten zugreifen!
+                    `).then((res) => resolve(res));
                 }
             }
             catch(e)
             {
-                const a = new Agent('Interner', 'Antworte in Deutsch!');
+                const a = new ErrorAgent();
 
-                a.run('Schreibe einem kurzen Satz mit folgendem Inhalt: Es gab einen Fehler bei deiner Anfrage!').then((res) => resolve(res));
+                a.run(`
+                    Frage: ${prompt}
+                    Antwort: Es gab einen Fehler bei deiner Anfrage!
+                `).then((res) => resolve(res));
             }
         });
     }
