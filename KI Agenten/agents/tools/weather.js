@@ -4,7 +4,7 @@ module.exports = class Weather extends Agent
 {
     constructor(platform)
     {
-        super('Wetter', `
+        super('Wetter', { temperature : 0.3, top_p : 0.3, top_k : 10 }, `
             SYSTEM:
             Du bist der Wetter-Agent. Deine Aufgabe: Erstelle aus den im INPUT übergebenen 24-Stunden-Arrays (index 0..23) eine kurze, menschenlesbare Wetter-Zusammenfassung auf Deutsch.
             Wichtig: Du darfst nichts erfinden. Alle Aussagen MÜSSEN direkt aus dem INPUT ableitbar sein.

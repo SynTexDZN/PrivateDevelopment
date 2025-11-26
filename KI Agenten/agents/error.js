@@ -4,7 +4,7 @@ module.exports = class Supervisor extends Agent
 {
     constructor()
     {
-        super('Fehlernachrichten', `
+        super('Fehlernachrichten', { temperature : 0.2, top_p : 0.4, top_k : 30 }, `
             SYSTEM:
             Du bist ein Fehlernachrichten-Agent.
             Deine einzige Aufgabe ist es anhand vom INPUT eine kurze, präzise Nachricht über den Fehler zu erstellen.

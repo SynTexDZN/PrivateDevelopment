@@ -13,13 +13,13 @@ class Main
         this.Basic = new Basic(this, { path : __dirname });
 
 		this.RequestManager = this.Basic.getRequestManager();
-
+        /*
         this.Weather = new Weather(this);
 
         this.Weather.run();
-
-        //this.Supervisor = new Supervisor();
-        /*
+        */
+        this.Supervisor = new Supervisor();
+        
         console.log('1) Frage:', 'Wie viel Uhr haben wir gerade?');
 
         this.Supervisor.run('Wie viel Uhr haben wir gerade?').then((out) => {
@@ -33,7 +33,7 @@ class Main
                 console.log('2) Antwort:', out);
             });
         });
-        */
+        
         //new Benchmark(20, this.Supervisor, 'Wie viel Uhr haben wir gerade?', 'internal');
 
         //new Benchmark(10, this.Supervisor, 'Wer bist du?', 'internal');

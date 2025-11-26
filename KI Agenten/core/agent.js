@@ -1,43 +1,48 @@
-const { spawn } = require('child_process');
+const { Ollama } = require('ollama');
 
 module.exports = class Agent
 {
-    constructor(name, prompt)
+    constructor(name, params, prompt)
     {
         console.log(`${name}-Agent wurde gestartet!`);
 
+        this.Ollama = new Ollama();
+
+        this.params = {
+            model : 'llama3.2:3b',
+        };
+
         this.name = name;
         this.prompt = prompt;
+
+        for(const x in params)
+        {
+            this.params[x] = params[x];
+        }
     }
 
     run(prompt)
     {
-        const p = spawn('ollama', ['run', 'llama3.2:3b'], { stdio : ['pipe', 'pipe', 'inherit'] });
+        return new Promise((resolve) => {
 
-        console.log(`${this.name}-Agent führt eine LLM Anfrage aus .. ( ${prompt} )`);
+            console.log(`${this.name}-Agent führt eine LLM Anfrage aus .. ( ${prompt} )`);
 
-        p.stdin.write(this.prompt);
+            prompt = `${this.prompt}
 
-        p.stdin.write(`
-            
             ---
             
             INPUT:
-        `);
 
-        p.stdin.write(prompt);
+            ${prompt}`;
 
-        p.stdin.end();
+            console.log(this.params);
 
-        let out = '';
+            this.Ollama.generate({ ...this.params, prompt }).then((data) => {
 
-        p.stdout.on('data', (d) => out += d.toString());
-
-        return new Promise((resolve) => p.stdout.on('end', () => {
-
-            console.log(`${this.name}-Agent hat eine Antwort vom LLM erhalten: ${out}`);
-            
-            resolve(out);
-        }));
+                console.log(`${this.name}-Agent hat eine Antwort vom LLM erhalten: ${data.response}`);
+                
+                resolve(data.response);
+            });
+        });
     }
 }

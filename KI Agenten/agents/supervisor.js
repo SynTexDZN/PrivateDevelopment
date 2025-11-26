@@ -4,7 +4,7 @@ module.exports = class Supervisor extends Agent
 {
     constructor()
     {
-        super('Supervisor', `
+        super('Supervisor', { temperature : 0.2, top_p : 0.3, top_k : 20 }, `
             SYSTEM:
             Du bist ein Supervisor-Agent.
             Deine einzige Aufgabe ist es zu entscheiden, ob der INPUT vom internen Wissensspeicher beantwortet werden kann oder ob externe Tools bzw. Plugins erforderlich sind.
@@ -75,7 +75,7 @@ module.exports = class Supervisor extends Agent
 
                 if(json.type == 'internal')
                 {
-                    const a = new Agent('Interner', 'Antworte in Deutsch!');
+                    const a = new Agent('Interner', { temperature : 0.7, top_p : 0.8, top_k : 80 }, 'Antworte in Deutsch!');
 
                     a.run(prompt).then((res) => resolve(res));
                 }
