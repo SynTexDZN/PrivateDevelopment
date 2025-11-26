@@ -8,7 +8,13 @@ class Main
     {
         this.Supervisor = new Supervisor();
 
-        this.Supervisor.run('Wie viel Uhr haben wir gerade?');
+        //this.Supervisor.run('Wie viel Uhr haben wir gerade?');
+
+        //new Benchmark(100, this.Supervisor, 'Wie viel Uhr haben wir gerade?', 'internal');
+
+        //new Benchmark(10, this.Supervisor, 'Wer bist du?', 'internal');
+
+        new Benchmark(10, this.Supervisor, 'Wer war Angela Merkel?', 'external');
     }
 
     async demo()
@@ -21,6 +27,38 @@ class Main
         {
             await agent.run('Erstelle eine kurze, knappe guten Morgen Nachricht mit maximal 2 Sätzen zum motivieren!');
         }
+    }
+}
+
+class Benchmark
+{
+    constructor(iterations, agent, prompt, filter)
+    {
+        this.iterations = iterations;
+        this.agent = agent;
+        this.prompt = prompt;
+        this.filter = filter;
+
+        this.result = [];
+
+        this.run();
+    }
+
+    run()
+    {
+        var promiseArray = [];
+
+        for(let i = 0; i < this.iterations; i++)
+        {
+            promiseArray.push(new Promise((callback) => this.agent.run(this.prompt).then((out) => {
+
+                if(out.includes(this.filter)) this.result.push(out);
+
+                callback();
+            })));
+        }
+
+        Promise.all(promiseArray).then(() => console.log(this.result, this.result.length))
     }
 }
 
