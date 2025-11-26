@@ -8,7 +8,19 @@ class Main
     {
         this.Supervisor = new Supervisor();
 
-        this.Supervisor.run('Wie viel Uhr haben wir gerade?').then(() => this.Supervisor.run('Wer bist du?'));
+        console.log('1 Frage:', 'Wie viel Uhr haben wir gerade?');
+
+        this.Supervisor.run('Wie viel Uhr haben wir gerade?').then((out) => {
+
+            console.log('1 Antwort:', out);
+
+            console.log('2 Frage:', 'Wer bist du?');
+            
+            this.Supervisor.run('Wer bist du?').then((out) => {
+                
+                console.log('2 Antwort:', out);
+            });
+        });
 
         //new Benchmark(100, this.Supervisor, 'Wie viel Uhr haben wir gerade?', 'internal');
 

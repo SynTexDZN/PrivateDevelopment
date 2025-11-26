@@ -62,4 +62,36 @@ module.exports = class Supervisor extends Agent
             Keine Erklärungen. Nur dieses JSON. Keine weiteren Texte.
         `);
     }
+
+    run(prompt)
+    {
+        return new Promise(async (resolve) => {
+
+            const out = await super.run(prompt);
+
+            try
+            {
+                const json = JSON.parse(out);
+
+                if(json.type == 'internal')
+                {
+                    const a = new Agent('Interner', 'Antworte in Deutsch!');
+
+                    a.run(prompt).then((res) => resolve(res));
+                }
+                else
+                {
+                    const a = new Agent('Interner', 'Antworte in Deutsch!');
+
+                    a.run('Schreibe einem kurzen Satz mit folgendem Inhalt: Ich kann aktuell auf keine externen Daten zugreifen!').then((res) => resolve(res));
+                }
+            }
+            catch(e)
+            {
+                const a = new Agent('Interner', 'Antworte in Deutsch!');
+
+                a.run('Schreibe einem kurzen Satz mit folgendem Inhalt: Es gab einen Fehler bei deiner Anfrage!').then((res) => resolve(res));
+            }
+        });
+    }
 }
