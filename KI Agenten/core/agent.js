@@ -2,16 +2,16 @@ const { spawn } = require('child_process');
 
 module.exports = class Agent
 {
-    constructor(platform)
+    constructor(basePrompt)
     {
-        this.basePrompt = 'Du bist ein induvidueller Agent. Du antwortest nur in Deutsch!';
+        this.basePrompt = basePrompt;
     }
 
     runLLM(prompt)
     {
         const p = spawn('ollama', ['run', 'llama3.2:3b'], { stdio : ['pipe', 'pipe', 'inherit'] });
 
-        p.stdin.write(prompt);
+        p.stdin.write(this.basePrompt);
         p.stdin.write(prompt);
         p.stdin.end();
 

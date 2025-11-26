@@ -1,10 +1,18 @@
 const DemoAgent = require('./core/agent');
 
-class AgentManager
+const AgentManager = require('./manager');
+
+class Main
 {
     constructor()
     {
-        this.demo();
+        console.log(0);
+
+        this.AgentManager = new AgentManager();
+
+        console.log(1);
+
+        this.AgentManager.runLLM('Wie viel Uhr haben wir gerade?').then((res) => console.log('2', res));
     }
 
     async demo()
@@ -20,6 +28,4 @@ class AgentManager
     }
 }
 
-console.log('-1');
-
-new AgentManager();
+new Main();
