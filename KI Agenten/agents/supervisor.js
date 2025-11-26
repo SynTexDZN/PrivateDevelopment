@@ -1,4 +1,4 @@
-const Agent = require('./core/agent');
+const Agent = require('../core/agent');
 
 module.exports = class Supervisor extends Agent
 {

@@ -1,6 +1,6 @@
 const DemoAgent = require('./core/agent');
 
-const Supervisor = require('./supervisor');
+const Supervisor = require('./agents/supervisor');
 
 class Main
 {
