@@ -1,6 +1,6 @@
 const Agent = require('./core/agent');
 
-module.exports = class AgentManager extends Agent
+module.exports = class Supervisor extends Agent
 {
     constructor()
     {

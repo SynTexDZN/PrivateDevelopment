@@ -7,7 +7,7 @@ module.exports = class Agent
         this.basePrompt = basePrompt;
     }
 
-    runLLM(prompt)
+    run(prompt)
     {
         const p = spawn('ollama', ['run', 'llama3.2:3b'], { stdio : ['pipe', 'pipe', 'inherit'] });
 
