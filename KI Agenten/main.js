@@ -1,14 +1,14 @@
 const DemoAgent = require('./core/agent');
 
-const AgentManager = require('./supervisor');
+const Supervisor = require('./supervisor');
 
 class Main
 {
     constructor()
     {
-        this.AgentManager = new AgentManager();
+        this.Supervisor = new Supervisor();
 
-        this.AgentManager.run('Wie viel Uhr haben wir gerade?');
+        this.Supervisor.run('Wie viel Uhr haben wir gerade?');
     }
 
     async demo()
