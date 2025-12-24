@@ -1,0 +1,17 @@
+{
+  "name": "coqui-tts-server",
+  "version": "1.0.0",
+  "description": "Persistent Coqui TTS HTTP Server",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "uuid": "^9.0.0"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "author": "Dein Name",
+  "license": "MIT"
+}
