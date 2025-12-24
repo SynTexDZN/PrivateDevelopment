@@ -1,59 +1,73 @@
-const http = require('http');
-const say = require('say');
+// client.js
+const http = require("http");
+const fs = require("fs");
+const os = require("os");
+const path = require("path");
+const { exec } = require("child_process");
+const formidable = require("formidable");
 
 const PORT = 3000;
 
-const server = http.createServer((req, res) => {
+http.createServer((req, res) => {
+    console.log(`[DEBUG] Request: ${req.method} ${req.url}`);
 
-    console.log(req.url, req.method);
+    if (req.url === "/speak" && req.method === "POST") {
 
-    if(req.url === '/speak')
-    {
-        if(req.method === 'POST')
-        {
-            let body = '';
+        // Formidable zum Parsen von multipart/form-data
+        const form = new formidable.IncomingForm({ multiples: false });
 
-            req.on('data', (chunk) => {
+        form.parse(req, (err, fields, files) => {
+            if (err) {
+                console.error(`[ERROR] Form parse error: ${err.message}`);
+                res.writeHead(400, { "Content-Type": "text/plain" });
+                res.end("Fehler beim Parsen des Formulars");
+                return;
+            }
 
-                body += chunk.toString();
-            });
+            console.log("Fields:", fields);
+            console.log("Files:", files);
 
-            req.on('end', () => {
+            // Prüfen, ob das Binary-Feld existiert
+            const uploadedFile = files.file[0];  // Name muss exakt "file" sein
+            if (!uploadedFile || !uploadedFile.filepath) {
+                console.error("[ERROR] Audiofile nicht gefunden!");
+                res.writeHead(400, { "Content-Type": "text/plain" });
+                res.end("Kein Audiofile gefunden");
+                return;
+            }
 
-                console.log('END');
+            try {
+                const tmpFile = path.join(os.tmpdir(), `tts_${Date.now()}.wav`);
+                fs.copyFileSync(uploadedFile.filepath, tmpFile);
+                console.log(`[DEBUG] Temporary file created: ${tmpFile}`);
 
-                try
-                {
-                    const { text } = JSON.parse(body);
+                const player = require('node-wav-player');
 
-                    if(!text) throw new Error('Kein Text angegeben');
+                player.play({
+                path: tmpFile,
+                }).then(() => {
+                console.log('Audio abgespielt!');
+                setTimeout(() => fs.unlinkSync(tmpFile), 60000);
+                }).catch((err) => console.error(err));
 
-                    say.speak(text);
 
-                    res.writeHead(200, { 'Content-Type': 'text/plain' });
-                    res.end('Text wird gesprochen.');
-                }
-                catch(err)
-                {
-                    res.writeHead(400, { 'Content-Type': 'text/plain' });
-                    res.end('Fehler: ' + err.message);
-                }
-            });
-        }
-        else
-        {    
-            res.writeHead(200, { 'Content-Type': 'text/plain' });
-            res.end('Text wird gesprochen.');
-        }
+                res.writeHead(200, { "Content-Type": "text/plain" });
+                res.end("Audio wird abgespielt");
+
+            } catch (err) {
+                console.error(`[ERROR] ${err.message}`);
+                res.writeHead(500, { "Content-Type": "text/plain" });
+                res.end("Fehler: " + err.message);
+            }
+
+        });
+
+        return;
     }
-    else 
-    {
-        res.writeHead(404, { 'Content-Type': 'text/plain' });
-        res.end('Nicht gefunden');
-    }
-});
 
-server.listen(PORT, () => {
+    res.writeHead(404, { "Content-Type": "text/plain" });
+    res.end("Nicht gefunden");
 
-    console.log(`TTS-Server läuft auf http://localhost:${PORT}`);
+}).listen(PORT, () => {
+    console.log(`[DEBUG] Client-Server läuft auf http://localhost:${PORT}`);
 });
