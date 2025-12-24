@@ -1,62 +1,78 @@
-const http = require('http');
-const { exec } = require('child_process');
-const fs = require('fs');
-const path = require('path');
+const http = require('http'), fs = require('fs'), path = require('path'), { exec } = require('child_process');
+
+const LoggerSpecial = require('./core/logger.js');
+
 const { v4 : uuidv4 } = require('uuid');
 
-const outputDir = '/data';
+const PLUGIN_NAME = 'TTS Server', PORT = 3000, OUTPUT_DIR = '/data';
 
-if (!fs.existsSync(outputDir)) fs.mkdirSync(outputDir);
-
-const server = http.createServer((req, res) => {
-
-	if(req.method === 'POST' && req.url === '/tts')
+class TTSServer
+{
+	constructor()
 	{
-		let body = '';
+		this.logger = new LoggerSpecial({ pluginName : PLUGIN_NAME }, { time : true });
 
-		req.on('data', chunk => body += chunk.toString());
+        this.logger.log('warn', 'HTTP-Server wird gestartet ..');
 
-		req.on('end', () => {
+		if(!fs.existsSync(OUTPUT_DIR)) fs.mkdirSync(OUTPUT_DIR);
 
-			const { text, model, speaker, language } = JSON.parse(body);
-			const filename = `tts_${uuidv4()}.wav`;
+        this.initWebServer();
+	}
 
-			let command = `tts --model_name tts_models/de/thorsten/tacotron2-DDC --text "${text.replace(/"/g, '\\"')}" --out_path /data/${filename} --vocoder_name vocoder_models/de/thorsten/hifigan_v1`;
+    initWebServer()
+    {
+		const server = http.createServer((req, res) => {
 
-			if(model == 1)
+			if(req.method === 'POST' && req.url === '/tts')
 			{
-				command = `tts --model_name tts_models/multilingual/multi-dataset/xtts_v2 --text "${text.replace(/"/g, '\\"')}" --out_path /data/${filename} --speaker_idx "${speaker}" --language_idx ${language}`;
-			}
+				let body = '';
 
-			if(model == 2)
-			{
-				command = `tts --model_name tts_models/multilingual/multi-dataset/xtts_v2 --text "${text.replace(/"/g, '\\"')}" --out_path /data/${filename} --speaker_wav /voices/de_male.wav --language_idx ${language}`;
-			}
+				req.on('data', (chunk) => body += chunk.toString());
 
-			exec(command, (error) => {
+				req.on('end', () => {
 
-				if(error)
-				{
-					res.writeHead(500); res.end(error.toString());
+					const { text, model, speaker, language } = JSON.parse(body), filename = `tts_${uuidv4()}.wav`;
 
-					return;
-				}
+					let command = `tts --model_name tts_models/de/thorsten/tacotron2-DDC --text "${text.replace(/"/g, '\\"')}" --out_path /data/${filename} --vocoder_name vocoder_models/de/thorsten/hifigan_v1`;
 
-				res.writeHead(200, {
-					'Content-Type' : 'audio/wav',
-					'Content-Disposition' : `attachment; filename="${filename}"`
+					if(model == 1)
+					{
+						command = `tts --model_name tts_models/multilingual/multi-dataset/xtts_v2 --text "${text.replace(/"/g, '\\"')}" --out_path /data/${filename} --speaker_idx "${speaker}" --language_idx ${language}`;
+					}
+
+					if(model == 2)
+					{
+						command = `tts --model_name tts_models/multilingual/multi-dataset/xtts_v2 --text "${text.replace(/"/g, '\\"')}" --out_path /data/${filename} --speaker_wav /voices/de_male.wav --language_idx ${language}`;
+					}
+
+					exec(command, (error) => {
+
+						if(error)
+						{
+							res.writeHead(500); res.end(error.toString());
+
+							return;
+						}
+
+						res.writeHead(200, {
+							'Content-Type' : 'audio/wav',
+							'Content-Disposition' : `attachment; filename="${filename}"`
+						});
+
+						fs.createReadStream(path.join(OUTPUT_DIR, filename)).pipe(res);
+					});
 				});
-
-				fs.createReadStream(path.join(outputDir, filename)).pipe(res);
-			});
+			}
+			else
+			{
+				res.writeHead(404); res.end('Not found');
+			}
 		});
-	}
-	else
-	{
-		res.writeHead(404); res.end('Not found');
-	}
-});
 
-server.listen(3000);
+		server.listen(PORT);
 
-console.log('Server läuft auf Port 3000 v1');
+		this.logger.debug(`HTTP-Server läuft auf http://localhost:${PORT}`);
+	}
+}
+
+new TTSServer();

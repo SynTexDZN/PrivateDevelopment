@@ -3,7 +3,10 @@ FROM ghcr.io/coqui-ai/tts:latest
 RUN apt-get update && apt-get install -y nodejs npm
 
 WORKDIR /app
-COPY package*.json server.js ./
+COPY package*.json ./
+COPY server.js ./
+COPY core ./core
+
 RUN npm install
 
 EXPOSE 3000
