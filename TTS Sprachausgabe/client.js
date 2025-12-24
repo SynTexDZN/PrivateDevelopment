@@ -1,6 +1,6 @@
 const http = require('http'), fs = require('fs'), os = require('os'), path = require('path');
 
-const Logger = require('syntex-logger'), LoggerSpecial = require('./core/logger.js');
+const LoggerSpecial = require('./core/logger.js');
 
 const player = require('node-wav-player'), formidable = require('formidable');
 
