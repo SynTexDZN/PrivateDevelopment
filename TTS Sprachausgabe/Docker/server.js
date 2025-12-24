@@ -21,7 +21,7 @@ const server = http.createServer((req, res) => {
 			const { text } = JSON.parse(body);
 			const filename = `tts_${uuidv4()}.wav`;
 
-			exec(`tts --model_name tts_models/de/thorsten/tacotron2-DDC --text "${text.replace(/"/g, '\\"')}" --out_path /data/${filename}`, (error) => {
+			exec(`tts --model_name tts_models/multilingual/multi-dataset/xtts_v2 --text "${text.replace(/"/g, '\\"')}" --out_path /data/${filename} --speaker_idx "Claribel Dervla" --language_idx de`, (error) => {
 
 				if(error)
 				{
