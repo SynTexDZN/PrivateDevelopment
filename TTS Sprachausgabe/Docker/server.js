@@ -18,10 +18,22 @@ const server = http.createServer((req, res) => {
 
 		req.on('end', () => {
 
-			const { text } = JSON.parse(body);
+			const { text, model, speaker, language } = JSON.parse(body);
 			const filename = `tts_${uuidv4()}.wav`;
 
-			exec(`tts --model_name tts_models/multilingual/multi-dataset/xtts_v2 --text "${text.replace(/"/g, '\\"')}" --out_path /data/${filename} --speaker_idx "Claribel Dervla" --language_idx de`, (error) => {
+			let command = `tts --model_name tts_models/de/thorsten/tacotron2-DDC --text "${text.replace(/"/g, '\\"')}" --out_path /data/${filename} --vocoder_name vocoder_models/de/thorsten/hifigan_v1`;
+
+			if(model == 1)
+			{
+				command = `tts --model_name tts_models/multilingual/multi-dataset/xtts_v2 --text "${text.replace(/"/g, '\\"')}" --out_path /data/${filename} --speaker_idx "${speaker}" --language_idx ${language}`;
+			}
+
+			if(model == 2)
+			{
+				command = `tts --model_name tts_models/multilingual/multi-dataset/xtts_v2 --text "${text.replace(/"/g, '\\"')}" --out_path /data/${filename} --speaker_wav /voices/de_male.wav --language_idx ${language}`;
+			}
+
+			exec(command, (error) => {
 
 				if(error)
 				{
