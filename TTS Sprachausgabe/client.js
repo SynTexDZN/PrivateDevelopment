@@ -1,90 +1,105 @@
-const http = require('http');
-const fs = require('fs');
-const os = require('os');
-const path = require('path');
-const player = require('node-wav-player');
-const formidable = require('formidable');
+const http = require('http'), fs = require('fs'), os = require('os'), path = require('path');
 
-const PORT = 3000;
+const Logger = require('syntex-logger'), LoggerSpecial = require('./core/logger.js');
 
-http.createServer((req, res) => {
+const player = require('node-wav-player'), formidable = require('formidable');
 
-    console.log(`[DEBUG] Request: ${req.method} ${req.url}`);
+const PLUGIN_NAME = 'TTS Client', PORT = 3000;
 
-    if(req.url === '/speak' && req.method === 'POST')
+class TTSClient
+{
+	constructor()
+	{
+		this.logger = new LoggerSpecial({ pluginName : PLUGIN_NAME }, { time : true });
+		this.loggerSpecial = new Logger({ pluginName : PLUGIN_NAME }, { language : 'de', time : true });
+
+        this.logger.log('warn', 'HTTP-Server wird gestartet ..');
+
+        this.initWebServer();
+	}
+
+    initWebServer()
     {
-        // Formidable zum Parsen von multipart/form-data
-        const form = new formidable.IncomingForm({ multiples : false });
+        http.createServer((req, res) => {
 
-        form.parse(req, (err, fields, files) => {
+            this.logger.debug(`Request: ${req.method} ${req.url}`);
 
-            if(err) 
+            if(req.url === '/speak' && req.method === 'POST')
             {
-                console.error(`[ERROR] Form parse error: ${err.message}`);
+                const form = new formidable.IncomingForm({ multiples : false });
 
-                res.writeHead(400, { 'Content-Type' : 'text/plain' });
-                res.end('Fehler beim Parsen des Formulars');
+                form.parse(req, (err, fields, files) => {
+
+                    if(err) 
+                    {
+                        this.logger.log('error', `Form parse error: ${err.message}`);
+
+                        res.writeHead(400, { 'Content-Type' : 'text/plain' });
+                        res.end('Fehler beim Parsen des Formulars');
+
+                        return;
+                    }
+
+                    this.logger.debug('Fields:', fields);
+                    this.logger.debug('Files:', files);
+
+                    const uploadedFile = files.file[0];
+
+                    if(!uploadedFile || !uploadedFile.filepath)
+                    {
+                        this.logger.log('error', 'Audiofile nicht gefunden!');
+
+                        res.writeHead(400, { 'Content-Type' : 'text/plain' });
+                        res.end('Kein Audiofile gefunden');
+
+                        return;
+                    }
+
+                    try
+                    {
+                        const tmpFile = path.join(os.tmpdir(), `tts_${Date.now()}.wav`);
+
+                        fs.copyFileSync(uploadedFile.filepath, tmpFile);
+
+                        this.logger.debug(`Temporary file created: ${tmpFile}`);
+
+                        player.play({ path : tmpFile }).then(() => {
+
+                            this.logger.debug('Audioausgabe wurde gestartet!');
+
+                            setTimeout(() => {
+                                
+                                fs.unlinkSync(tmpFile);
+
+                                this.logger.debug(`Temporary file removed: ${tmpFile}`);
+                            
+                            }, 60000);
+
+                        }).catch((err) => this.logger.err(err));
+
+                        res.writeHead(200, { 'Content-Type': 'text/plain' });
+                        res.end('Audio wird abgespielt');
+                    }
+                    catch(err) 
+                    {
+                        this.logger.log('error', `${err.message}`);
+
+                        res.writeHead(500, { 'Content-Type' : 'text/plain' });
+                        res.end('Fehler: ' + err.message);
+                    }
+                });
 
                 return;
             }
 
-            console.log('Fields:', fields);
-            console.log('Files:', files);
+            res.writeHead(404, { 'Content-Type' : 'text/plain' });
+            res.end('Nicht gefunden');
 
-            // Prüfen, ob das Binary-Feld existiert
-            const uploadedFile = files.file[0];  // Name muss exakt 'file' sein
+        }).listen(PORT, () => {
 
-            if(!uploadedFile || !uploadedFile.filepath)
-            {
-                console.error('[ERROR] Audiofile nicht gefunden!');
-
-                res.writeHead(400, { 'Content-Type' : 'text/plain' });
-                res.end('Kein Audiofile gefunden');
-
-                return;
-            }
-
-            try
-            {
-                const tmpFile = path.join(os.tmpdir(), `tts_${Date.now()}.wav`);
-
-                fs.copyFileSync(uploadedFile.filepath, tmpFile);
-
-                console.log(`[DEBUG] Temporary file created: ${tmpFile}`);
-
-                player.play({ path : tmpFile }).then(() => {
-
-                    console.log('Audioausgabe wurde gestartet!');
-
-                    setTimeout(() => {
-                        
-                        fs.unlinkSync(tmpFile);
-
-                        console.log(`[DEBUG] Temporary file removed: ${tmpFile}`);
-                    
-                    }, 60000);
-
-                }).catch((err) => console.error(err));
-
-                res.writeHead(200, { 'Content-Type': 'text/plain' });
-                res.end('Audio wird abgespielt');
-            }
-            catch(err) 
-            {
-                console.error(`[ERROR] ${err.message}`);
-
-                res.writeHead(500, { 'Content-Type' : 'text/plain' });
-                res.end('Fehler: ' + err.message);
-            }
+            this.logger.debug(`HTTP-Server läuft auf http://localhost:${PORT}`);
         });
-
-        return;
     }
+}
 
-    res.writeHead(404, { 'Content-Type' : 'text/plain' });
-    res.end('Nicht gefunden');
-
-}).listen(PORT, () => {
-
-    console.log(`[DEBUG] Client-Server läuft auf http://localhost:${PORT}`);
-});
+new TTSClient();
