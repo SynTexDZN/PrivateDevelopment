@@ -11,7 +11,6 @@ class TTSClient
 	constructor()
 	{
 		this.logger = new LoggerSpecial({ pluginName : PLUGIN_NAME }, { time : true });
-		this.loggerSpecial = new Logger({ pluginName : PLUGIN_NAME }, { language : 'de', time : true });
 
         this.logger.log('warn', 'HTTP-Server wird gestartet ..');
 
